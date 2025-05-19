@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,27 +25,43 @@ const Header = () => {
       title: "A Federação",
       dropdown: true,
       key: "federation",
-      items: ["História", "Orgãos Sociais", "Estatutos", "Contactos"]
+      items: [
+        { name: "História", path: "/federacao/historia" },
+        { name: "Orgãos Sociais", path: "/federacao/orgaos-sociais" },
+        { name: "Estatutos", path: "/federacao/estatutos" },
+        { name: "Contactos", path: "/federacao/contactos" }
+      ]
     },
     {
       title: "Competições",
       dropdown: true,
       key: "competitions",
-      items: ["Liga Nacional", "Taça de Cabo Verde", "Super Taça", "Competições Regionais"]
+      items: [
+        { name: "Liga Nacional", path: "/competicoes/liga-nacional" },
+        { name: "Taça de Cabo Verde", path: "/competicoes/taca-de-cabo-verde" },
+        { name: "Super Taça", path: "/competicoes/super-taca" },
+        { name: "Competições Regionais", path: "/competicoes/competicoes-regionais" }
+      ]
     },
     {
       title: "Seleções",
       dropdown: true,
       key: "teams",
-      items: ["Seleção Masculina", "Seleção Feminina", "Seleções Jovens"]
+      items: [
+        { name: "Seleção Masculina", path: "/selecoes/masculina" },
+        { name: "Seleção Feminina", path: "/selecoes/feminina" },
+        { name: "Seleções Jovens", path: "/selecoes/jovens" }
+      ]
     },
     {
       title: "Notícias",
-      dropdown: false
+      dropdown: false,
+      path: "/noticias"
     },
     {
       title: "Galeria",
-      dropdown: false
+      dropdown: false,
+      path: "/galeria"
     },
   ];
 
@@ -54,15 +71,17 @@ const Header = () => {
         {/* Top bar with logo and secondary navigation */}
         <div className="flex justify-between items-center py-3">
           <div className="flex items-center">
-            <a href="/" className="font-bold text-xl text-cv-blue">
+            <Link to="/" className="font-bold text-xl text-cv-blue">
               FCBB
-            </a>
+            </Link>
           </div>
           <div className="hidden md:flex items-center space-x-4">
-            <a href="#" className="text-sm hover:text-cv-blue">Área Reservada</a>
-            <a href="#" className="text-sm hover:text-cv-blue">PT</a>
-            <a href="#" className="text-sm hover:text-cv-blue">EN</a>
-            <Button size="sm" className="bg-cv-blue hover:bg-blue-700">Contacto</Button>
+            <Link to="/area-reservada" className="text-sm hover:text-cv-blue">Área Reservada</Link>
+            <Link to="?lang=pt" className="text-sm hover:text-cv-blue">PT</Link>
+            <Link to="?lang=en" className="text-sm hover:text-cv-blue">EN</Link>
+            <Button size="sm" className="bg-cv-blue hover:bg-blue-700" asChild>
+              <Link to="/contacto">Contacto</Link>
+            </Button>
           </div>
         </div>
         
@@ -82,19 +101,20 @@ const Header = () => {
                     <div className={`absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-md overflow-hidden transition-all duration-300 ${activeDropdown === item.key ? 'block' : 'hidden'}`}>
                       <div className="py-2">
                         {item.items?.map((subItem) => (
-                          <a 
-                            key={subItem} 
-                            href="#" 
+                          <Link 
+                            key={subItem.name} 
+                            to={subItem.path}
                             className="block px-4 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white"
+                            onClick={() => setActiveDropdown(null)}
                           >
-                            {subItem}
-                          </a>
+                            {subItem.name}
+                          </Link>
                         ))}
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <a href="#" className="nav-link">{item.title}</a>
+                  <Link to={item.path || "#"} className="nav-link">{item.title}</Link>
                 )}
               </li>
             ))}
@@ -128,27 +148,43 @@ const Header = () => {
                       {activeDropdown === item.key && (
                         <div className="pl-4">
                           {item.items?.map((subItem) => (
-                            <a key={subItem} href="#" className="block py-2 px-4 text-sm">
-                              {subItem}
-                            </a>
+                            <Link 
+                              key={subItem.name} 
+                              to={subItem.path}
+                              className="block py-2 px-4 text-sm"
+                              onClick={() => {
+                                setActiveDropdown(null);
+                                setMobileMenuOpen(false);
+                              }}
+                            >
+                              {subItem.name}
+                            </Link>
                           ))}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <a href="#" className="nav-link-mobile">{item.title}</a>
+                    <Link 
+                      to={item.path || "#"} 
+                      className="nav-link-mobile"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.title}
+                    </Link>
                   )}
                 </li>
               ))}
               <li className="pt-4 border-t mt-2">
-                <a href="#" className="nav-link-mobile">Área Reservada</a>
+                <Link to="/area-reservada" className="nav-link-mobile" onClick={() => setMobileMenuOpen(false)}>Área Reservada</Link>
               </li>
               <li className="pt-2 flex space-x-4 px-4">
-                <a href="#" className="text-sm hover:text-cv-blue">PT</a>
-                <a href="#" className="text-sm hover:text-cv-blue">EN</a>
+                <Link to="?lang=pt" className="text-sm hover:text-cv-blue">PT</Link>
+                <Link to="?lang=en" className="text-sm hover:text-cv-blue">EN</Link>
               </li>
               <li className="py-2 px-4">
-                <Button size="sm" className="w-full bg-cv-blue hover:bg-blue-700">Contacto</Button>
+                <Button size="sm" className="w-full bg-cv-blue hover:bg-blue-700" asChild>
+                  <Link to="/contacto" onClick={() => setMobileMenuOpen(false)}>Contacto</Link>
+                </Button>
               </li>
             </ul>
           </div>

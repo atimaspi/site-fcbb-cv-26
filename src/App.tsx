@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,27 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import NoticiasPage from "./pages/NoticiasPage";
+import GaleriaPage from "./pages/GaleriaPage";
+import ContactoPage from "./pages/ContactoPage";
+import AreaReservadaPage from "./pages/AreaReservadaPage";
+
+// Federation pages
+import HistoriaPage from "./pages/federation/HistoriaPage";
+import OrgaosSociaisPage from "./pages/federation/OrgaosSociaisPage";
+import EstatutosPage from "./pages/federation/EstatutosPage";
+import ContactosPage from "./pages/federation/ContactosPage";
+
+// Competitions pages
+import LigaNacionalPage from "./pages/competitions/LigaNacionalPage";
+import TacaPage from "./pages/competitions/TacaPage";
+import SuperTacaPage from "./pages/competitions/SuperTacaPage";
+import CompeticoesRegionaisPage from "./pages/competitions/CompeticoesRegionaisPage";
+
+// Teams pages
+import SelecaoMasculinaPage from "./pages/teams/SelecaoMasculinaPage";
+import SelecaoFemininaPage from "./pages/teams/SelecaoFemininaPage";
+import SelecoesJovensPage from "./pages/teams/SelecoesJovensPage";
 
 const queryClient = new QueryClient();
 
@@ -16,7 +38,31 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          
+          {/* Federation routes */}
+          <Route path="/federacao/historia" element={<HistoriaPage />} />
+          <Route path="/federacao/orgaos-sociais" element={<OrgaosSociaisPage />} />
+          <Route path="/federacao/estatutos" element={<EstatutosPage />} />
+          <Route path="/federacao/contactos" element={<ContactosPage />} />
+          
+          {/* Competitions routes */}
+          <Route path="/competicoes/liga-nacional" element={<LigaNacionalPage />} />
+          <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
+          <Route path="/competicoes/super-taca" element={<SuperTacaPage />} />
+          <Route path="/competicoes/competicoes-regionais" element={<CompeticoesRegionaisPage />} />
+          
+          {/* Teams routes */}
+          <Route path="/selecoes/masculina" element={<SelecaoMasculinaPage />} />
+          <Route path="/selecoes/feminina" element={<SelecaoFemininaPage />} />
+          <Route path="/selecoes/jovens" element={<SelecoesJovensPage />} />
+          
+          {/* Main routes */}
+          <Route path="/noticias" element={<NoticiasPage />} />
+          <Route path="/galeria" element={<GaleriaPage />} />
+          <Route path="/area-reservada" element={<AreaReservadaPage />} />
+          <Route path="/contacto" element={<ContactoPage />} />
+          
+          {/* Catch-all route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
