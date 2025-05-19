@@ -1,12 +1,13 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Menu, X, ChevronDown, Lock, LogIn, User } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const location = useLocation();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -76,7 +77,10 @@ const Header = () => {
             </Link>
           </div>
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/area-reservada" className="text-sm hover:text-cv-blue">Área Reservada</Link>
+            <Link to="/area-reservada" className="text-sm hover:text-cv-blue flex items-center gap-1">
+              <Lock size={16} />
+              Área Reservada
+            </Link>
             <Link to="?lang=pt" className="text-sm hover:text-cv-blue">PT</Link>
             <Link to="?lang=en" className="text-sm hover:text-cv-blue">EN</Link>
             <Button size="sm" className="bg-cv-blue hover:bg-blue-700" asChild>
@@ -89,16 +93,19 @@ const Header = () => {
         <nav className="hidden md:block pb-3">
           <ul className="flex space-x-6">
             {navItems.map((item) => (
-              <li key={item.title} className="relative">
+              <li key={item.title} className="relative group">
                 {item.dropdown ? (
-                  <div className="group">
+                  <div>
                     <button 
                       onClick={() => toggleDropdown(item.key || "")}
                       className="nav-link flex items-center"
                     >
                       {item.title} <ChevronDown className="ml-1 w-4 h-4" />
                     </button>
-                    <div className={`absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-md overflow-hidden transition-all duration-300 ${activeDropdown === item.key ? 'block' : 'hidden'}`}>
+                    <div 
+                      className={`absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-md overflow-hidden z-50
+                                ${activeDropdown === item.key ? 'block' : 'hidden'} group-hover:block`}
+                    >
                       <div className="py-2">
                         {item.items?.map((subItem) => (
                           <Link 
@@ -175,7 +182,10 @@ const Header = () => {
                 </li>
               ))}
               <li className="pt-4 border-t mt-2">
-                <Link to="/area-reservada" className="nav-link-mobile" onClick={() => setMobileMenuOpen(false)}>Área Reservada</Link>
+                <Link to="/area-reservada" className="nav-link-mobile flex items-center gap-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Lock size={16} />
+                  Área Reservada
+                </Link>
               </li>
               <li className="pt-2 flex space-x-4 px-4">
                 <Link to="?lang=pt" className="text-sm hover:text-cv-blue">PT</Link>
