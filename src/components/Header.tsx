@@ -41,7 +41,9 @@ const Header = () => {
         { name: "Liga Nacional", path: "/competicoes/liga-nacional" },
         { name: "Taça de Cabo Verde", path: "/competicoes/taca-de-cabo-verde" },
         { name: "Super Taça", path: "/competicoes/super-taca" },
-        { name: "Competições Regionais", path: "/competicoes/competicoes-regionais" }
+        { name: "Competições Regionais", path: "/competicoes/competicoes-regionais" },
+        { name: "Classificações", path: "/competicoes/classificacoes" },
+        { name: "Resultados e Calendário", path: "/competicoes/resultados" }
       ]
     },
     {
@@ -55,19 +57,31 @@ const Header = () => {
       ]
     },
     {
-      title: "Notícias",
-      dropdown: false,
-      path: "/noticias"
+      title: "Basquetebol",
+      dropdown: true,
+      key: "basketball",
+      items: [
+        { name: "Estatísticas", path: "/estatisticas" },
+        { name: "Arbitragem", path: "/arbitragem" },
+        { name: "Clubes e Atletas", path: "/clubes" },
+        { name: "Formação", path: "/formacao" }
+      ]
     },
     {
-      title: "Galeria",
-      dropdown: false,
-      path: "/galeria"
-    },
+      title: "Multimédia",
+      dropdown: true,
+      key: "multimedia",
+      items: [
+        { name: "Notícias", path: "/noticias" },
+        { name: "Galeria", path: "/galeria" },
+        { name: "Transmissões", path: "/transmissoes" },
+        { name: "Eventos", path: "/eventos" }
+      ]
+    }
   ];
 
   return (
-    <header className="bg-white shadow-md">
+    <header className="bg-white shadow-md relative z-50">
       <div className="cv-container">
         {/* Top bar with logo and secondary navigation */}
         <div className="flex justify-between items-center py-3">
@@ -103,7 +117,7 @@ const Header = () => {
                       {item.title} <ChevronDown className="ml-1 w-4 h-4" />
                     </button>
                     <div 
-                      className={`absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-md overflow-hidden z-50
+                      className={`absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-md overflow-hidden z-50 border
                                 ${activeDropdown === item.key ? 'block' : 'hidden'} group-hover:block`}
                     >
                       <div className="py-2">

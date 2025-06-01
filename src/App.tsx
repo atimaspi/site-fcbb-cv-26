@@ -28,6 +28,16 @@ import SelecaoMasculinaPage from "./pages/teams/SelecaoMasculinaPage";
 import SelecaoFemininaPage from "./pages/teams/SelecaoFemininaPage";
 import SelecoesJovensPage from "./pages/teams/SelecoesJovensPage";
 
+// New feature pages
+import ClassificacoesPage from "./pages/ClassificacoesPage";
+import EstatisticasPage from "./pages/EstatisticasPage";
+import ResultadosPage from "./pages/ResultadosPage";
+import ArbitragemPage from "./pages/ArbitragemPage";
+import ClubesPage from "./pages/ClubesPage";
+import FormacaoPage from "./pages/FormacaoPage";
+import EventosPage from "./pages/EventosPage";
+import TransmissoesPage from "./pages/TransmissoesPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -50,11 +60,21 @@ const App = () => (
           <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
           <Route path="/competicoes/super-taca" element={<SuperTacaPage />} />
           <Route path="/competicoes/competicoes-regionais" element={<CompeticoesRegionaisPage />} />
+          <Route path="/competicoes/classificacoes" element={<ClassificacoesPage />} />
+          <Route path="/competicoes/resultados" element={<ResultadosPage />} />
           
           {/* Teams routes */}
           <Route path="/selecoes/masculina" element={<SelecaoMasculinaPage />} />
           <Route path="/selecoes/feminina" element={<SelecaoFemininaPage />} />
           <Route path="/selecoes/jovens" element={<SelecoesJovensPage />} />
+          
+          {/* New feature routes */}
+          <Route path="/estatisticas" element={<EstatisticasPage />} />
+          <Route path="/arbitragem" element={<ArbitragemPage />} />
+          <Route path="/clubes" element={<ClubesPage />} />
+          <Route path="/formacao" element={<FormacaoPage />} />
+          <Route path="/eventos" element={<EventosPage />} />
+          <Route path="/transmissoes" element={<TransmissoesPage />} />
           
           {/* Main routes */}
           <Route path="/noticias" element={<NoticiasPage />} />
