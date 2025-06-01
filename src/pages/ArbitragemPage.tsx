@@ -1,4 +1,3 @@
-
 import PageLayout from './PageLayout';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,7 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
-import { Whistle, Calendar, FileText, Users } from 'lucide-react';
+import { Zap, Calendar, FileText, Users } from 'lucide-react';
 
 const ArbitragemPage = () => {
   const [showReportDialog, setShowReportDialog] = useState(false);
@@ -91,7 +90,7 @@ const ArbitragemPage = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Cursos Disponíveis</CardTitle>
-            <Whistle className="h-4 w-4 text-cv-blue" />
+            <Zap className="h-4 w-4 text-cv-blue" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-cv-blue">2</div>

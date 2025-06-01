@@ -108,35 +108,31 @@ const Header = () => {
           <ul className="flex space-x-6">
             {navItems.map((item) => (
               <li key={item.title} className="relative group">
-                {item.dropdown ? (
-                  <div>
-                    <button 
-                      onClick={() => toggleDropdown(item.key || "")}
-                      className="nav-link flex items-center"
-                    >
-                      {item.title} <ChevronDown className="ml-1 w-4 h-4" />
-                    </button>
-                    <div 
-                      className={`absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-md overflow-hidden z-50 border
-                                ${activeDropdown === item.key ? 'block' : 'hidden'} group-hover:block`}
-                    >
-                      <div className="py-2">
-                        {item.items?.map((subItem) => (
-                          <Link 
-                            key={subItem.name} 
-                            to={subItem.path}
-                            className="block px-4 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white"
-                            onClick={() => setActiveDropdown(null)}
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
+                <div>
+                  <button 
+                    onClick={() => toggleDropdown(item.key || "")}
+                    className="nav-link flex items-center"
+                  >
+                    {item.title} <ChevronDown className="ml-1 w-4 h-4" />
+                  </button>
+                  <div 
+                    className={`absolute left-0 mt-2 w-56 bg-white shadow-lg rounded-md overflow-hidden z-50 border
+                              ${activeDropdown === item.key ? 'block' : 'hidden'} group-hover:block`}
+                  >
+                    <div className="py-2">
+                      {item.items?.map((subItem) => (
+                        <Link 
+                          key={subItem.name} 
+                          to={subItem.path}
+                          className="block px-4 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white"
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
                     </div>
                   </div>
-                ) : (
-                  <Link to={item.path || "#"} className="nav-link">{item.title}</Link>
-                )}
+                </div>
               </li>
             ))}
           </ul>
@@ -157,42 +153,32 @@ const Header = () => {
             <ul>
               {navItems.map((item) => (
                 <li key={item.title} className="py-2">
-                  {item.dropdown ? (
-                    <div>
-                      <button 
-                        onClick={() => toggleDropdown(item.key || "")}
-                        className="w-full text-left flex justify-between items-center nav-link-mobile"
-                      >
-                        {item.title}
-                        <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === item.key ? 'transform rotate-180' : ''}`} />
-                      </button>
-                      {activeDropdown === item.key && (
-                        <div className="pl-4">
-                          {item.items?.map((subItem) => (
-                            <Link 
-                              key={subItem.name} 
-                              to={subItem.path}
-                              className="block py-2 px-4 text-sm"
-                              onClick={() => {
-                                setActiveDropdown(null);
-                                setMobileMenuOpen(false);
-                              }}
-                            >
-                              {subItem.name}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <Link 
-                      to={item.path || "#"} 
-                      className="nav-link-mobile"
-                      onClick={() => setMobileMenuOpen(false)}
+                  <div>
+                    <button 
+                      onClick={() => toggleDropdown(item.key || "")}
+                      className="w-full text-left flex justify-between items-center nav-link-mobile"
                     >
                       {item.title}
-                    </Link>
-                  )}
+                      <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === item.key ? 'transform rotate-180' : ''}`} />
+                    </button>
+                    {activeDropdown === item.key && (
+                      <div className="pl-4">
+                        {item.items?.map((subItem) => (
+                          <Link 
+                            key={subItem.name} 
+                            to={subItem.path}
+                            className="block py-2 px-4 text-sm"
+                            onClick={() => {
+                              setActiveDropdown(null);
+                              setMobileMenuOpen(false);
+                            }}
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </li>
               ))}
               <li className="pt-4 border-t mt-2">
