@@ -1,8 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PenLine, Plus, Trash2, Eye } from 'lucide-react';
+import { PenLine, Plus, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -19,36 +19,72 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface NewsItem {
-  id: number;
+  id: string;
   title: string;
   content: string;
-  date: string;
+  created_at: string;
   category: string;
   status: string;
   author: string;
 }
 
 const NewsManagement = () => {
-  const [newsList, setNewsList] = useState<NewsItem[]>([
-    { id: 1, title: 'ABC vence a SuperTaça de Cabo Verde 2025', content: 'O ABC conquistou...', date: '23/03/2025', category: 'Competições', status: 'Publicado', author: 'Admin' },
-    { id: 2, title: 'Seleção Nacional convoca 20 jogadores', content: 'A seleção nacional...', date: '20/03/2025', category: 'Seleções', status: 'Publicado', author: 'Admin' },
-    { id: 3, title: 'Final Four da Liga Nacional', content: 'A Final Four...', date: '15/03/2025', category: 'Competições', status: 'Rascunho', author: 'Admin' }
-  ]);
-
+  const [newsList, setNewsList] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<NewsItem | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     content: '',
     category: 'Competições',
-    status: 'Rascunho'
+    status: 'draft'
   });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  const fetchNews = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('news')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedNews = data.map(item => ({
+        id: item.id,
+        title: item.title,
+        content: item.content,
+        created_at: new Date(item.created_at).toLocaleDateString('pt-PT'),
+        category: item.category,
+        status: item.status === 'published' ? 'Publicado' : 'Rascunho',
+        author: item.author || 'Admin'
+      }));
+
+      setNewsList(formattedNews);
+    } catch (error) {
+      console.error('Erro ao carregar notícias:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar notícias. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAdd = () => {
     setEditingItem(null);
-    setFormData({ title: '', content: '', category: 'Competições', status: 'Rascunho' });
+    setFormData({ title: '', content: '', category: 'Competições', status: 'draft' });
     setShowDialog(true);
   };
 
@@ -58,40 +94,94 @@ const NewsManagement = () => {
       title: item.title,
       content: item.content,
       category: item.category,
-      status: item.status
+      status: item.status === 'Publicado' ? 'published' : 'draft'
     });
     setShowDialog(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja eliminar esta notícia?')) {
-      setNewsList(newsList.filter(item => item.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja eliminar esta notícia?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('news')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Notícia eliminada com sucesso.",
+      });
+
+      fetchNews();
+    } catch (error) {
+      console.error('Erro ao eliminar notícia:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao eliminar notícia. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (editingItem) {
-      // Update existing
-      setNewsList(newsList.map(item => 
-        item.id === editingItem.id 
-          ? { ...item, ...formData, date: new Date().toLocaleDateString('pt-PT') }
-          : item
-      ));
-    } else {
-      // Add new
-      const newItem: NewsItem = {
-        id: Math.max(...newsList.map(n => n.id)) + 1,
-        ...formData,
-        date: new Date().toLocaleDateString('pt-PT'),
-        author: 'Admin'
-      };
-      setNewsList([...newsList, newItem]);
+    setLoading(true);
+
+    try {
+      if (editingItem) {
+        const { error } = await supabase
+          .from('news')
+          .update({
+            title: formData.title,
+            content: formData.content,
+            category: formData.category,
+            status: formData.status,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingItem.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Notícia atualizada com sucesso.",
+        });
+      } else {
+        const { error } = await supabase
+          .from('news')
+          .insert({
+            title: formData.title,
+            content: formData.content,
+            category: formData.category,
+            status: formData.status,
+            author: 'Admin',
+            published: formData.status === 'published'
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Notícia criada com sucesso.",
+        });
+      }
+
+      setShowDialog(false);
+      setFormData({ title: '', content: '', category: 'Competições', status: 'draft' });
+      fetchNews();
+    } catch (error) {
+      console.error('Erro ao salvar notícia:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar notícia. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-    
-    setShowDialog(false);
-    setFormData({ title: '', content: '', category: 'Competições', status: 'Rascunho' });
   };
 
   return (
@@ -108,7 +198,6 @@ const NewsManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Título</TableHead>
               <TableHead>Data</TableHead>
               <TableHead>Categoria</TableHead>
@@ -118,40 +207,49 @@ const NewsManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {newsList.map((news) => (
-              <TableRow key={news.id}>
-                <TableCell>{news.id}</TableCell>
-                <TableCell className="max-w-xs truncate">{news.title}</TableCell>
-                <TableCell>{news.date}</TableCell>
-                <TableCell>{news.category}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    news.status === 'Publicado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {news.status}
-                  </span>
-                </TableCell>
-                <TableCell>{news.author}</TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleEdit(news)}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Editar"
-                    >
-                      <PenLine size={16} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(news.id)}
-                      className="text-red-600 hover:text-red-800"
-                      title="Eliminar"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">Carregando...</TableCell>
               </TableRow>
-            ))}
+            ) : newsList.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">Nenhuma notícia encontrada</TableCell>
+              </TableRow>
+            ) : (
+              newsList.map((news) => (
+                <TableRow key={news.id}>
+                  <TableCell className="max-w-xs truncate">{news.title}</TableCell>
+                  <TableCell>{news.created_at}</TableCell>
+                  <TableCell>{news.category}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      news.status === 'Publicado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {news.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>{news.author}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <button 
+                        onClick={() => handleEdit(news)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Editar"
+                      >
+                        <PenLine size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(news.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -208,9 +306,8 @@ const NewsManagement = () => {
                   onChange={(e) => setFormData({...formData, status: e.target.value})}
                   className="px-3 py-2 border border-gray-300 rounded-md"
                 >
-                  <option value="Rascunho">Rascunho</option>
-                  <option value="Publicado">Publicado</option>
-                  <option value="Arquivado">Arquivado</option>
+                  <option value="draft">Rascunho</option>
+                  <option value="published">Publicado</option>
                 </select>
               </div>
               
@@ -231,8 +328,8 @@ const NewsManagement = () => {
               <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" className="bg-cv-blue">
-                {editingItem ? 'Atualizar' : 'Criar'} Notícia
+              <Button type="submit" className="bg-cv-blue" disabled={loading}>
+                {loading ? 'A processar...' : editingItem ? 'Atualizar' : 'Criar'} Notícia
               </Button>
             </DialogFooter>
           </form>

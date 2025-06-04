@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trophy, PenLine, Trash2, Plus } from 'lucide-react';
@@ -19,40 +19,77 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Competition {
-  id: number;
+  id: string;
   name: string;
   type: string;
   season: string;
-  startDate: string;
-  endDate: string;
+  start_date: string;
+  end_date: string;
   teams: number;
   status: string;
 }
 
 const CompetitionsManagement = () => {
-  const [competitions, setCompetitions] = useState<Competition[]>([
-    { id: 1, name: 'Liga Nacional 2025', type: 'Liga', season: '2024/2025', startDate: '01/02/2025', endDate: '30/06/2025', teams: 12, status: 'Em Curso' },
-    { id: 2, name: 'Taça de Cabo Verde 2025', type: 'Taça', season: '2024/2025', startDate: '15/03/2025', endDate: '15/05/2025', teams: 16, status: 'Agendado' },
-    { id: 3, name: 'Super Taça 2025', type: 'Super Taça', season: '2024/2025', startDate: '10/07/2025', endDate: '10/07/2025', teams: 2, status: 'Agendado' }
-  ]);
-
+  const [competitions, setCompetitions] = useState<Competition[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<Competition | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    type: 'Liga',
+    type: 'championship',
     season: '2024/2025',
-    startDate: '',
-    endDate: '',
+    start_date: '',
+    end_date: '',
     teams: 0,
-    status: 'Agendado'
+    status: 'upcoming'
   });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchCompetitions();
+  }, []);
+
+  const fetchCompetitions = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('championships')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedCompetitions = data.map(item => ({
+        id: item.id,
+        name: item.name,
+        type: item.type,
+        season: item.season,
+        start_date: item.start_date || '',
+        end_date: item.end_date || '',
+        teams: 0, // This would need to be calculated from a teams relationship
+        status: item.status === 'ongoing' ? 'Em Curso' : item.status === 'upcoming' ? 'Agendado' : 'Concluído'
+      }));
+
+      setCompetitions(formattedCompetitions);
+    } catch (error) {
+      console.error('Erro ao carregar competições:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar competições. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAdd = () => {
     setEditingItem(null);
-    setFormData({ name: '', type: 'Liga', season: '2024/2025', startDate: '', endDate: '', teams: 0, status: 'Agendado' });
+    setFormData({ name: '', type: 'championship', season: '2024/2025', start_date: '', end_date: '', teams: 0, status: 'upcoming' });
     setShowDialog(true);
   };
 
@@ -62,39 +99,98 @@ const CompetitionsManagement = () => {
       name: item.name,
       type: item.type,
       season: item.season,
-      startDate: item.startDate,
-      endDate: item.endDate,
+      start_date: item.start_date,
+      end_date: item.end_date,
       teams: item.teams,
-      status: item.status
+      status: item.status === 'Em Curso' ? 'ongoing' : item.status === 'Agendado' ? 'upcoming' : 'completed'
     });
     setShowDialog(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja eliminar esta competição?')) {
-      setCompetitions(competitions.filter(item => item.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja eliminar esta competição?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('championships')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Competição eliminada com sucesso.",
+      });
+
+      fetchCompetitions();
+    } catch (error) {
+      console.error('Erro ao eliminar competição:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao eliminar competição. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (editingItem) {
-      setCompetitions(competitions.map(item => 
-        item.id === editingItem.id 
-          ? { ...item, ...formData }
-          : item
-      ));
-    } else {
-      const newItem: Competition = {
-        id: Math.max(...competitions.map(c => c.id)) + 1,
-        ...formData
-      };
-      setCompetitions([...competitions, newItem]);
+    setLoading(true);
+
+    try {
+      if (editingItem) {
+        const { error } = await supabase
+          .from('championships')
+          .update({
+            name: formData.name,
+            type: formData.type,
+            season: formData.season,
+            start_date: formData.start_date || null,
+            end_date: formData.end_date || null,
+            status: formData.status
+          })
+          .eq('id', editingItem.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Competição atualizada com sucesso.",
+        });
+      } else {
+        const { error } = await supabase
+          .from('championships')
+          .insert({
+            name: formData.name,
+            type: formData.type,
+            season: formData.season,
+            start_date: formData.start_date || null,
+            end_date: formData.end_date || null,
+            status: formData.status
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Competição criada com sucesso.",
+        });
+      }
+
+      setShowDialog(false);
+      setFormData({ name: '', type: 'championship', season: '2024/2025', start_date: '', end_date: '', teams: 0, status: 'upcoming' });
+      fetchCompetitions();
+    } catch (error) {
+      console.error('Erro ao salvar competição:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar competição. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-    
-    setShowDialog(false);
-    setFormData({ name: '', type: 'Liga', season: '2024/2025', startDate: '', endDate: '', teams: 0, status: 'Agendado' });
   };
 
   return (
@@ -111,55 +207,61 @@ const CompetitionsManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Nome</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Época</TableHead>
               <TableHead>Período</TableHead>
-              <TableHead>Equipas</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {competitions.map((comp) => (
-              <TableRow key={comp.id}>
-                <TableCell>{comp.id}</TableCell>
-                <TableCell className="max-w-xs truncate">{comp.name}</TableCell>
-                <TableCell>{comp.type}</TableCell>
-                <TableCell>{comp.season}</TableCell>
-                <TableCell className="text-sm">
-                  {comp.startDate} - {comp.endDate}
-                </TableCell>
-                <TableCell>{comp.teams}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    comp.status === 'Em Curso' ? 'bg-green-100 text-green-800' : 
-                    comp.status === 'Agendado' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {comp.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleEdit(comp)}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Editar"
-                    >
-                      <PenLine size={16} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(comp.id)}
-                      className="text-red-600 hover:text-red-800"
-                      title="Eliminar"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">Carregando...</TableCell>
               </TableRow>
-            ))}
+            ) : competitions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">Nenhuma competição encontrada</TableCell>
+              </TableRow>
+            ) : (
+              competitions.map((comp) => (
+                <TableRow key={comp.id}>
+                  <TableCell className="max-w-xs truncate">{comp.name}</TableCell>
+                  <TableCell>{comp.type}</TableCell>
+                  <TableCell>{comp.season}</TableCell>
+                  <TableCell className="text-sm">
+                    {comp.start_date && comp.end_date ? `${comp.start_date} - ${comp.end_date}` : 'Não definido'}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      comp.status === 'Em Curso' ? 'bg-green-100 text-green-800' : 
+                      comp.status === 'Agendado' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {comp.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <button 
+                        onClick={() => handleEdit(comp)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Editar"
+                      >
+                        <PenLine size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(comp.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -199,10 +301,10 @@ const CompetitionsManagement = () => {
                     onChange={(e) => setFormData({...formData, type: e.target.value})}
                     className="px-3 py-2 border border-gray-300 rounded-md"
                   >
-                    <option value="Liga">Liga</option>
-                    <option value="Taça">Taça</option>
-                    <option value="Super Taça">Super Taça</option>
-                    <option value="Torneio">Torneio</option>
+                    <option value="championship">Liga</option>
+                    <option value="cup">Taça</option>
+                    <option value="super_cup">Super Taça</option>
+                    <option value="tournament">Torneio</option>
                   </select>
                 </div>
                 
@@ -222,71 +324,53 @@ const CompetitionsManagement = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <label htmlFor="startDate" className="text-sm font-medium">
+                  <label htmlFor="start_date" className="text-sm font-medium">
                     Data Início
                   </label>
                   <Input
-                    id="startDate"
+                    id="start_date"
                     type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({...formData, startDate: e.target.value})}
-                    required
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({...formData, start_date: e.target.value})}
                   />
                 </div>
                 
                 <div className="grid gap-2">
-                  <label htmlFor="endDate" className="text-sm font-medium">
+                  <label htmlFor="end_date" className="text-sm font-medium">
                     Data Fim
                   </label>
                   <Input
-                    id="endDate"
+                    id="end_date"
                     type="date"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({...formData, endDate: e.target.value})}
-                    required
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({...formData, end_date: e.target.value})}
                   />
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="teams" className="text-sm font-medium">
-                    Número de Equipas
-                  </label>
-                  <Input
-                    id="teams"
-                    type="number"
-                    value={formData.teams}
-                    onChange={(e) => setFormData({...formData, teams: parseInt(e.target.value)})}
-                    min="2"
-                    required
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <label htmlFor="status" className="text-sm font-medium">
-                    Estado
-                  </label>
-                  <select
-                    id="status"
-                    value={formData.status}
-                    onChange={(e) => setFormData({...formData, status: e.target.value})}
-                    className="px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="Agendado">Agendado</option>
-                    <option value="Em Curso">Em Curso</option>
-                    <option value="Concluído">Concluído</option>
-                    <option value="Cancelado">Cancelado</option>
-                  </select>
-                </div>
+              
+              <div className="grid gap-2">
+                <label htmlFor="status" className="text-sm font-medium">
+                  Estado
+                </label>
+                <select
+                  id="status"
+                  value={formData.status}
+                  onChange={(e) => setFormData({...formData, status: e.target.value})}
+                  className="px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="upcoming">Agendado</option>
+                  <option value="ongoing">Em Curso</option>
+                  <option value="completed">Concluído</option>
+                  <option value="cancelled">Cancelado</option>
+                </select>
               </div>
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" className="bg-cv-blue">
-                {editingItem ? 'Atualizar' : 'Criar'} Competição
+              <Button type="submit" className="bg-cv-blue" disabled={loading}>
+                {loading ? 'A processar...' : editingItem ? 'Atualizar' : 'Criar'} Competição
               </Button>
             </DialogFooter>
           </form>

@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ads: {
+        Row: {
+          clicks: number | null
+          created_at: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          link: string | null
+          position: string | null
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          clicks?: number | null
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          link?: string | null
+          position?: string | null
+          start_date?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          clicks?: number | null
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          link?: string | null
+          position?: string | null
+          start_date?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       championships: {
         Row: {
           created_at: string | null
@@ -80,6 +122,7 @@ export type Database = {
           logo_url: string | null
           name: string
           regional_association_id: string | null
+          status: string | null
           website: string | null
         }
         Insert: {
@@ -95,6 +138,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           regional_association_id?: string | null
+          status?: string | null
           website?: string | null
         }
         Update: {
@@ -110,6 +154,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           regional_association_id?: string | null
+          status?: string | null
           website?: string | null
         }
         Relationships: [
@@ -230,6 +275,39 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event: string | null
+          id: string
+          image_count: number | null
+          status: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          event?: string | null
+          id?: string
+          image_count?: number | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          event?: string | null
+          id?: string
+          image_count?: number | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       games: {
         Row: {
           away_score: number | null
@@ -296,6 +374,7 @@ export type Database = {
       }
       news: {
         Row: {
+          author: string | null
           author_id: string | null
           category: string
           content: string
@@ -305,10 +384,12 @@ export type Database = {
           id: string
           image_url: string | null
           published: boolean | null
+          status: string | null
           title: string
           updated_at: string | null
         }
         Insert: {
+          author?: string | null
           author_id?: string | null
           category?: string
           content: string
@@ -318,10 +399,12 @@ export type Database = {
           id?: string
           image_url?: string | null
           published?: boolean | null
+          status?: string | null
           title: string
           updated_at?: string | null
         }
         Update: {
+          author?: string | null
           author_id?: string | null
           category?: string
           content?: string
@@ -331,6 +414,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           published?: boolean | null
+          status?: string | null
           title?: string
           updated_at?: string | null
         }
@@ -339,7 +423,9 @@ export type Database = {
       players: {
         Row: {
           active: boolean | null
+          age: number | null
           birth_date: string | null
+          club: string | null
           created_at: string | null
           first_name: string
           height_cm: number | null
@@ -348,12 +434,15 @@ export type Database = {
           last_name: string
           nationality: string | null
           position: string | null
+          status: string | null
           team_id: string | null
           weight_kg: number | null
         }
         Insert: {
           active?: boolean | null
+          age?: number | null
           birth_date?: string | null
+          club?: string | null
           created_at?: string | null
           first_name: string
           height_cm?: number | null
@@ -362,12 +451,15 @@ export type Database = {
           last_name: string
           nationality?: string | null
           position?: string | null
+          status?: string | null
           team_id?: string | null
           weight_kg?: number | null
         }
         Update: {
           active?: boolean | null
+          age?: number | null
           birth_date?: string | null
+          club?: string | null
           created_at?: string | null
           first_name?: string
           height_cm?: number | null
@@ -376,6 +468,7 @@ export type Database = {
           last_name?: string
           nationality?: string | null
           position?: string | null
+          status?: string | null
           team_id?: string | null
           weight_kg?: number | null
         }

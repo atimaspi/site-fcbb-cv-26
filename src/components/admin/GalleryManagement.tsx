@@ -1,8 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ImagePlus, PenLine, Trash2, Eye } from 'lucide-react';
+import { ImagePlus, PenLine, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -19,36 +19,72 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface GalleryItem {
-  id: number;
+  id: string;
   title: string;
   description: string;
   event: string;
-  date: string;
+  created_at: string;
   status: string;
-  imageCount: number;
+  image_count: number;
 }
 
 const GalleryManagement = () => {
-  const [galleryList, setGalleryList] = useState<GalleryItem[]>([
-    { id: 1, title: 'Final Liga Nacional 2025', description: 'Fotos da final da Liga Nacional', event: 'Liga Nacional', date: '15/04/2025', status: 'Publicado', imageCount: 25 },
-    { id: 2, title: 'Workshop Treinadores', description: 'Workshop de formação para treinadores', event: 'Formação', date: '10/03/2025', status: 'Publicado', imageCount: 12 },
-    { id: 3, title: 'Seleção Nacional', description: 'Treino da seleção nacional', event: 'Seleções', date: '05/02/2025', status: 'Rascunho', imageCount: 8 }
-  ]);
-
+  const [galleryList, setGalleryList] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     event: '',
-    status: 'Rascunho'
+    status: 'draft'
   });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchGallery();
+  }, []);
+
+  const fetchGallery = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('gallery')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedGallery = data.map(item => ({
+        id: item.id,
+        title: item.title,
+        description: item.description || '',
+        event: item.event || '',
+        created_at: new Date(item.created_at).toLocaleDateString('pt-PT'),
+        status: item.status === 'published' ? 'Publicado' : 'Rascunho',
+        image_count: item.image_count || 0
+      }));
+
+      setGalleryList(formattedGallery);
+    } catch (error) {
+      console.error('Erro ao carregar galeria:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar galeria. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAdd = () => {
     setEditingItem(null);
-    setFormData({ title: '', description: '', event: '', status: 'Rascunho' });
+    setFormData({ title: '', description: '', event: '', status: 'draft' });
     setShowDialog(true);
   };
 
@@ -58,38 +94,93 @@ const GalleryManagement = () => {
       title: item.title,
       description: item.description,
       event: item.event,
-      status: item.status
+      status: item.status === 'Publicado' ? 'published' : 'draft'
     });
     setShowDialog(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja eliminar este álbum?')) {
-      setGalleryList(galleryList.filter(item => item.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja eliminar este álbum?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('gallery')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Álbum eliminado com sucesso.",
+      });
+
+      fetchGallery();
+    } catch (error) {
+      console.error('Erro ao eliminar álbum:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao eliminar álbum. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (editingItem) {
-      setGalleryList(galleryList.map(item => 
-        item.id === editingItem.id 
-          ? { ...item, ...formData, date: new Date().toLocaleDateString('pt-PT') }
-          : item
-      ));
-    } else {
-      const newItem: GalleryItem = {
-        id: Math.max(...galleryList.map(g => g.id)) + 1,
-        ...formData,
-        date: new Date().toLocaleDateString('pt-PT'),
-        imageCount: 0
-      };
-      setGalleryList([...galleryList, newItem]);
+    setLoading(true);
+
+    try {
+      if (editingItem) {
+        const { error } = await supabase
+          .from('gallery')
+          .update({
+            title: formData.title,
+            description: formData.description,
+            event: formData.event,
+            status: formData.status,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingItem.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Álbum atualizado com sucesso.",
+        });
+      } else {
+        const { error } = await supabase
+          .from('gallery')
+          .insert({
+            title: formData.title,
+            description: formData.description,
+            event: formData.event,
+            status: formData.status,
+            image_count: 0
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Álbum criado com sucesso.",
+        });
+      }
+
+      setShowDialog(false);
+      setFormData({ title: '', description: '', event: '', status: 'draft' });
+      fetchGallery();
+    } catch (error) {
+      console.error('Erro ao salvar álbum:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar álbum. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-    
-    setShowDialog(false);
-    setFormData({ title: '', description: '', event: '', status: 'Rascunho' });
   };
 
   return (
@@ -106,7 +197,6 @@ const GalleryManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Título</TableHead>
               <TableHead>Evento</TableHead>
               <TableHead>Data</TableHead>
@@ -116,40 +206,49 @@ const GalleryManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {galleryList.map((gallery) => (
-              <TableRow key={gallery.id}>
-                <TableCell>{gallery.id}</TableCell>
-                <TableCell className="max-w-xs truncate">{gallery.title}</TableCell>
-                <TableCell>{gallery.event}</TableCell>
-                <TableCell>{gallery.date}</TableCell>
-                <TableCell>{gallery.imageCount}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    gallery.status === 'Publicado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {gallery.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleEdit(gallery)}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Editar"
-                    >
-                      <PenLine size={16} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(gallery.id)}
-                      className="text-red-600 hover:text-red-800"
-                      title="Eliminar"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">Carregando...</TableCell>
               </TableRow>
-            ))}
+            ) : galleryList.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">Nenhum álbum encontrado</TableCell>
+              </TableRow>
+            ) : (
+              galleryList.map((gallery) => (
+                <TableRow key={gallery.id}>
+                  <TableCell className="max-w-xs truncate">{gallery.title}</TableCell>
+                  <TableCell>{gallery.event}</TableCell>
+                  <TableCell>{gallery.created_at}</TableCell>
+                  <TableCell>{gallery.image_count}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      gallery.status === 'Publicado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {gallery.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <button 
+                        onClick={() => handleEdit(gallery)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Editar"
+                      >
+                        <PenLine size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(gallery.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -200,9 +299,8 @@ const GalleryManagement = () => {
                   onChange={(e) => setFormData({...formData, status: e.target.value})}
                   className="px-3 py-2 border border-gray-300 rounded-md"
                 >
-                  <option value="Rascunho">Rascunho</option>
-                  <option value="Publicado">Publicado</option>
-                  <option value="Arquivado">Arquivado</option>
+                  <option value="draft">Rascunho</option>
+                  <option value="published">Publicado</option>
                 </select>
               </div>
               
@@ -217,29 +315,13 @@ const GalleryManagement = () => {
                   className="px-3 py-2 border border-gray-300 rounded-md h-20"
                 />
               </div>
-              
-              <div className="grid gap-2">
-                <label htmlFor="images" className="text-sm font-medium">
-                  Fotos
-                </label>
-                <input
-                  id="images"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="px-3 py-2 border border-gray-300 rounded-md"
-                />
-                <p className="text-xs text-gray-500">
-                  Selecione várias imagens. Tamanho máximo: 5MB por imagem.
-                </p>
-              </div>
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" className="bg-cv-blue">
-                {editingItem ? 'Atualizar' : 'Criar'} Álbum
+              <Button type="submit" className="bg-cv-blue" disabled={loading}>
+                {loading ? 'A processar...' : editingItem ? 'Atualizar' : 'Criar'} Álbum
               </Button>
             </DialogFooter>
           </form>

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, PenLine, Trash2, Plus } from 'lucide-react';
@@ -19,82 +19,186 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Player {
-  id: number;
-  name: string;
+  id: string;
+  first_name: string;
+  last_name: string;
   club: string;
   position: string;
-  number: number;
+  jersey_number: number;
   age: number;
   nationality: string;
   status: string;
 }
 
 const PlayersManagement = () => {
-  const [players, setPlayers] = useState<Player[]>([
-    { id: 1, name: 'João Silva', club: 'ABC Basquete', position: 'Base', number: 10, age: 25, nationality: 'Cabo Verde', status: 'Ativo' },
-    { id: 2, name: 'Carlos Santos', club: 'Praia Basketball', position: 'Poste', number: 15, age: 28, nationality: 'Cabo Verde', status: 'Ativo' },
-    { id: 3, name: 'Pedro Costa', club: 'Mindelo BC', position: 'Extremo', number: 7, age: 22, nationality: 'Cabo Verde', status: 'Lesionado' }
-  ]);
-
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<Player | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
+    first_name: '',
+    last_name: '',
     club: '',
     position: 'Base',
-    number: 0,
+    jersey_number: 0,
     age: 0,
     nationality: 'Cabo Verde',
-    status: 'Ativo'
+    status: 'active'
   });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchPlayers();
+  }, []);
+
+  const fetchPlayers = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('players')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedPlayers = data.map(item => ({
+        id: item.id,
+        first_name: item.first_name,
+        last_name: item.last_name,
+        club: item.club || '',
+        position: item.position || 'Base',
+        jersey_number: item.jersey_number || 0,
+        age: item.age || 0,
+        nationality: item.nationality || 'Cabo Verde',
+        status: item.status === 'active' ? 'Ativo' : item.status === 'injured' ? 'Lesionado' : 'Inativo'
+      }));
+
+      setPlayers(formattedPlayers);
+    } catch (error) {
+      console.error('Erro ao carregar jogadores:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar jogadores. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAdd = () => {
     setEditingItem(null);
-    setFormData({ name: '', club: '', position: 'Base', number: 0, age: 0, nationality: 'Cabo Verde', status: 'Ativo' });
+    setFormData({ first_name: '', last_name: '', club: '', position: 'Base', jersey_number: 0, age: 0, nationality: 'Cabo Verde', status: 'active' });
     setShowDialog(true);
   };
 
   const handleEdit = (item: Player) => {
     setEditingItem(item);
     setFormData({
-      name: item.name,
+      first_name: item.first_name,
+      last_name: item.last_name,
       club: item.club,
       position: item.position,
-      number: item.number,
+      jersey_number: item.jersey_number,
       age: item.age,
       nationality: item.nationality,
-      status: item.status
+      status: item.status === 'Ativo' ? 'active' : item.status === 'Lesionado' ? 'injured' : 'inactive'
     });
     setShowDialog(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja eliminar este jogador?')) {
-      setPlayers(players.filter(item => item.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja eliminar este jogador?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('players')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Jogador eliminado com sucesso.",
+      });
+
+      fetchPlayers();
+    } catch (error) {
+      console.error('Erro ao eliminar jogador:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao eliminar jogador. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (editingItem) {
-      setPlayers(players.map(item => 
-        item.id === editingItem.id 
-          ? { ...item, ...formData }
-          : item
-      ));
-    } else {
-      const newItem: Player = {
-        id: Math.max(...players.map(p => p.id)) + 1,
-        ...formData
-      };
-      setPlayers([...players, newItem]);
+    setLoading(true);
+
+    try {
+      if (editingItem) {
+        const { error } = await supabase
+          .from('players')
+          .update({
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            club: formData.club,
+            position: formData.position,
+            jersey_number: formData.jersey_number,
+            age: formData.age,
+            nationality: formData.nationality,
+            status: formData.status
+          })
+          .eq('id', editingItem.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Jogador atualizado com sucesso.",
+        });
+      } else {
+        const { error } = await supabase
+          .from('players')
+          .insert({
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            club: formData.club,
+            position: formData.position,
+            jersey_number: formData.jersey_number,
+            age: formData.age,
+            nationality: formData.nationality,
+            status: formData.status
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Jogador registado com sucesso.",
+        });
+      }
+
+      setShowDialog(false);
+      setFormData({ first_name: '', last_name: '', club: '', position: 'Base', jersey_number: 0, age: 0, nationality: 'Cabo Verde', status: 'active' });
+      fetchPlayers();
+    } catch (error) {
+      console.error('Erro ao salvar jogador:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar jogador. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-    
-    setShowDialog(false);
-    setFormData({ name: '', club: '', position: 'Base', number: 0, age: 0, nationality: 'Cabo Verde', status: 'Ativo' });
   };
 
   return (
@@ -111,7 +215,6 @@ const PlayersManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Nome</TableHead>
               <TableHead>Clube</TableHead>
               <TableHead>Posição</TableHead>
@@ -123,43 +226,52 @@ const PlayersManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {players.map((player) => (
-              <TableRow key={player.id}>
-                <TableCell>{player.id}</TableCell>
-                <TableCell className="font-medium">{player.name}</TableCell>
-                <TableCell>{player.club}</TableCell>
-                <TableCell>{player.position}</TableCell>
-                <TableCell>{player.number}</TableCell>
-                <TableCell>{player.age}</TableCell>
-                <TableCell>{player.nationality}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    player.status === 'Ativo' ? 'bg-green-100 text-green-800' : 
-                    player.status === 'Lesionado' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {player.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleEdit(player)}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Editar"
-                    >
-                      <PenLine size={16} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(player.id)}
-                      className="text-red-600 hover:text-red-800"
-                      title="Eliminar"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center">Carregando...</TableCell>
               </TableRow>
-            ))}
+            ) : players.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center">Nenhum jogador encontrado</TableCell>
+              </TableRow>
+            ) : (
+              players.map((player) => (
+                <TableRow key={player.id}>
+                  <TableCell className="font-medium">{`${player.first_name} ${player.last_name}`}</TableCell>
+                  <TableCell>{player.club}</TableCell>
+                  <TableCell>{player.position}</TableCell>
+                  <TableCell>{player.jersey_number}</TableCell>
+                  <TableCell>{player.age}</TableCell>
+                  <TableCell>{player.nationality}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      player.status === 'Ativo' ? 'bg-green-100 text-green-800' : 
+                      player.status === 'Lesionado' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {player.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <button 
+                        onClick={() => handleEdit(player)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Editar"
+                      >
+                        <PenLine size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(player.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -176,16 +288,30 @@ const PlayersManagement = () => {
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="name" className="text-sm font-medium">
-                  Nome Completo
-                </label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <label htmlFor="first_name" className="text-sm font-medium">
+                    Primeiro Nome
+                  </label>
+                  <Input
+                    id="first_name"
+                    value={formData.first_name}
+                    onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div className="grid gap-2">
+                  <label htmlFor="last_name" className="text-sm font-medium">
+                    Último Nome
+                  </label>
+                  <Input
+                    id="last_name"
+                    value={formData.last_name}
+                    onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                    required
+                  />
+                </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -222,14 +348,14 @@ const PlayersManagement = () => {
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="grid gap-2">
-                  <label htmlFor="number" className="text-sm font-medium">
+                  <label htmlFor="jersey_number" className="text-sm font-medium">
                     Número
                   </label>
                   <Input
-                    id="number"
+                    id="jersey_number"
                     type="number"
-                    value={formData.number}
-                    onChange={(e) => setFormData({...formData, number: parseInt(e.target.value)})}
+                    value={formData.jersey_number}
+                    onChange={(e) => setFormData({...formData, jersey_number: parseInt(e.target.value)})}
                     min="0"
                     max="99"
                     required
@@ -274,10 +400,10 @@ const PlayersManagement = () => {
                   onChange={(e) => setFormData({...formData, status: e.target.value})}
                   className="px-3 py-2 border border-gray-300 rounded-md"
                 >
-                  <option value="Ativo">Ativo</option>
-                  <option value="Lesionado">Lesionado</option>
-                  <option value="Suspenso">Suspenso</option>
-                  <option value="Inativo">Inativo</option>
+                  <option value="active">Ativo</option>
+                  <option value="injured">Lesionado</option>
+                  <option value="suspended">Suspenso</option>
+                  <option value="inactive">Inativo</option>
                 </select>
               </div>
             </div>
@@ -285,8 +411,8 @@ const PlayersManagement = () => {
               <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" className="bg-cv-blue">
-                {editingItem ? 'Atualizar' : 'Registar'} Jogador
+              <Button type="submit" className="bg-cv-blue" disabled={loading}>
+                {loading ? 'A processar...' : editingItem ? 'Atualizar' : 'Registar'} Jogador
               </Button>
             </DialogFooter>
           </form>

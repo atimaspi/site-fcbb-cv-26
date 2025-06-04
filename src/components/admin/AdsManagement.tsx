@@ -1,8 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LayoutGrid, PenLine, Trash2, Eye } from 'lucide-react';
+import { LayoutGrid, PenLine, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -19,39 +19,76 @@ import {
   DialogTitle,
   DialogFooter
 } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AdItem {
-  id: number;
+  id: string;
   title: string;
   link: string;
   position: string;
   status: string;
-  startDate: string;
-  endDate: string;
+  start_date: string;
+  end_date: string;
   clicks: number;
 }
 
 const AdsManagement = () => {
-  const [adsList, setAdsList] = useState<AdItem[]>([
-    { id: 1, title: 'Patrocínio Nike', link: 'https://nike.com', position: 'Cabeçalho', status: 'Ativo', startDate: '01/01/2025', endDate: '31/12/2025', clicks: 1250 },
-    { id: 2, title: 'Parceria Banco CV', link: 'https://bcv.cv', position: 'Sidebar', status: 'Ativo', startDate: '15/03/2025', endDate: '15/09/2025', clicks: 890 },
-    { id: 3, title: 'Promoção Equipamentos', link: 'https://store.com', position: 'Rodapé', status: 'Inativo', startDate: '01/02/2025', endDate: '28/02/2025', clicks: 456 }
-  ]);
-
+  const [adsList, setAdsList] = useState<AdItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<AdItem | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     link: '',
     position: 'sidebar',
-    status: 'Inativo',
-    startDate: '',
-    endDate: ''
+    status: 'inactive',
+    start_date: '',
+    end_date: ''
   });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchAds();
+  }, []);
+
+  const fetchAds = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('ads')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedAds = data.map(item => ({
+        id: item.id,
+        title: item.title,
+        link: item.link || '',
+        position: item.position,
+        status: item.status === 'active' ? 'Ativo' : 'Inativo',
+        start_date: item.start_date || '',
+        end_date: item.end_date || '',
+        clicks: item.clicks || 0
+      }));
+
+      setAdsList(formattedAds);
+    } catch (error) {
+      console.error('Erro ao carregar anúncios:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar anúncios. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAdd = () => {
     setEditingItem(null);
-    setFormData({ title: '', link: '', position: 'sidebar', status: 'Inativo', startDate: '', endDate: '' });
+    setFormData({ title: '', link: '', position: 'sidebar', status: 'inactive', start_date: '', end_date: '' });
     setShowDialog(true);
   };
 
@@ -61,47 +98,126 @@ const AdsManagement = () => {
       title: item.title,
       link: item.link,
       position: item.position,
-      status: item.status,
-      startDate: item.startDate,
-      endDate: item.endDate
+      status: item.status === 'Ativo' ? 'active' : 'inactive',
+      start_date: item.start_date,
+      end_date: item.end_date
     });
     setShowDialog(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('Tem certeza que deseja eliminar este anúncio?')) {
-      setAdsList(adsList.filter(item => item.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja eliminar este anúncio?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('ads')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Anúncio eliminado com sucesso.",
+      });
+
+      fetchAds();
+    } catch (error) {
+      console.error('Erro ao eliminar anúncio:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao eliminar anúncio. Tente novamente.",
+        variant: "destructive",
+      });
     }
   };
 
-  const toggleStatus = (id: number) => {
-    setAdsList(adsList.map(item => 
-      item.id === id 
-        ? { ...item, status: item.status === 'Ativo' ? 'Inativo' : 'Ativo' }
-        : item
-    ));
+  const toggleStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'Ativo' ? 'inactive' : 'active';
+    
+    try {
+      const { error } = await supabase
+        .from('ads')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso",
+        description: "Estado do anúncio atualizado com sucesso.",
+      });
+
+      fetchAds();
+    } catch (error) {
+      console.error('Erro ao atualizar estado:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao atualizar estado. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (editingItem) {
-      setAdsList(adsList.map(item => 
-        item.id === editingItem.id 
-          ? { ...item, ...formData }
-          : item
-      ));
-    } else {
-      const newItem: AdItem = {
-        id: Math.max(...adsList.map(a => a.id)) + 1,
-        ...formData,
-        clicks: 0
-      };
-      setAdsList([...adsList, newItem]);
+    setLoading(true);
+
+    try {
+      if (editingItem) {
+        const { error } = await supabase
+          .from('ads')
+          .update({
+            title: formData.title,
+            link: formData.link,
+            position: formData.position,
+            status: formData.status,
+            start_date: formData.start_date || null,
+            end_date: formData.end_date || null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingItem.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Anúncio atualizado com sucesso.",
+        });
+      } else {
+        const { error } = await supabase
+          .from('ads')
+          .insert({
+            title: formData.title,
+            link: formData.link,
+            position: formData.position,
+            status: formData.status,
+            start_date: formData.start_date || null,
+            end_date: formData.end_date || null,
+            clicks: 0
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Sucesso",
+          description: "Anúncio criado com sucesso.",
+        });
+      }
+
+      setShowDialog(false);
+      setFormData({ title: '', link: '', position: 'sidebar', status: 'inactive', start_date: '', end_date: '' });
+      fetchAds();
+    } catch (error) {
+      console.error('Erro ao salvar anúncio:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar anúncio. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-    
-    setShowDialog(false);
-    setFormData({ title: '', link: '', position: 'sidebar', status: 'Inativo', startDate: '', endDate: '' });
   };
 
   return (
@@ -118,7 +234,6 @@ const AdsManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Título</TableHead>
               <TableHead>Posição</TableHead>
               <TableHead>Período</TableHead>
@@ -128,45 +243,54 @@ const AdsManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {adsList.map((ad) => (
-              <TableRow key={ad.id}>
-                <TableCell>{ad.id}</TableCell>
-                <TableCell className="max-w-xs truncate">{ad.title}</TableCell>
-                <TableCell>{ad.position}</TableCell>
-                <TableCell className="text-sm">
-                  {ad.startDate} - {ad.endDate}
-                </TableCell>
-                <TableCell>{ad.clicks}</TableCell>
-                <TableCell>
-                  <button
-                    onClick={() => toggleStatus(ad.id)}
-                    className={`px-2 py-1 rounded-full text-xs cursor-pointer ${
-                      ad.status === 'Ativo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {ad.status}
-                  </button>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleEdit(ad)}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Editar"
-                    >
-                      <PenLine size={16} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(ad.id)}
-                      className="text-red-600 hover:text-red-800"
-                      title="Eliminar"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </TableCell>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">Carregando...</TableCell>
               </TableRow>
-            ))}
+            ) : adsList.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">Nenhum anúncio encontrado</TableCell>
+              </TableRow>
+            ) : (
+              adsList.map((ad) => (
+                <TableRow key={ad.id}>
+                  <TableCell className="max-w-xs truncate">{ad.title}</TableCell>
+                  <TableCell>{ad.position}</TableCell>
+                  <TableCell className="text-sm">
+                    {ad.start_date && ad.end_date ? `${ad.start_date} - ${ad.end_date}` : 'Não definido'}
+                  </TableCell>
+                  <TableCell>{ad.clicks}</TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() => toggleStatus(ad.id, ad.status)}
+                      className={`px-2 py-1 rounded-full text-xs cursor-pointer ${
+                        ad.status === 'Ativo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {ad.status}
+                    </button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <button 
+                        onClick={() => handleEdit(ad)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Editar"
+                      >
+                        <PenLine size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(ad.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -227,26 +351,26 @@ const AdsManagement = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <label htmlFor="startDate" className="text-sm font-medium">
+                  <label htmlFor="start_date" className="text-sm font-medium">
                     Data Início
                   </label>
                   <Input
-                    id="startDate"
+                    id="start_date"
                     type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                    value={formData.start_date}
+                    onChange={(e) => setFormData({...formData, start_date: e.target.value})}
                   />
                 </div>
                 
                 <div className="grid gap-2">
-                  <label htmlFor="endDate" className="text-sm font-medium">
+                  <label htmlFor="end_date" className="text-sm font-medium">
                     Data Fim
                   </label>
                   <Input
-                    id="endDate"
+                    id="end_date"
                     type="date"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                    value={formData.end_date}
+                    onChange={(e) => setFormData({...formData, end_date: e.target.value})}
                   />
                 </div>
               </div>
@@ -261,32 +385,17 @@ const AdsManagement = () => {
                   onChange={(e) => setFormData({...formData, status: e.target.value})}
                   className="px-3 py-2 border border-gray-300 rounded-md"
                 >
-                  <option value="Inativo">Inativo</option>
-                  <option value="Ativo">Ativo</option>
+                  <option value="inactive">Inativo</option>
+                  <option value="active">Ativo</option>
                 </select>
-              </div>
-              
-              <div className="grid gap-2">
-                <label htmlFor="adImage" className="text-sm font-medium">
-                  Imagem do Anúncio
-                </label>
-                <input
-                  id="adImage"
-                  type="file"
-                  accept="image/*"
-                  className="px-3 py-2 border border-gray-300 rounded-md"
-                />
-                <p className="text-xs text-gray-500">
-                  Formatos recomendados: Banner (728x90), Retângulo (300x250)
-                </p>
               </div>
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
                 Cancelar
               </Button>
-              <Button type="submit" className="bg-cv-blue">
-                {editingItem ? 'Atualizar' : 'Criar'} Anúncio
+              <Button type="submit" className="bg-cv-blue" disabled={loading}>
+                {loading ? 'A processar...' : editingItem ? 'Atualizar' : 'Criar'} Anúncio
               </Button>
             </DialogFooter>
           </form>
