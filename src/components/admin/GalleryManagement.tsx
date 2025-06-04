@@ -52,14 +52,20 @@ const GalleryManagement = () => {
   const fetchGallery = async () => {
     setLoading(true);
     try {
+      console.log('Fetching gallery...');
       const { data, error } = await supabase
         .from('gallery')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('Gallery fetch result:', { data, error });
 
-      const formattedGallery = data.map(item => ({
+      if (error) {
+        console.error('Erro ao carregar galeria:', error);
+        throw error;
+      }
+
+      const formattedGallery = data?.map(item => ({
         id: item.id,
         title: item.title,
         description: item.description || '',
@@ -67,14 +73,15 @@ const GalleryManagement = () => {
         created_at: new Date(item.created_at).toLocaleDateString('pt-PT'),
         status: item.status === 'published' ? 'Publicado' : 'Rascunho',
         image_count: item.image_count || 0
-      }));
+      })) || [];
 
+      console.log('Formatted gallery:', formattedGallery);
       setGalleryList(formattedGallery);
     } catch (error) {
       console.error('Erro ao carregar galeria:', error);
       toast({
         title: "Erro",
-        description: "Erro ao carregar galeria. Tente novamente.",
+        description: `Erro ao carregar galeria: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -103,24 +110,29 @@ const GalleryManagement = () => {
     if (!confirm('Tem certeza que deseja eliminar este álbum?')) return;
 
     try {
+      console.log('Deleting gallery with id:', id);
       const { error } = await supabase
         .from('gallery')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
 
+      console.log('Gallery deleted successfully');
       toast({
         title: "Sucesso",
         description: "Álbum eliminado com sucesso.",
       });
 
-      fetchGallery();
+      await fetchGallery();
     } catch (error) {
       console.error('Erro ao eliminar álbum:', error);
       toast({
         title: "Erro",
-        description: "Erro ao eliminar álbum. Tente novamente.",
+        description: `Erro ao eliminar álbum: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -131,8 +143,11 @@ const GalleryManagement = () => {
     setLoading(true);
 
     try {
+      console.log('Submitting gallery form data:', formData);
+      
       if (editingItem) {
-        const { error } = await supabase
+        console.log('Updating gallery with id:', editingItem.id);
+        const { data, error } = await supabase
           .from('gallery')
           .update({
             title: formData.title,
@@ -141,16 +156,23 @@ const GalleryManagement = () => {
             status: formData.status,
             updated_at: new Date().toISOString()
           })
-          .eq('id', editingItem.id);
+          .eq('id', editingItem.id)
+          .select();
 
-        if (error) throw error;
+        console.log('Update result:', { data, error });
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
           description: "Álbum atualizado com sucesso.",
         });
       } else {
-        const { error } = await supabase
+        console.log('Creating new gallery');
+        const { data, error } = await supabase
           .from('gallery')
           .insert({
             title: formData.title,
@@ -158,9 +180,15 @@ const GalleryManagement = () => {
             event: formData.event,
             status: formData.status,
             image_count: 0
-          });
+          })
+          .select();
 
-        if (error) throw error;
+        console.log('Insert result:', { data, error });
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
@@ -170,12 +198,12 @@ const GalleryManagement = () => {
 
       setShowDialog(false);
       setFormData({ title: '', description: '', event: '', status: 'draft' });
-      fetchGallery();
+      await fetchGallery();
     } catch (error) {
       console.error('Erro ao salvar álbum:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar álbum. Tente novamente.",
+        description: `Erro ao salvar álbum: ${error.message}`,
         variant: "destructive",
       });
     } finally {

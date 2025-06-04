@@ -58,14 +58,20 @@ const PlayersManagement = () => {
   const fetchPlayers = async () => {
     setLoading(true);
     try {
+      console.log('Fetching players...');
       const { data, error } = await supabase
         .from('players')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('Players fetch result:', { data, error });
 
-      const formattedPlayers = data.map(item => ({
+      if (error) {
+        console.error('Erro ao carregar jogadores:', error);
+        throw error;
+      }
+
+      const formattedPlayers = data?.map(item => ({
         id: item.id,
         first_name: item.first_name,
         last_name: item.last_name,
@@ -75,14 +81,15 @@ const PlayersManagement = () => {
         age: item.age || 0,
         nationality: item.nationality || 'Cabo Verde',
         status: item.status === 'active' ? 'Ativo' : item.status === 'injured' ? 'Lesionado' : 'Inativo'
-      }));
+      })) || [];
 
+      console.log('Formatted players:', formattedPlayers);
       setPlayers(formattedPlayers);
     } catch (error) {
       console.error('Erro ao carregar jogadores:', error);
       toast({
         title: "Erro",
-        description: "Erro ao carregar jogadores. Tente novamente.",
+        description: `Erro ao carregar jogadores: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -115,24 +122,29 @@ const PlayersManagement = () => {
     if (!confirm('Tem certeza que deseja eliminar este jogador?')) return;
 
     try {
+      console.log('Deleting player with id:', id);
       const { error } = await supabase
         .from('players')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
 
+      console.log('Player deleted successfully');
       toast({
         title: "Sucesso",
         description: "Jogador eliminado com sucesso.",
       });
 
-      fetchPlayers();
+      await fetchPlayers();
     } catch (error) {
       console.error('Erro ao eliminar jogador:', error);
       toast({
         title: "Erro",
-        description: "Erro ao eliminar jogador. Tente novamente.",
+        description: `Erro ao eliminar jogador: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -143,8 +155,11 @@ const PlayersManagement = () => {
     setLoading(true);
 
     try {
+      console.log('Submitting player form data:', formData);
+      
       if (editingItem) {
-        const { error } = await supabase
+        console.log('Updating player with id:', editingItem.id);
+        const { data, error } = await supabase
           .from('players')
           .update({
             first_name: formData.first_name,
@@ -156,16 +171,23 @@ const PlayersManagement = () => {
             nationality: formData.nationality,
             status: formData.status
           })
-          .eq('id', editingItem.id);
+          .eq('id', editingItem.id)
+          .select();
 
-        if (error) throw error;
+        console.log('Update result:', { data, error });
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
           description: "Jogador atualizado com sucesso.",
         });
       } else {
-        const { error } = await supabase
+        console.log('Creating new player');
+        const { data, error } = await supabase
           .from('players')
           .insert({
             first_name: formData.first_name,
@@ -176,9 +198,15 @@ const PlayersManagement = () => {
             age: formData.age,
             nationality: formData.nationality,
             status: formData.status
-          });
+          })
+          .select();
 
-        if (error) throw error;
+        console.log('Insert result:', { data, error });
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
@@ -188,12 +216,12 @@ const PlayersManagement = () => {
 
       setShowDialog(false);
       setFormData({ first_name: '', last_name: '', club: '', position: 'Base', jersey_number: 0, age: 0, nationality: 'Cabo Verde', status: 'active' });
-      fetchPlayers();
+      await fetchPlayers();
     } catch (error) {
       console.error('Erro ao salvar jogador:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar jogador. Tente novamente.",
+        description: `Erro ao salvar jogador: ${error.message}`,
         variant: "destructive",
       });
     } finally {

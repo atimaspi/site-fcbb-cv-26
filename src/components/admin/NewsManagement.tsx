@@ -52,14 +52,20 @@ const NewsManagement = () => {
   const fetchNews = async () => {
     setLoading(true);
     try {
+      console.log('Fetching news...');
       const { data, error } = await supabase
         .from('news')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('News fetch result:', { data, error });
 
-      const formattedNews = data.map(item => ({
+      if (error) {
+        console.error('Erro ao carregar notícias:', error);
+        throw error;
+      }
+
+      const formattedNews = data?.map(item => ({
         id: item.id,
         title: item.title,
         content: item.content,
@@ -67,14 +73,15 @@ const NewsManagement = () => {
         category: item.category,
         status: item.status === 'published' ? 'Publicado' : 'Rascunho',
         author: item.author || 'Admin'
-      }));
+      })) || [];
 
+      console.log('Formatted news:', formattedNews);
       setNewsList(formattedNews);
     } catch (error) {
       console.error('Erro ao carregar notícias:', error);
       toast({
         title: "Erro",
-        description: "Erro ao carregar notícias. Tente novamente.",
+        description: `Erro ao carregar notícias: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -103,24 +110,29 @@ const NewsManagement = () => {
     if (!confirm('Tem certeza que deseja eliminar esta notícia?')) return;
 
     try {
+      console.log('Deleting news with id:', id);
       const { error } = await supabase
         .from('news')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
 
+      console.log('News deleted successfully');
       toast({
         title: "Sucesso",
         description: "Notícia eliminada com sucesso.",
       });
 
-      fetchNews();
+      await fetchNews();
     } catch (error) {
       console.error('Erro ao eliminar notícia:', error);
       toast({
         title: "Erro",
-        description: "Erro ao eliminar notícia. Tente novamente.",
+        description: `Erro ao eliminar notícia: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -131,8 +143,11 @@ const NewsManagement = () => {
     setLoading(true);
 
     try {
+      console.log('Submitting form data:', formData);
+      
       if (editingItem) {
-        const { error } = await supabase
+        console.log('Updating news with id:', editingItem.id);
+        const { data, error } = await supabase
           .from('news')
           .update({
             title: formData.title,
@@ -141,16 +156,23 @@ const NewsManagement = () => {
             status: formData.status,
             updated_at: new Date().toISOString()
           })
-          .eq('id', editingItem.id);
+          .eq('id', editingItem.id)
+          .select();
 
-        if (error) throw error;
+        console.log('Update result:', { data, error });
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
           description: "Notícia atualizada com sucesso.",
         });
       } else {
-        const { error } = await supabase
+        console.log('Creating new news');
+        const { data, error } = await supabase
           .from('news')
           .insert({
             title: formData.title,
@@ -159,9 +181,15 @@ const NewsManagement = () => {
             status: formData.status,
             author: 'Admin',
             published: formData.status === 'published'
-          });
+          })
+          .select();
 
-        if (error) throw error;
+        console.log('Insert result:', { data, error });
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
@@ -171,12 +199,12 @@ const NewsManagement = () => {
 
       setShowDialog(false);
       setFormData({ title: '', content: '', category: 'Competições', status: 'draft' });
-      fetchNews();
+      await fetchNews();
     } catch (error) {
       console.error('Erro ao salvar notícia:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar notícia. Tente novamente.",
+        description: `Erro ao salvar notícia: ${error.message}`,
         variant: "destructive",
       });
     } finally {

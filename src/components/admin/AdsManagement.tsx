@@ -55,14 +55,20 @@ const AdsManagement = () => {
   const fetchAds = async () => {
     setLoading(true);
     try {
+      console.log('Fetching ads...');
       const { data, error } = await supabase
         .from('ads')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('Ads fetch result:', { data, error });
 
-      const formattedAds = data.map(item => ({
+      if (error) {
+        console.error('Erro ao carregar anúncios:', error);
+        throw error;
+      }
+
+      const formattedAds = data?.map(item => ({
         id: item.id,
         title: item.title,
         link: item.link || '',
@@ -71,14 +77,15 @@ const AdsManagement = () => {
         start_date: item.start_date || '',
         end_date: item.end_date || '',
         clicks: item.clicks || 0
-      }));
+      })) || [];
 
+      console.log('Formatted ads:', formattedAds);
       setAdsList(formattedAds);
     } catch (error) {
       console.error('Erro ao carregar anúncios:', error);
       toast({
         title: "Erro",
-        description: "Erro ao carregar anúncios. Tente novamente.",
+        description: `Erro ao carregar anúncios: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -109,24 +116,29 @@ const AdsManagement = () => {
     if (!confirm('Tem certeza que deseja eliminar este anúncio?')) return;
 
     try {
+      console.log('Deleting ad with id:', id);
       const { error } = await supabase
         .from('ads')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
 
+      console.log('Ad deleted successfully');
       toast({
         title: "Sucesso",
         description: "Anúncio eliminado com sucesso.",
       });
 
-      fetchAds();
+      await fetchAds();
     } catch (error) {
       console.error('Erro ao eliminar anúncio:', error);
       toast({
         title: "Erro",
-        description: "Erro ao eliminar anúncio. Tente novamente.",
+        description: `Erro ao eliminar anúncio: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -136,24 +148,29 @@ const AdsManagement = () => {
     const newStatus = currentStatus === 'Ativo' ? 'inactive' : 'active';
     
     try {
+      console.log('Toggling status for ad:', id, 'from', currentStatus, 'to', newStatus);
       const { error } = await supabase
         .from('ads')
         .update({ status: newStatus })
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Toggle status error:', error);
+        throw error;
+      }
 
+      console.log('Ad status updated successfully');
       toast({
         title: "Sucesso",
         description: "Estado do anúncio atualizado com sucesso.",
       });
 
-      fetchAds();
+      await fetchAds();
     } catch (error) {
       console.error('Erro ao atualizar estado:', error);
       toast({
         title: "Erro",
-        description: "Erro ao atualizar estado. Tente novamente.",
+        description: `Erro ao atualizar estado: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -164,8 +181,11 @@ const AdsManagement = () => {
     setLoading(true);
 
     try {
+      console.log('Submitting ads form data:', formData);
+      
       if (editingItem) {
-        const { error } = await supabase
+        console.log('Updating ad with id:', editingItem.id);
+        const { data, error } = await supabase
           .from('ads')
           .update({
             title: formData.title,
@@ -176,16 +196,23 @@ const AdsManagement = () => {
             end_date: formData.end_date || null,
             updated_at: new Date().toISOString()
           })
-          .eq('id', editingItem.id);
+          .eq('id', editingItem.id)
+          .select();
 
-        if (error) throw error;
+        console.log('Update result:', { data, error });
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
           description: "Anúncio atualizado com sucesso.",
         });
       } else {
-        const { error } = await supabase
+        console.log('Creating new ad');
+        const { data, error } = await supabase
           .from('ads')
           .insert({
             title: formData.title,
@@ -195,9 +222,15 @@ const AdsManagement = () => {
             start_date: formData.start_date || null,
             end_date: formData.end_date || null,
             clicks: 0
-          });
+          })
+          .select();
 
-        if (error) throw error;
+        console.log('Insert result:', { data, error });
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
@@ -207,12 +240,12 @@ const AdsManagement = () => {
 
       setShowDialog(false);
       setFormData({ title: '', link: '', position: 'sidebar', status: 'inactive', start_date: '', end_date: '' });
-      fetchAds();
+      await fetchAds();
     } catch (error) {
       console.error('Erro ao salvar anúncio:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar anúncio. Tente novamente.",
+        description: `Erro ao salvar anúncio: ${error.message}`,
         variant: "destructive",
       });
     } finally {

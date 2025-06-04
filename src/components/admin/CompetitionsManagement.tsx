@@ -56,14 +56,20 @@ const CompetitionsManagement = () => {
   const fetchCompetitions = async () => {
     setLoading(true);
     try {
+      console.log('Fetching competitions...');
       const { data, error } = await supabase
         .from('championships')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('Competitions fetch result:', { data, error });
 
-      const formattedCompetitions = data.map(item => ({
+      if (error) {
+        console.error('Erro ao carregar competições:', error);
+        throw error;
+      }
+
+      const formattedCompetitions = data?.map(item => ({
         id: item.id,
         name: item.name,
         type: item.type,
@@ -72,14 +78,15 @@ const CompetitionsManagement = () => {
         end_date: item.end_date || '',
         teams: 0, // This would need to be calculated from a teams relationship
         status: item.status === 'ongoing' ? 'Em Curso' : item.status === 'upcoming' ? 'Agendado' : 'Concluído'
-      }));
+      })) || [];
 
+      console.log('Formatted competitions:', formattedCompetitions);
       setCompetitions(formattedCompetitions);
     } catch (error) {
       console.error('Erro ao carregar competições:', error);
       toast({
         title: "Erro",
-        description: "Erro ao carregar competições. Tente novamente.",
+        description: `Erro ao carregar competições: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -111,24 +118,29 @@ const CompetitionsManagement = () => {
     if (!confirm('Tem certeza que deseja eliminar esta competição?')) return;
 
     try {
+      console.log('Deleting competition with id:', id);
       const { error } = await supabase
         .from('championships')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
 
+      console.log('Competition deleted successfully');
       toast({
         title: "Sucesso",
         description: "Competição eliminada com sucesso.",
       });
 
-      fetchCompetitions();
+      await fetchCompetitions();
     } catch (error) {
       console.error('Erro ao eliminar competição:', error);
       toast({
         title: "Erro",
-        description: "Erro ao eliminar competição. Tente novamente.",
+        description: `Erro ao eliminar competição: ${error.message}`,
         variant: "destructive",
       });
     }
@@ -139,8 +151,11 @@ const CompetitionsManagement = () => {
     setLoading(true);
 
     try {
+      console.log('Submitting competitions form data:', formData);
+      
       if (editingItem) {
-        const { error } = await supabase
+        console.log('Updating competition with id:', editingItem.id);
+        const { data, error } = await supabase
           .from('championships')
           .update({
             name: formData.name,
@@ -150,16 +165,23 @@ const CompetitionsManagement = () => {
             end_date: formData.end_date || null,
             status: formData.status
           })
-          .eq('id', editingItem.id);
+          .eq('id', editingItem.id)
+          .select();
 
-        if (error) throw error;
+        console.log('Update result:', { data, error });
+
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
           description: "Competição atualizada com sucesso.",
         });
       } else {
-        const { error } = await supabase
+        console.log('Creating new competition');
+        const { data, error } = await supabase
           .from('championships')
           .insert({
             name: formData.name,
@@ -168,9 +190,15 @@ const CompetitionsManagement = () => {
             start_date: formData.start_date || null,
             end_date: formData.end_date || null,
             status: formData.status
-          });
+          })
+          .select();
 
-        if (error) throw error;
+        console.log('Insert result:', { data, error });
+
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
 
         toast({
           title: "Sucesso",
@@ -180,12 +208,12 @@ const CompetitionsManagement = () => {
 
       setShowDialog(false);
       setFormData({ name: '', type: 'championship', season: '2024/2025', start_date: '', end_date: '', teams: 0, status: 'upcoming' });
-      fetchCompetitions();
+      await fetchCompetitions();
     } catch (error) {
       console.error('Erro ao salvar competição:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar competição. Tente novamente.",
+        description: `Erro ao salvar competição: ${error.message}`,
         variant: "destructive",
       });
     } finally {
