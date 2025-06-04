@@ -8,37 +8,14 @@ import {
   Calendar, 
   Users, 
   LogIn, 
-  PenLine, 
-  ImagePlus, 
-  Database,
-  Settings,
   LayoutGrid
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { 
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage 
-} from "@/components/ui/form";
+import NewsManagement from '../components/admin/NewsManagement';
+import GalleryManagement from '../components/admin/GalleryManagement';
+import AdsManagement from '../components/admin/AdsManagement';
+import CompetitionsManagement from '../components/admin/CompetitionsManagement';
+import PlayersManagement from '../components/admin/PlayersManagement';
 
 const AreaReservadaPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -46,40 +23,7 @@ const AreaReservadaPage = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Content management states
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [showNewsDialog, setShowNewsDialog] = useState(false);
-  const [showPhotoDialog, setShowPhotoDialog] = useState(false);
-  const [showAdDialog, setShowAdDialog] = useState(false);
-  const [newsTitle, setNewsTitle] = useState('');
-  const [newsContent, setNewsContent] = useState('');
-  const [newsCategory, setNewsCategory] = useState('Competições');
-  const [photoTitle, setPhotoTitle] = useState('');
-  const [photoDescription, setPhotoDescription] = useState('');
-  const [photoEvent, setPhotoEvent] = useState('');
-  const [adTitle, setAdTitle] = useState('');
-  const [adLink, setAdLink] = useState('');
-  const [adPosition, setAdPosition] = useState('sidebar');
-  
-  // Sample data
-  const newsList = [
-    { id: 1, title: 'ABC vence a SuperTaça de Cabo Verde 2025', date: '23/03/2025', category: 'Competições', status: 'Publicado' },
-    { id: 2, title: 'Seleção Nacional convoca 20 jogadores para o AfroBasket', date: '20/03/2025', category: 'Seleções', status: 'Publicado' },
-    { id: 3, title: 'Final Four da Liga Nacional em São Vicente', date: '15/03/2025', category: 'Competições', status: 'Rascunho' }
-  ];
-  
-  const photosList = [
-    { id: 1, title: 'Final Liga Nacional 2025', event: 'Liga Nacional', date: '15/04/2025', status: 'Publicado' },
-    { id: 2, title: 'Workshop Treinadores', event: 'Formação', date: '10/03/2025', status: 'Publicado' },
-    { id: 3, title: 'Selecção Nacional', event: 'Seleções', date: '05/02/2025', status: 'Rascunho' }
-  ];
-  
-  const adsList = [
-    { id: 1, title: 'Patrocínio Nike', position: 'Cabeçalho', status: 'Ativo' },
-    { id: 2, title: 'Parceria com Banco de Cabo Verde', position: 'Sidebar', status: 'Ativo' },
-    { id: 3, title: 'Promoção Equipamentos', position: 'Rodapé', status: 'Inativo' }
-  ];
   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +32,6 @@ const AreaReservadaPage = () => {
     
     // Simulate API call
     setTimeout(() => {
-      // For demo purposes, let's just check if email contains "@" and password is not empty
       if (email.includes('@') && password.length > 0) {
         setIsLoggedIn(true);
         setError(null);
@@ -97,45 +40,6 @@ const AreaReservadaPage = () => {
       }
       setIsLoading(false);
     }, 1000);
-  };
-  
-  const handleAddNews = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would send the data to an API
-    console.log('Add news:', { newsTitle, newsContent, newsCategory });
-    setShowNewsDialog(false);
-    // Reset form fields
-    setNewsTitle('');
-    setNewsContent('');
-    setNewsCategory('Competições');
-    // Show success message in a real app
-    alert('Notícia adicionada com sucesso!');
-  };
-  
-  const handleAddPhoto = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would send the data to an API
-    console.log('Add photo:', { photoTitle, photoDescription, photoEvent });
-    setShowPhotoDialog(false);
-    // Reset form fields
-    setPhotoTitle('');
-    setPhotoDescription('');
-    setPhotoEvent('');
-    // Show success message in a real app
-    alert('Foto adicionada com sucesso!');
-  };
-  
-  const handleAddAd = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would send the data to an API
-    console.log('Add ad:', { adTitle, adLink, adPosition });
-    setShowAdDialog(false);
-    // Reset form fields
-    setAdTitle('');
-    setAdLink('');
-    setAdPosition('sidebar');
-    // Show success message in a real app
-    alert('Anúncio adicionado com sucesso!');
   };
   
   return (
@@ -269,6 +173,18 @@ const AreaReservadaPage = () => {
                 Publicidade
               </button>
               <button 
+                className={`px-6 py-4 focus:outline-none ${activeTab === 'competitions' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
+                onClick={() => setActiveTab('competitions')}
+              >
+                Competições
+              </button>
+              <button 
+                className={`px-6 py-4 focus:outline-none ${activeTab === 'players' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
+                onClick={() => setActiveTab('players')}
+              >
+                Jogadores
+              </button>
+              <button 
                 className={`px-6 py-4 focus:outline-none ${activeTab === 'profile' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
                 onClick={() => setActiveTab('profile')}
               >
@@ -398,177 +314,12 @@ const AreaReservadaPage = () => {
             </div>
           )}
           
-          {/* News Management Tab */}
-          {activeTab === 'news' && (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold text-cv-blue">Gestão de Notícias</h3>
-                <Button 
-                  className="bg-cv-blue hover:bg-blue-700 flex items-center gap-2"
-                  onClick={() => setShowNewsDialog(true)}
-                >
-                  <PenLine size={18} />
-                  Adicionar Notícia
-                </Button>
-              </div>
-              
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Título</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Categoria</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {newsList.map((news) => (
-                    <TableRow key={news.id}>
-                      <TableCell>{news.id}</TableCell>
-                      <TableCell>{news.title}</TableCell>
-                      <TableCell>{news.date}</TableCell>
-                      <TableCell>{news.category}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          news.status === 'Publicado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {news.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <button className="text-blue-600 hover:text-blue-800">
-                            <PenLine size={16} />
-                          </button>
-                          <button className="text-red-600 hover:text-red-800">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-          
-          {/* Gallery Management Tab */}
-          {activeTab === 'gallery' && (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold text-cv-blue">Gestão de Galeria</h3>
-                <Button 
-                  className="bg-cv-blue hover:bg-blue-700 flex items-center gap-2"
-                  onClick={() => setShowPhotoDialog(true)}
-                >
-                  <ImagePlus size={18} />
-                  Adicionar Fotos
-                </Button>
-              </div>
-              
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Título</TableHead>
-                    <TableHead>Evento</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {photosList.map((photo) => (
-                    <TableRow key={photo.id}>
-                      <TableCell>{photo.id}</TableCell>
-                      <TableCell>{photo.title}</TableCell>
-                      <TableCell>{photo.event}</TableCell>
-                      <TableCell>{photo.date}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          photo.status === 'Publicado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {photo.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <button className="text-blue-600 hover:text-blue-800">
-                            <PenLine size={16} />
-                          </button>
-                          <button className="text-red-600 hover:text-red-800">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-          
-          {/* Ads Management Tab */}
-          {activeTab === 'ads' && (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold text-cv-blue">Gestão de Publicidade</h3>
-                <Button 
-                  className="bg-cv-blue hover:bg-blue-700 flex items-center gap-2"
-                  onClick={() => setShowAdDialog(true)}
-                >
-                  <LayoutGrid size={18} />
-                  Adicionar Anúncio
-                </Button>
-              </div>
-              
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Título</TableHead>
-                    <TableHead>Posição</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {adsList.map((ad) => (
-                    <TableRow key={ad.id}>
-                      <TableCell>{ad.id}</TableCell>
-                      <TableCell>{ad.title}</TableCell>
-                      <TableCell>{ad.position}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          ad.status === 'Ativo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {ad.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <button className="text-blue-600 hover:text-blue-800">
-                            <PenLine size={16} />
-                          </button>
-                          <button className="text-red-600 hover:text-red-800">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+          {/* Content Management Tabs */}
+          {activeTab === 'news' && <NewsManagement />}
+          {activeTab === 'gallery' && <GalleryManagement />}
+          {activeTab === 'ads' && <AdsManagement />}
+          {activeTab === 'competitions' && <CompetitionsManagement />}
+          {activeTab === 'players' && <PlayersManagement />}
           
           {/* Profile Tab */}
           {activeTab === 'profile' && (
@@ -635,230 +386,6 @@ const AreaReservadaPage = () => {
               </div>
             </div>
           )}
-
-          {/* Add News Dialog */}
-          <Dialog open={showNewsDialog} onOpenChange={setShowNewsDialog}>
-            <DialogContent className="sm:max-w-[525px]">
-              <DialogHeader>
-                <DialogTitle>Adicionar Nova Notícia</DialogTitle>
-                <DialogDescription>
-                  Preencha os campos abaixo para adicionar uma nova notícia ao site.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddNews}>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <label htmlFor="newsTitle" className="text-sm font-medium">
-                      Título da Notícia
-                    </label>
-                    <input
-                      id="newsTitle"
-                      value={newsTitle}
-                      onChange={(e) => setNewsTitle(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="newsCategory" className="text-sm font-medium">
-                      Categoria
-                    </label>
-                    <select
-                      id="newsCategory"
-                      value={newsCategory}
-                      onChange={(e) => setNewsCategory(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="Competições">Competições</option>
-                      <option value="Seleções">Seleções</option>
-                      <option value="Formação">Formação</option>
-                      <option value="Arbitragem">Arbitragem</option>
-                    </select>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="newsContent" className="text-sm font-medium">
-                      Conteúdo
-                    </label>
-                    <textarea
-                      id="newsContent"
-                      value={newsContent}
-                      onChange={(e) => setNewsContent(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md h-32"
-                      required
-                    ></textarea>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="newsImage" className="text-sm font-medium">
-                      Imagem
-                    </label>
-                    <input
-                      id="newsImage"
-                      type="file"
-                      accept="image/*"
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                    <p className="text-xs text-gray-500">
-                      Recomendado: imagem de 1200x628 pixels, máx. 2MB
-                    </p>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" className="bg-cv-blue">Publicar Notícia</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-          
-          {/* Add Photo Dialog */}
-          <Dialog open={showPhotoDialog} onOpenChange={setShowPhotoDialog}>
-            <DialogContent className="sm:max-w-[525px]">
-              <DialogHeader>
-                <DialogTitle>Adicionar Fotos à Galeria</DialogTitle>
-                <DialogDescription>
-                  Carregue fotos para adicionar à galeria do site.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddPhoto}>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <label htmlFor="photoTitle" className="text-sm font-medium">
-                      Título do Álbum
-                    </label>
-                    <input
-                      id="photoTitle"
-                      value={photoTitle}
-                      onChange={(e) => setPhotoTitle(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="photoEvent" className="text-sm font-medium">
-                      Evento
-                    </label>
-                    <input
-                      id="photoEvent"
-                      value={photoEvent}
-                      onChange={(e) => setPhotoEvent(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="photoDescription" className="text-sm font-medium">
-                      Descrição
-                    </label>
-                    <textarea
-                      id="photoDescription"
-                      value={photoDescription}
-                      onChange={(e) => setPhotoDescription(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md h-20"
-                    ></textarea>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="photoFiles" className="text-sm font-medium">
-                      Fotos
-                    </label>
-                    <input
-                      id="photoFiles"
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                    <p className="text-xs text-gray-500">
-                      Você pode selecionar várias imagens. Tamanho máximo: 5MB por imagem.
-                    </p>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" className="bg-cv-blue">Carregar Fotos</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-          
-          {/* Add Ad Dialog */}
-          <Dialog open={showAdDialog} onOpenChange={setShowAdDialog}>
-            <DialogContent className="sm:max-w-[525px]">
-              <DialogHeader>
-                <DialogTitle>Adicionar Novo Anúncio</DialogTitle>
-                <DialogDescription>
-                  Preencha os campos abaixo para adicionar um novo anúncio ao site.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddAd}>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <label htmlFor="adTitle" className="text-sm font-medium">
-                      Título do Anúncio
-                    </label>
-                    <input
-                      id="adTitle"
-                      value={adTitle}
-                      onChange={(e) => setAdTitle(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="adLink" className="text-sm font-medium">
-                      Link
-                    </label>
-                    <input
-                      id="adLink"
-                      type="url"
-                      value={adLink}
-                      onChange={(e) => setAdLink(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="https://..."
-                    />
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="adPosition" className="text-sm font-medium">
-                      Posição
-                    </label>
-                    <select
-                      id="adPosition"
-                      value={adPosition}
-                      onChange={(e) => setAdPosition(e.target.value)}
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="header">Cabeçalho</option>
-                      <option value="sidebar">Barra Lateral</option>
-                      <option value="footer">Rodapé</option>
-                      <option value="content">Entre Conteúdo</option>
-                    </select>
-                  </div>
-                  
-                  <div className="grid gap-2">
-                    <label htmlFor="adImage" className="text-sm font-medium">
-                      Imagem do Anúncio
-                    </label>
-                    <input
-                      id="adImage"
-                      type="file"
-                      accept="image/*"
-                      className="px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                    <p className="text-xs text-gray-500">
-                      Formatos recomendados: Banner (728x90), Retângulo (300x250)
-                    </p>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" className="bg-cv-blue">Publicar Anúncio</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
         </div>
       )}
     </PageLayout>
