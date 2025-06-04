@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown, Lock, LogIn, User } from 'lucide-react';
@@ -86,8 +85,12 @@ const Header = () => {
         {/* Top bar with logo and secondary navigation */}
         <div className="flex justify-between items-center py-3">
           <div className="flex items-center">
-            <Link to="/" className="font-bold text-xl text-cv-blue">
-              FCBB
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
+                alt="FCBB Logo" 
+                className="h-12 w-auto"
+              />
             </Link>
           </div>
           <div className="hidden md:flex items-center space-x-4">
