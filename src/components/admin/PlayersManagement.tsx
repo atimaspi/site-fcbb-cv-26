@@ -85,7 +85,7 @@ const PlayersManagement = () => {
 
       console.log('Formatted players:', formattedPlayers);
       setPlayers(formattedPlayers);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao carregar jogadores:', error);
       toast({
         title: "Erro",
@@ -98,12 +98,14 @@ const PlayersManagement = () => {
   };
 
   const handleAdd = () => {
+    console.log('Adding new player');
     setEditingItem(null);
     setFormData({ first_name: '', last_name: '', club: '', position: 'Base', jersey_number: 0, age: 0, nationality: 'Cabo Verde', status: 'active' });
     setShowDialog(true);
   };
 
   const handleEdit = (item: Player) => {
+    console.log('Editing player:', item);
     setEditingItem(item);
     setFormData({
       first_name: item.first_name,
@@ -119,8 +121,13 @@ const PlayersManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja eliminar este jogador?')) return;
+    console.log('Delete button clicked for id:', id);
+    if (!window.confirm('Tem certeza que deseja eliminar este jogador?')) {
+      console.log('Delete cancelled by user');
+      return;
+    }
 
+    setLoading(true);
     try {
       console.log('Deleting player with id:', id);
       const { error } = await supabase
@@ -140,23 +147,24 @@ const PlayersManagement = () => {
       });
 
       await fetchPlayers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao eliminar jogador:', error);
       toast({
         title: "Erro",
         description: `Erro ao eliminar jogador: ${error.message}`,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with data:', formData);
     setLoading(true);
 
     try {
-      console.log('Submitting player form data:', formData);
-      
       if (editingItem) {
         console.log('Updating player with id:', editingItem.id);
         const { data, error } = await supabase
@@ -217,7 +225,7 @@ const PlayersManagement = () => {
       setShowDialog(false);
       setFormData({ first_name: '', last_name: '', club: '', position: 'Base', jersey_number: 0, age: 0, nationality: 'Cabo Verde', status: 'active' });
       await fetchPlayers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar jogador:', error);
       toast({
         title: "Erro",
@@ -283,14 +291,14 @@ const PlayersManagement = () => {
                     <div className="flex space-x-2">
                       <button 
                         onClick={() => handleEdit(player)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 rounded"
                         title="Editar"
                       >
                         <PenLine size={16} />
                       </button>
                       <button 
                         onClick={() => handleDelete(player.id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 hover:text-red-800 hover:bg-red-50 p-1 rounded"
                         title="Eliminar"
                       >
                         <Trash2 size={16} />

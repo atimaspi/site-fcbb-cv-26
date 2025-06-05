@@ -77,7 +77,7 @@ const NewsManagement = () => {
 
       console.log('Formatted news:', formattedNews);
       setNewsList(formattedNews);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao carregar notícias:', error);
       toast({
         title: "Erro",
@@ -90,12 +90,14 @@ const NewsManagement = () => {
   };
 
   const handleAdd = () => {
+    console.log('Adding new news item');
     setEditingItem(null);
     setFormData({ title: '', content: '', category: 'Competições', status: 'draft' });
     setShowDialog(true);
   };
 
   const handleEdit = (item: NewsItem) => {
+    console.log('Editing news item:', item);
     setEditingItem(item);
     setFormData({
       title: item.title,
@@ -107,8 +109,13 @@ const NewsManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja eliminar esta notícia?')) return;
+    console.log('Delete button clicked for id:', id);
+    if (!window.confirm('Tem certeza que deseja eliminar esta notícia?')) {
+      console.log('Delete cancelled by user');
+      return;
+    }
 
+    setLoading(true);
     try {
       console.log('Deleting news with id:', id);
       const { error } = await supabase
@@ -128,23 +135,24 @@ const NewsManagement = () => {
       });
 
       await fetchNews();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao eliminar notícia:', error);
       toast({
         title: "Erro",
         description: `Erro ao eliminar notícia: ${error.message}`,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with data:', formData);
     setLoading(true);
 
     try {
-      console.log('Submitting form data:', formData);
-      
       if (editingItem) {
         console.log('Updating news with id:', editingItem.id);
         const { data, error } = await supabase
@@ -200,7 +208,7 @@ const NewsManagement = () => {
       setShowDialog(false);
       setFormData({ title: '', content: '', category: 'Competições', status: 'draft' });
       await fetchNews();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar notícia:', error);
       toast({
         title: "Erro",

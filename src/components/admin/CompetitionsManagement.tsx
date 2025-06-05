@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -115,8 +114,13 @@ const CompetitionsManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja eliminar esta competição?')) return;
+    console.log('Delete button clicked for id:', id);
+    if (!window.confirm('Tem certeza que deseja eliminar esta competição?')) {
+      console.log('Delete cancelled by user');
+      return;
+    }
 
+    setLoading(true);
     try {
       console.log('Deleting competition with id:', id);
       const { error } = await supabase
@@ -136,13 +140,15 @@ const CompetitionsManagement = () => {
       });
 
       await fetchCompetitions();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao eliminar competição:', error);
       toast({
         title: "Erro",
         description: `Erro ao eliminar competição: ${error.message}`,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 

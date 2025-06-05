@@ -77,7 +77,7 @@ const GalleryManagement = () => {
 
       console.log('Formatted gallery:', formattedGallery);
       setGalleryList(formattedGallery);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao carregar galeria:', error);
       toast({
         title: "Erro",
@@ -90,12 +90,14 @@ const GalleryManagement = () => {
   };
 
   const handleAdd = () => {
+    console.log('Adding new gallery item');
     setEditingItem(null);
     setFormData({ title: '', description: '', event: '', status: 'draft' });
     setShowDialog(true);
   };
 
   const handleEdit = (item: GalleryItem) => {
+    console.log('Editing gallery item:', item);
     setEditingItem(item);
     setFormData({
       title: item.title,
@@ -107,8 +109,13 @@ const GalleryManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja eliminar este álbum?')) return;
+    console.log('Delete button clicked for id:', id);
+    if (!window.confirm('Tem certeza que deseja eliminar este álbum?')) {
+      console.log('Delete cancelled by user');
+      return;
+    }
 
+    setLoading(true);
     try {
       console.log('Deleting gallery with id:', id);
       const { error } = await supabase
@@ -128,23 +135,24 @@ const GalleryManagement = () => {
       });
 
       await fetchGallery();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao eliminar álbum:', error);
       toast({
         title: "Erro",
         description: `Erro ao eliminar álbum: ${error.message}`,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with data:', formData);
     setLoading(true);
 
     try {
-      console.log('Submitting gallery form data:', formData);
-      
       if (editingItem) {
         console.log('Updating gallery with id:', editingItem.id);
         const { data, error } = await supabase
@@ -199,7 +207,7 @@ const GalleryManagement = () => {
       setShowDialog(false);
       setFormData({ title: '', description: '', event: '', status: 'draft' });
       await fetchGallery();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar álbum:', error);
       toast({
         title: "Erro",

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,8 +112,13 @@ const AdsManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja eliminar este anúncio?')) return;
+    console.log('Delete button clicked for id:', id);
+    if (!window.confirm('Tem certeza que deseja eliminar este anúncio?')) {
+      console.log('Delete cancelled by user');
+      return;
+    }
 
+    setLoading(true);
     try {
       console.log('Deleting ad with id:', id);
       const { error } = await supabase
@@ -134,13 +138,15 @@ const AdsManagement = () => {
       });
 
       await fetchAds();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao eliminar anúncio:', error);
       toast({
         title: "Erro",
         description: `Erro ao eliminar anúncio: ${error.message}`,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
