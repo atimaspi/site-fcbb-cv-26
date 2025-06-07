@@ -14,6 +14,7 @@ import VideosPage from "./pages/VideosPage";
 import ImprensaPage from "./pages/ImprensaPage";
 import CalendarioPage from "./pages/competitions/CalendarioPage";
 import TransferenciasPage from "./pages/TransferenciasPage";
+import FibaLiveStatsPage from "./pages/FibaLiveStatsPage";
 
 // Federation pages
 import MissaoVisaoPage from "./pages/federation/MissaoVisaoPage";
@@ -57,6 +58,8 @@ const App = () => (
           
           {/* Federation routes */}
           <Route path="/federacao/historia" element={<HistoriaPage />} />
+          <Route path="/federacao/missao-visao" element={<MissaoVisaoPage />} />
+          <Route path="/federacao/direcao" element={<DirecaoPage />} />
           <Route path="/federacao/orgaos-sociais" element={<OrgaosSociaisPage />} />
           <Route path="/federacao/estatutos" element={<EstatutosPage />} />
           <Route path="/federacao/contactos" element={<ContactosPage />} />
@@ -66,6 +69,7 @@ const App = () => (
           <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
           <Route path="/competicoes/super-taca" element={<SuperTacaPage />} />
           <Route path="/competicoes/competicoes-regionais" element={<CompeticoesRegionaisPage />} />
+          <Route path="/competicoes/calendario" element={<CalendarioPage />} />
           <Route path="/competicoes/classificacoes" element={<ClassificacoesPage />} />
           <Route path="/competicoes/resultados" element={<ResultadosPage />} />
           
@@ -81,6 +85,14 @@ const App = () => (
           <Route path="/formacao" element={<FormacaoPage />} />
           <Route path="/eventos" element={<EventosPage />} />
           <Route path="/transmissoes" element={<TransmissoesPage />} />
+          <Route path="/transferencias" element={<TransferenciasPage />} />
+          
+          {/* FIBA LiveStats route */}
+          <Route path="/resultados/fiba-livestats" element={<FibaLiveStatsPage />} />
+          
+          {/* Multimedia routes */}
+          <Route path="/videos" element={<VideosPage />} />
+          <Route path="/imprensa" element={<ImprensaPage />} />
           
           {/* Main routes */}
           <Route path="/noticias" element={<NoticiasPage />} />
