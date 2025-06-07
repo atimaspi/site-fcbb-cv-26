@@ -10,8 +10,13 @@ import NoticiasPage from "./pages/NoticiasPage";
 import GaleriaPage from "./pages/GaleriaPage";
 import ContactoPage from "./pages/ContactoPage";
 import AreaReservadaPage from "./pages/AreaReservadaPage";
+import VideosPage from "./pages/VideosPage";
+import ImprensaPage from "./pages/ImprensaPage";
+import CalendarioPage from "./pages/competitions/CalendarioPage";
 
 // Federation pages
+import MissaoVisaoPage from "./pages/federation/MissaoVisaoPage";
+import DirecaoPage from "./pages/federation/DirecaoPage";
 import HistoriaPage from "./pages/federation/HistoriaPage";
 import OrgaosSociaisPage from "./pages/federation/OrgaosSociaisPage";
 import EstatutosPage from "./pages/federation/EstatutosPage";
