@@ -1,131 +1,307 @@
 
 import PageLayout from '../PageLayout';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { MapPin, Phone, Mail, Clock, Users, Building, Calendar } from 'lucide-react';
 
 const ContactosPage = () => {
+  const departamentos = [
+    {
+      nome: "Presidência",
+      responsavel: "João Silva",
+      email: "presidencia@fcbb.cv",
+      telefone: "+238 262 1000",
+      extensao: "100"
+    },
+    {
+      nome: "Secretariado Geral",
+      responsavel: "Maria Santos",
+      email: "secretariado@fcbb.cv", 
+      telefone: "+238 262 1001",
+      extensao: "101"
+    },
+    {
+      nome: "Competições",
+      responsavel: "Carlos Mendes",
+      email: "competicoes@fcbb.cv",
+      telefone: "+238 262 1002", 
+      extensao: "102"
+    },
+    {
+      nome: "Comunicação",
+      responsavel: "Ana Pereira",
+      email: "comunicacao@fcbb.cv",
+      telefone: "+238 262 1003",
+      extensao: "103"
+    },
+    {
+      nome: "Formação",
+      responsavel: "Pedro Gomes", 
+      email: "formacao@fcbb.cv",
+      telefone: "+238 262 1004",
+      extensao: "104"
+    },
+    {
+      nome: "Arbitragem",
+      responsavel: "José Santos",
+      email: "arbitragem@fcbb.cv",
+      telefone: "+238 262 1005",
+      extensao: "105"
+    }
+  ];
+
+  const horarios = [
+    { dia: "Segunda a Quinta", horario: "08:00 - 17:00", tipo: "normal" },
+    { dia: "Sexta-feira", horario: "08:00 - 16:00", tipo: "normal" },
+    { dia: "Sábado", horario: "Apenas para eventos", tipo: "especial" },
+    { dia: "Domingo", horario: "Encerrado", tipo: "encerrado" }
+  ];
+
+  const delegacoes = [
+    {
+      ilha: "Santiago",
+      responsavel: "Dr. Manuel Costa",
+      endereco: "Av. Cidade de Lisboa, Plateau, Praia",
+      telefone: "+238 262 2000",
+      email: "santiago@fcbb.cv"
+    },
+    {
+      ilha: "São Vicente",
+      responsavel: "Eng. Teresa Alves", 
+      endereco: "Rua Lisboa, Mindelo",
+      telefone: "+238 232 3000",
+      email: "saovicente@fcbb.cv"
+    },
+    {
+      ilha: "Sal",
+      responsavel: "Prof. António Silva",
+      endereco: "Espargos, Zona Industrial", 
+      telefone: "+238 241 4000",
+      email: "sal@fcbb.cv"
+    }
+  ];
+
   return (
     <PageLayout title="Contactos">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-cv-blue mb-4">Informações de Contacto</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold">Morada</h3>
-              <p className="text-gray-700">
-                Federação Cabo-verdiana de Basquetebol<br />
-                Rua Cidade de Lisboa, 20<br />
-                Plateô<br />
-                Praia, Cabo Verde
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold">Telefone</h3>
-              <p className="text-gray-700">(+238) 260 XX XX</p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold">Email</h3>
-              <p className="text-gray-700">info@fcbb.cv</p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold">Horário de Funcionamento</h3>
-              <p className="text-gray-700">
-                Segunda a Sexta: 9h00 - 17h00<br />
-                Sábado e Domingo: Fechado
-              </p>
-            </div>
-            
-            <div className="mt-6">
-              <h3 className="font-semibold">Redes Sociais</h3>
-              <div className="flex space-x-4 mt-2">
-                <a href="#" className="text-cv-blue hover:text-blue-700">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
-                  </svg>
-                </a>
-                <a href="#" className="text-cv-blue hover:text-blue-700">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.475 2 2 6.475 2 12s4.475 10 10 10 10-4.475 10-10S17.525 2 12 2zm4.11 8.29A4.201 4.201 0 0 1 13.03 13a4.2 4.2 0 0 1-.82.35v3.18h-1.99v-3.18a4.201 4.201 0 0 1-.82-.35 4.206 4.206 0 0 1-1.48-1.71 4.203 4.203 0 1 1 8.18-.05zm-4.11-3.65C10.26 6.64 8.83 8.07 8.83 9.8c0 1.73 1.43 3.16 3.16 3.16 1.73 0 3.16-1.43 3.16-3.16.01-1.73-1.42-3.16-3.16-3.16z" />
-                  </svg>
-                </a>
-                <a href="#" className="text-cv-blue hover:text-blue-700">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.947 8.305a6.53 6.53 0 0 0-.419-2.216 4.61 4.61 0 0 0-2.633-2.633 6.606 6.606 0 0 0-2.186-.42C14.3 2.999 13.933 3 12 3c-1.933 0-2.301.001-3.709.036a6.606 6.606 0 0 0-2.185.42 4.607 4.607 0 0 0-2.633 2.633 6.554 6.554 0 0 0-.419 2.185C2.999 9.729 3 10.097 3 12s-.001 2.271.035 3.678a6.606 6.606 0 0 0 .419 2.186 4.607 4.607 0 0 0 2.634 2.632 6.554 6.554 0 0 0 2.185.45c1.409.034 1.776.035 3.709.035 1.934 0 2.301-.001 3.71-.035a6.606 6.606 0 0 0 2.186-.42 4.607 4.607 0 0 0 2.633-2.632c.263-.7.404-1.438.419-2.187.034-1.407.035-1.774.035-3.707s-.001-2.3-.035-3.709zm-8.947 8.034a4.34 4.34 0 0 1-4.339-4.338 4.34 4.34 0 0 1 4.339-4.338 4.34 4.34 0 0 1 4.338 4.338 4.34 4.34 0 0 1-4.338 4.338zm4.51-7.834a1.014 1.014 0 0 1-1.014-1.013c0-.56.454-1.013 1.013-1.013.56 0 1.014.453 1.014 1.013 0 .56-.454 1.013-1.014 1.013z" />
-                  </svg>
-                </a>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Sede Principal */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-cv-blue">
+                <Building className="mr-2 h-5 w-5" />
+                Sede Principal
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <MapPin className="h-5 w-5 text-cv-blue mt-1" />
+                <div>
+                  <p className="font-medium">Endereço</p>
+                  <p className="text-gray-600">
+                    Complexo Desportivo Nacional<br />
+                    Várzea, Cidade da Praia<br />
+                    Cabo Verde
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
+              
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-cv-blue" />
+                <div>
+                  <p className="font-medium">Telefone Principal</p>
+                  <p className="text-gray-600">+238 262 1000</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-cv-blue" />
+                <div>
+                  <p className="font-medium">Email Geral</p>
+                  <p className="text-gray-600">geral@fcbb.cv</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Horários de Funcionamento */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-cv-blue">
+                <Clock className="mr-2 h-5 w-5" />
+                Horários de Funcionamento
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {horarios.map((horario, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 rounded-lg bg-gray-50">
+                    <span className="font-medium">{horario.dia}</span>
+                    <span className={`${
+                      horario.tipo === 'encerrado' ? 'text-red-600' :
+                      horario.tipo === 'especial' ? 'text-orange-600' : 'text-green-600'
+                    }`}>
+                      {horario.horario}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Formulário de Contacto */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-cv-blue">Envie uma Mensagem</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Nome</label>
+                    <Input placeholder="Seu nome completo" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Email</label>
+                    <Input type="email" placeholder="seu@email.com" />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Assunto</label>
+                  <Input placeholder="Assunto da sua mensagem" />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Mensagem</label>
+                  <Textarea 
+                    placeholder="Escreva aqui a sua mensagem..."
+                    rows={4}
+                  />
+                </div>
+                
+                <Button className="w-full">
+                  Enviar Mensagem
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold text-cv-blue mb-4">Envie-nos uma Mensagem</h2>
-          
-          <form className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-              <input 
-                type="text" 
-                id="name" 
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cv-blue"
-                required
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input 
-                type="email" 
-                id="email" 
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cv-blue"
-                required
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">Assunto</label>
-              <input 
-                type="text" 
-                id="subject" 
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cv-blue"
-                required
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Mensagem</label>
-              <textarea 
-                id="message" 
-                rows={5}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cv-blue"
-                required
-              ></textarea>
-            </div>
-            
-            <div>
-              <button 
-                type="submit" 
-                className="bg-cv-blue hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
-              >
-                Enviar Mensagem
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-      
-      <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold text-cv-blue mb-4">Nossa Localização</h2>
-        <div className="aspect-w-16 aspect-h-9">
-          <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15656.41357000035!2d-23.52639!3d14.91778!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDU1JzA0LjEiTiAyM8KwMzEnMzUuMCJX!5e0!3m2!1sen!2scv!4v1640001234567!5m2!1sen!2scv" 
-            className="w-full h-96 border-0 rounded-md" 
-            allowFullScreen 
-            loading="lazy"
-            title="Mapa da Localização da FCBB"
-          ></iframe>
+
+        {/* Departamentos e Delegações */}
+        <div className="space-y-6">
+          {/* Departamentos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-cv-blue">
+                <Users className="mr-2 h-5 w-5" />
+                Departamentos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {departamentos.map((dept, index) => (
+                  <Card key={index} className="border">
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-lg mb-2">{dept.nome}</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center">
+                          <Users className="h-4 w-4 mr-2 text-gray-400" />
+                          <span className="text-gray-600">Responsável: </span>
+                          <span className="font-medium">{dept.responsavel}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Mail className="h-4 w-4 mr-2 text-gray-400" />
+                          <a href={`mailto:${dept.email}`} className="text-cv-blue hover:underline">
+                            {dept.email}
+                          </a>
+                        </div>
+                        <div className="flex items-center">
+                          <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                          <span>{dept.telefone} (ext. {dept.extensao})</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Delegações Regionais */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-cv-blue">
+                <MapPin className="mr-2 h-5 w-5" />
+                Delegações Regionais
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {delegacoes.map((delegacao, index) => (
+                  <Card key={index} className="border">
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-lg mb-2">Delegação de {delegacao.ilha}</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-start">
+                          <Users className="h-4 w-4 mr-2 text-gray-400 mt-0.5" />
+                          <div>
+                            <span className="text-gray-600">Responsável: </span>
+                            <span className="font-medium">{delegacao.responsavel}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-start">
+                          <MapPin className="h-4 w-4 mr-2 text-gray-400 mt-0.5" />
+                          <span className="text-gray-600">{delegacao.endereco}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                          <span>{delegacao.telefone}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Mail className="h-4 w-4 mr-2 text-gray-400" />
+                          <a href={`mailto:${delegacao.email}`} className="text-cv-blue hover:underline">
+                            {delegacao.email}
+                          </a>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Informações de Emergência */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-cv-blue">
+                <Calendar className="mr-2 h-5 w-5" />
+                Contactos de Emergência
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                  <h4 className="font-semibold text-red-800 mb-2">Situações Urgentes</h4>
+                  <p className="text-sm text-red-700">
+                    Para situações que requerem atenção imediata (acidentes, emergências médicas durante eventos):
+                  </p>
+                  <p className="font-semibold text-red-800">+238 9XX XXXX (24h)</p>
+                </div>
+                
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">Fim de Semana</h4>
+                  <p className="text-sm text-blue-700">
+                    Contacto disponível durante eventos oficiais aos fins de semana:
+                  </p>
+                  <p className="font-semibold text-blue-800">diretor.competicoes@fcbb.cv</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </PageLayout>
