@@ -13,6 +13,7 @@ import AreaReservadaPage from "./pages/AreaReservadaPage";
 import VideosPage from "./pages/VideosPage";
 import ImprensaPage from "./pages/ImprensaPage";
 import CalendarioPage from "./pages/competitions/CalendarioPage";
+import TransferenciasPage from "./pages/TransferenciasPage";
 
 // Federation pages
 import MissaoVisaoPage from "./pages/federation/MissaoVisaoPage";
