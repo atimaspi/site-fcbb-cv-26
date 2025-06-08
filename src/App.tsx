@@ -75,9 +75,11 @@ const App = () => (
           <Route path="/competicoes/classificacoes" element={<ClassificacoesPage />} />
           <Route path="/competicoes/resultados" element={<ResultadosPage />} />
           
-          {/* Teams routes */}
+          {/* Teams routes - Fixed routes */}
           <Route path="/selecoes/masculina" element={<SelecaoMasculinaPage />} />
+          <Route path="/selecoes/senior-masculina" element={<SelecaoMasculinaPage />} />
           <Route path="/selecoes/feminina" element={<SelecaoFemininaPage />} />
+          <Route path="/selecoes/senior-feminina" element={<SelecaoFemininaPage />} />
           <Route path="/selecoes/jovens" element={<SelecoesJovensPage />} />
           
           {/* New feature routes */}
