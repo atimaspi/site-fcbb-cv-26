@@ -4,149 +4,130 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Phone, Mail, Clock, Users, Building, Calendar } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Building, User } from 'lucide-react';
 
 const ContactosPage = () => {
   const departamentos = [
     {
       nome: "Presidência",
-      responsavel: "João Silva",
-      email: "presidencia@fcbb.cv",
-      telefone: "+238 262 1000",
-      extensao: "100"
+      responsavel: "António Silva",
+      email: "presidente@fcbb.cv",
+      telefone: "+238 261 22 34",
+      ext: "101"
     },
     {
-      nome: "Secretariado Geral",
-      responsavel: "Maria Santos",
-      email: "secretariado@fcbb.cv", 
-      telefone: "+238 262 1001",
-      extensao: "101"
+      nome: "Secretaria Geral",
+      responsavel: "Carlos Tavares", 
+      email: "secretario@fcbb.cv",
+      telefone: "+238 261 22 36",
+      ext: "102"
+    },
+    {
+      nome: "Departamento Técnico",
+      responsavel: "João Monteiro",
+      email: "tecnico@fcbb.cv",
+      telefone: "+238 261 22 38", 
+      ext: "103"
     },
     {
       nome: "Competições",
-      responsavel: "Carlos Mendes",
-      email: "competicoes@fcbb.cv",
-      telefone: "+238 262 1002", 
-      extensao: "102"
-    },
-    {
-      nome: "Comunicação",
       responsavel: "Ana Pereira",
-      email: "comunicacao@fcbb.cv",
-      telefone: "+238 262 1003",
-      extensao: "103"
+      email: "competicoes@fcbb.cv",
+      telefone: "+238 261 22 40",
+      ext: "104"
     },
     {
-      nome: "Formação",
-      responsavel: "Pedro Gomes", 
-      email: "formacao@fcbb.cv",
-      telefone: "+238 262 1004",
-      extensao: "104"
-    },
-    {
-      nome: "Arbitragem",
-      responsavel: "José Santos",
-      email: "arbitragem@fcbb.cv",
-      telefone: "+238 262 1005",
-      extensao: "105"
+      nome: "Imprensa",
+      responsavel: "Maria Santos",
+      email: "imprensa@fcbb.cv",
+      telefone: "+238 261 22 41",
+      ext: "105"
     }
   ];
 
-  const horarios = [
-    { dia: "Segunda a Quinta", horario: "08:00 - 17:00", tipo: "normal" },
-    { dia: "Sexta-feira", horario: "08:00 - 16:00", tipo: "normal" },
-    { dia: "Sábado", horario: "Apenas para eventos", tipo: "especial" },
-    { dia: "Domingo", horario: "Encerrado", tipo: "encerrado" }
-  ];
-
-  const delegacoes = [
+  const associacoesRegionais = [
     {
       ilha: "Santiago",
-      responsavel: "Dr. Manuel Costa",
-      endereco: "Av. Cidade de Lisboa, Plateau, Praia",
-      telefone: "+238 262 2000",
-      email: "santiago@fcbb.cv"
+      nome: "Associação Regional de Santiago",
+      responsavel: "Carlos Mendes",
+      email: "santiago@fcbb.cv",
+      telefone: "+238 262 11 22"
     },
     {
-      ilha: "São Vicente",
-      responsavel: "Eng. Teresa Alves", 
-      endereco: "Rua Lisboa, Mindelo",
-      telefone: "+238 232 3000",
-      email: "saovicente@fcbb.cv"
+      ilha: "São Vicente", 
+      nome: "Associação Regional de São Vicente",
+      responsavel: "João Silva",
+      email: "saovicente@fcbb.cv",
+      telefone: "+238 232 15 30"
     },
     {
       ilha: "Sal",
-      responsavel: "Prof. António Silva",
-      endereco: "Espargos, Zona Industrial", 
-      telefone: "+238 241 4000",
-      email: "sal@fcbb.cv"
+      nome: "Associação Regional do Sal",
+      responsavel: "Ana Tavares",
+      email: "sal@fcbb.cv", 
+      telefone: "+238 241 12 45"
+    },
+    {
+      ilha: "Fogo",
+      nome: "Associação Regional do Fogo",
+      responsavel: "Pedro Santos",
+      email: "fogo@fcbb.cv",
+      telefone: "+238 281 18 90"
     }
   ];
 
   return (
     <PageLayout title="Contactos">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Sede Principal */}
-        <div className="space-y-6">
+      <div className="space-y-8">
+        {/* Informações Principais */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Sede Principal */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center text-cv-blue">
-                <Building className="mr-2 h-5 w-5" />
+              <CardTitle className="text-cv-blue flex items-center">
+                <Building className="w-6 h-6 mr-2" />
                 Sede Principal
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-cv-blue mt-1" />
+                <MapPin className="w-5 h-5 text-cv-red mt-1 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Endereço</p>
+                  <p className="font-semibold">Endereço</p>
                   <p className="text-gray-600">
-                    Complexo Desportivo Nacional<br />
-                    Várzea, Cidade da Praia<br />
+                    Av. Cidade de Lisboa, CP 540<br />
+                    Praia, Ilha de Santiago<br />
                     Cabo Verde
                   </p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-cv-blue" />
+                <Phone className="w-5 h-5 text-cv-red" />
                 <div>
-                  <p className="font-medium">Telefone Principal</p>
-                  <p className="text-gray-600">+238 262 1000</p>
+                  <p className="font-semibold">Telefone</p>
+                  <p className="text-gray-600">(+238) 261 22 34</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-cv-blue" />
+                <Mail className="w-5 h-5 text-cv-red" />
                 <div>
-                  <p className="font-medium">Email Geral</p>
+                  <p className="font-semibold">Email</p>
                   <p className="text-gray-600">geral@fcbb.cv</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Horários de Funcionamento */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-cv-blue">
-                <Clock className="mr-2 h-5 w-5" />
-                Horários de Funcionamento
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {horarios.map((horario, index) => (
-                  <div key={index} className="flex justify-between items-center p-3 rounded-lg bg-gray-50">
-                    <span className="font-medium">{horario.dia}</span>
-                    <span className={`${
-                      horario.tipo === 'encerrado' ? 'text-red-600' :
-                      horario.tipo === 'especial' ? 'text-orange-600' : 'text-green-600'
-                    }`}>
-                      {horario.horario}
-                    </span>
+              
+              <div className="flex items-start space-x-3">
+                <Clock className="w-5 h-5 text-cv-red mt-1" />
+                <div>
+                  <p className="font-semibold">Horário</p>
+                  <div className="text-gray-600 text-sm">
+                    <p>Segunda a Sexta: 08:00 - 17:00</p>
+                    <p>Sábado: 08:00 - 12:00</p>
+                    <p>Domingo: Encerrado</p>
                   </div>
-                ))}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -154,7 +135,7 @@ const ContactosPage = () => {
           {/* Formulário de Contacto */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-cv-blue">Envie uma Mensagem</CardTitle>
+              <CardTitle className="text-cv-blue">Envie-nos uma Mensagem</CardTitle>
             </CardHeader>
             <CardContent>
               <form className="space-y-4">
@@ -168,21 +149,18 @@ const ContactosPage = () => {
                     <Input type="email" placeholder="seu@email.com" />
                   </div>
                 </div>
-                
                 <div>
                   <label className="block text-sm font-medium mb-1">Assunto</label>
-                  <Input placeholder="Assunto da sua mensagem" />
+                  <Input placeholder="Assunto da mensagem" />
                 </div>
-                
                 <div>
                   <label className="block text-sm font-medium mb-1">Mensagem</label>
                   <Textarea 
-                    placeholder="Escreva aqui a sua mensagem..."
+                    placeholder="Escreva sua mensagem aqui..." 
                     rows={4}
                   />
                 </div>
-                
-                <Button className="w-full">
+                <Button className="w-full bg-cv-blue hover:bg-blue-700">
                   Enviar Mensagem
                 </Button>
               </form>
@@ -190,119 +168,89 @@ const ContactosPage = () => {
           </Card>
         </div>
 
-        {/* Departamentos e Delegações */}
-        <div className="space-y-6">
-          {/* Departamentos */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-cv-blue">
-                <Users className="mr-2 h-5 w-5" />
-                Departamentos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {departamentos.map((dept, index) => (
-                  <Card key={index} className="border">
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg mb-2">{dept.nome}</h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center">
-                          <Users className="h-4 w-4 mr-2 text-gray-400" />
-                          <span className="text-gray-600">Responsável: </span>
-                          <span className="font-medium">{dept.responsavel}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                          <a href={`mailto:${dept.email}`} className="text-cv-blue hover:underline">
-                            {dept.email}
-                          </a>
-                        </div>
-                        <div className="flex items-center">
-                          <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                          <span>{dept.telefone} (ext. {dept.extensao})</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Delegações Regionais */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-cv-blue">
-                <MapPin className="mr-2 h-5 w-5" />
-                Delegações Regionais
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {delegacoes.map((delegacao, index) => (
-                  <Card key={index} className="border">
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg mb-2">Delegação de {delegacao.ilha}</h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-start">
-                          <Users className="h-4 w-4 mr-2 text-gray-400 mt-0.5" />
-                          <div>
-                            <span className="text-gray-600">Responsável: </span>
-                            <span className="font-medium">{delegacao.responsavel}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-start">
-                          <MapPin className="h-4 w-4 mr-2 text-gray-400 mt-0.5" />
-                          <span className="text-gray-600">{delegacao.endereco}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                          <span>{delegacao.telefone}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                          <a href={`mailto:${delegacao.email}`} className="text-cv-blue hover:underline">
-                            {delegacao.email}
-                          </a>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Informações de Emergência */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-cv-blue">
-                <Calendar className="mr-2 h-5 w-5" />
-                Contactos de Emergência
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                  <h4 className="font-semibold text-red-800 mb-2">Situações Urgentes</h4>
-                  <p className="text-sm text-red-700">
-                    Para situações que requerem atenção imediata (acidentes, emergências médicas durante eventos):
-                  </p>
-                  <p className="font-semibold text-red-800">+238 9XX XXXX (24h)</p>
+        {/* Departamentos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-cv-blue">Departamentos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {departamentos.map((dept, index) => (
+                <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <h3 className="font-semibold text-cv-blue mb-2">{dept.nome}</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center">
+                      <User className="w-4 h-4 mr-2 text-gray-500" />
+                      <span>{dept.responsavel}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Mail className="w-4 h-4 mr-2 text-gray-500" />
+                      <a href={`mailto:${dept.email}`} className="text-cv-blue hover:underline">
+                        {dept.email}
+                      </a>
+                    </div>
+                    <div className="flex items-center">
+                      <Phone className="w-4 h-4 mr-2 text-gray-500" />
+                      <span>{dept.telefone} (ext. {dept.ext})</span>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <h4 className="font-semibold text-blue-800 mb-2">Fim de Semana</h4>
-                  <p className="text-sm text-blue-700">
-                    Contacto disponível durante eventos oficiais aos fins de semana:
-                  </p>
-                  <p className="font-semibold text-blue-800">diretor.competicoes@fcbb.cv</p>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Associações Regionais */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-cv-blue">Associações Regionais</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {associacoesRegionais.map((assoc, index) => (
+                <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                  <div className="flex items-center mb-3">
+                    <MapPin className="w-5 h-5 text-cv-red mr-2" />
+                    <h3 className="font-semibold text-cv-blue">{assoc.ilha}</h3>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <p className="font-medium">{assoc.nome}</p>
+                    <div className="flex items-center">
+                      <User className="w-4 h-4 mr-2 text-gray-500" />
+                      <span>{assoc.responsavel}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Mail className="w-4 h-4 mr-2 text-gray-500" />
+                      <a href={`mailto:${assoc.email}`} className="text-cv-blue hover:underline">
+                        {assoc.email}
+                      </a>
+                    </div>
+                    <div className="flex items-center">
+                      <Phone className="w-4 h-4 mr-2 text-gray-500" />
+                      <span>{assoc.telefone}</span>
+                    </div>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Mapa (placeholder) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-cv-blue">Localização</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+              <div className="text-center text-gray-600">
+                <MapPin className="w-12 h-12 mx-auto mb-2" />
+                <p>Mapa da localização da sede</p>
+                <p className="text-sm">Av. Cidade de Lisboa, Praia</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </PageLayout>
   );

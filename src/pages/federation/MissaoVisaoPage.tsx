@@ -1,133 +1,134 @@
 
 import PageLayout from '../PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Target, Eye, Heart, Globe } from 'lucide-react';
+import { Target, Eye, Heart, Award, Users, Globe } from 'lucide-react';
 
 const MissaoVisaoPage = () => {
+  const valores = [
+    {
+      icon: <Heart className="w-8 h-8" />,
+      title: "Paixão",
+      description: "Promover o amor pelo basquetebol em todas as idades e níveis de competição."
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "Inclusão",
+      description: "Garantir oportunidades iguais para todos, independentemente da origem ou condição social."
+    },
+    {
+      icon: <Award className="w-8 h-8" />,
+      title: "Excelência",
+      description: "Buscar sempre os mais altos padrões de qualidade na organização e desenvolvimento."
+    },
+    {
+      icon: <Globe className="w-8 h-8" />,
+      title: "Integridade",
+      description: "Atuar com transparência, ética e responsabilidade em todas as nossas ações."
+    }
+  ];
+
+  const objetivos = [
+    "Desenvolver o basquetebol em todas as ilhas de Cabo Verde",
+    "Formar jogadores, treinadores e árbitros de alta qualidade",
+    "Organizar competições nacionais e regionais regulares",
+    "Promover a participação internacional das seleções nacionais",
+    "Modernizar as infraestruturas desportivas do país",
+    "Fomentar o basquetebol feminino e jovem",
+    "Estabelecer parcerias estratégicas nacionais e internacionais",
+    "Implementar programas de desenvolvimento comunitário"
+  ];
+
   return (
     <PageLayout title="Missão e Visão">
       <div className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="border-l-4 border-cv-blue">
-            <CardHeader>
-              <CardTitle className="flex items-center text-cv-blue">
-                <Target className="mr-3 h-6 w-6" />
-                Nossa Missão
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-lg">
-              <p className="text-gray-700 leading-relaxed">
-                Promover, desenvolver e organizar o basquetebol em Cabo Verde, garantindo 
-                a excelência desportiva, a formação integral dos atletas e o crescimento 
-                sustentável da modalidade em todas as ilhas do arquipélago.
-              </p>
-              <p className="text-gray-700 leading-relaxed mt-4">
-                Trabalhamos para elevar o nível competitivo do basquetebol cabo-verdiano, 
-                criando oportunidades para jovens talentos e promovendo valores como 
-                fair-play, disciplina e trabalho em equipa.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-cv-red">
-            <CardHeader>
-              <CardTitle className="flex items-center text-cv-red">
-                <Eye className="mr-3 h-6 w-6" />
-                Nossa Visão
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-lg">
-              <p className="text-gray-700 leading-relaxed">
-                Ser reconhecida como uma federação de referência em África, 
-                posicionando Cabo Verde no cenário internacional do basquetebol 
-                através da excelência organizacional e competitiva.
-              </p>
-              <p className="text-gray-700 leading-relaxed mt-4">
-                Aspiramos a consolidar o basquetebol como uma das modalidades 
-                mais praticadas e admiradas em Cabo Verde, contribuindo para 
-                o desenvolvimento social e cultural do país.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <Heart className="mx-auto h-12 w-12 text-cv-blue mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Paixão pelo Desporto</h3>
-              <p className="text-gray-600">
-                Cultivamos o amor pelo basquetebol em todas as idades e níveis competitivos.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <Globe className="mx-auto h-12 w-12 text-cv-red mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Projeção Internacional</h3>
-              <p className="text-gray-600">
-                Levamos o nome de Cabo Verde além fronteiras através do basquetebol.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center">
-            <CardContent className="pt-6">
-              <Target className="mx-auto h-12 w-12 text-cv-yellow mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Excelência Técnica</h3>
-              <p className="text-gray-600">
-                Buscamos constantemente a melhoria dos padrões técnicos e organizacionais.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
+        {/* Missão */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-cv-blue">Valores Fundamentais</CardTitle>
+            <div className="flex items-center space-x-3">
+              <Target className="w-8 h-8 text-cv-blue" />
+              <CardTitle className="text-2xl text-cv-blue">Nossa Missão</CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="bg-cv-blue text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                  <span className="font-bold text-lg">I</span>
-                </div>
-                <h4 className="font-semibold mb-2">Integridade</h4>
-                <p className="text-sm text-gray-600">
-                  Atuamos com transparência e ética em todas as nossas decisões.
-                </p>
-              </div>
+            <p className="text-lg text-gray-700 leading-relaxed">
+              Promover, desenvolver e organizar o basquetebol em Cabo Verde, criando oportunidades 
+              para todos os cidadãos praticarem esta modalidade, desde o nível recreativo até ao 
+              alto rendimento, contribuindo para o desenvolvimento social, cultural e desportivo 
+              do país.
+            </p>
+          </CardContent>
+        </Card>
 
-              <div className="text-center">
-                <div className="bg-cv-red text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                  <span className="font-bold text-lg">R</span>
-                </div>
-                <h4 className="font-semibold mb-2">Respeito</h4>
-                <p className="text-sm text-gray-600">
-                  Valorizamos todos os intervenientes do basquetebol cabo-verdiano.
-                </p>
-              </div>
+        {/* Visão */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <Eye className="w-8 h-8 text-cv-blue" />
+              <CardTitle className="text-2xl text-cv-blue">Nossa Visão</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-lg text-gray-700 leading-relaxed">
+              Ser reconhecida como uma federação de referência em África, destacando-se pela 
+              qualidade da organização, pelo desenvolvimento sustentável do basquetebol e pela 
+              formação de atletas que representem Cabo Verde com distinção no cenário internacional.
+            </p>
+          </CardContent>
+        </Card>
 
-              <div className="text-center">
-                <div className="bg-cv-yellow text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                  <span className="font-bold text-lg">E</span>
+        {/* Valores */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl text-cv-blue">Nossos Valores</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {valores.map((valor, index) => (
+                <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="text-cv-blue flex-shrink-0">
+                    {valor.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-cv-blue mb-2">{valor.title}</h3>
+                    <p className="text-gray-700">{valor.description}</p>
+                  </div>
                 </div>
-                <h4 className="font-semibold mb-2">Excelência</h4>
-                <p className="text-sm text-gray-600">
-                  Procuramos sempre o mais alto nível de qualidade em tudo o que fazemos.
-                </p>
-              </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-              <div className="text-center">
-                <div className="bg-cv-blue text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                  <span className="font-bold text-lg">U</span>
+        {/* Objetivos Estratégicos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl text-cv-blue">Objetivos Estratégicos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {objetivos.map((objetivo, index) => (
+                <div key={index} className="flex items-start space-x-3 p-3 border-l-4 border-cv-red bg-gray-50 rounded-r">
+                  <div className="w-6 h-6 bg-cv-blue text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-1">
+                    {index + 1}
+                  </div>
+                  <p className="text-gray-700">{objetivo}</p>
                 </div>
-                <h4 className="font-semibold mb-2">União</h4>
-                <p className="text-sm text-gray-600">
-                  Trabalhamos em conjunto para o desenvolvimento da modalidade.
-                </p>
-              </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Compromisso */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl text-cv-blue">Nosso Compromisso</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-gradient-to-r from-cv-blue to-cv-red text-white p-6 rounded-lg">
+              <p className="text-lg leading-relaxed">
+                A FCBB compromete-se a trabalhar incansavelmente para o desenvolvimento do basquetebol 
+                cabo-verdiano, mantendo sempre os mais altos padrões de integridade, transparência e 
+                dedicação ao serviço da comunidade desportiva nacional.
+              </p>
             </div>
           </CardContent>
         </Card>

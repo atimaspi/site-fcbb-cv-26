@@ -2,199 +2,183 @@
 import PageLayout from '../PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, Calendar } from 'lucide-react';
 
 const DirecaoPage = () => {
-  const direcao = [
+  const diretores = [
     {
-      nome: "João Silva Santos",
+      nome: "António Silva",
       cargo: "Presidente",
-      mandato: "2024-2028",
+      mandato: "2020-2024",
       email: "presidente@fcbb.cv",
-      telefone: "+238 262 1234",
-      bio: "Licenciado em Gestão Desportiva com vasta experiência na liderança de organizações desportivas.",
-      foto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&h=200&q=80"
+      telefone: "+238 261 22 34",
+      experiencia: "Ex-jogador internacional, treinador licenciado FIBA",
+      foto: "/lovable-uploads/placeholder-person.jpg"
     },
     {
-      nome: "Maria Fernanda Lopes",
+      nome: "Maria Santos",
       cargo: "Vice-Presidente",
-      mandato: "2024-2028",
+      mandato: "2020-2024",
       email: "vice.presidente@fcbb.cv",
-      telefone: "+238 262 5678",
-      bio: "Ex-jogadora internacional e treinadora certificada pela FIBA com 15 anos de experiência.",
-      foto: "https://images.unsplash.com/photo-1494790108755-2616b612b1db?auto=format&fit=crop&w=200&h=200&q=80"
+      telefone: "+238 261 22 35",
+      experiencia: "Gestora desportiva, especialista em desenvolvimento feminino",
+      foto: "/lovable-uploads/placeholder-person.jpg"
     },
     {
-      nome: "Carlos Manuel Évora",
+      nome: "Carlos Tavares",
       cargo: "Secretário-Geral",
-      mandato: "2024-2028",
+      mandato: "2020-2024",
       email: "secretario@fcbb.cv",
-      telefone: "+238 262 9012",
-      bio: "Gestor com especialização em administração desportiva e desenvolvimento organizacional.",
-      foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&h=200&q=80"
+      telefone: "+238 261 22 36",
+      experiencia: "Administração desportiva, ex-árbitro internacional",
+      foto: "/lovable-uploads/placeholder-person.jpg"
     },
     {
-      nome: "Ana Paula Monteiro",
+      nome: "Ana Pereira",
       cargo: "Tesoureira",
-      mandato: "2024-2028",
+      mandato: "2020-2024",
       email: "tesouraria@fcbb.cv",
-      telefone: "+238 262 3456",
-      bio: "Contabilista certificada com experiência em gestão financeira de organizações sem fins lucrativos.",
-      foto: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&h=200&q=80"
+      telefone: "+238 261 22 37",
+      experiencia: "Contabilista certificada, gestão financeira desportiva",
+      foto: "/lovable-uploads/placeholder-person.jpg"
+    },
+    {
+      nome: "João Monteiro",
+      cargo: "Diretor Técnico",
+      mandato: "2020-2024",
+      email: "tecnico@fcbb.cv",
+      telefone: "+238 261 22 38",
+      experiencia: "Treinador Nível 3 FIBA, formação de quadros técnicos",
+      foto: "/lovable-uploads/placeholder-person.jpg"
+    },
+    {
+      nome: "Luisa Rodrigues",
+      cargo: "Diretora de Desenvolvimento",
+      mandato: "2020-2024",
+      email: "desenvolvimento@fcbb.cv",
+      telefone: "+238 261 22 39",
+      experiencia: "Pedagogia desportiva, programas de base",
+      foto: "/lovable-uploads/placeholder-person.jpg"
     }
   ];
 
-  const vogais = [
-    "Dr. Pedro Almada Correia",
-    "Eng. Rita Fonseca Lima", 
-    "Prof. Manuel Rodrigues",
-    "Dra. Sandra Tavares Pina",
-    "Sr. António Borges Semedo"
+  const departamentos = [
+    {
+      nome: "Departamento Técnico",
+      responsavel: "João Monteiro",
+      funcoes: ["Formação de treinadores", "Desenvolvimento técnico", "Seleções nacionais", "Métodos de treino"]
+    },
+    {
+      nome: "Departamento de Competições",
+      responsavel: "Carlos Tavares",
+      funcoes: ["Organização de campeonatos", "Calendário desportivo", "Regulamentos", "Arbitragem"]
+    },
+    {
+      nome: "Departamento de Desenvolvimento",
+      responsavel: "Luisa Rodrigues",
+      funcoes: ["Basquetebol de base", "Programas escolares", "Formação de massa", "Infraestruturas"]
+    },
+    {
+      nome: "Departamento Administrativo",
+      responsavel: "Ana Pereira",
+      funcoes: ["Gestão financeira", "Recursos humanos", "Licenciamento", "Documentação"]
+    }
   ];
 
   return (
     <PageLayout title="Direção da FCBB">
       <div className="space-y-8">
+        {/* Membros da Direção */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-cv-blue">Mesa da Assembleia Geral</CardTitle>
+            <CardTitle className="text-cv-blue">Membros da Direção</CardTitle>
+            <p className="text-gray-600">Mandato 2020-2024</p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <h4 className="font-semibold text-lg">Presidente</h4>
-                <p className="text-gray-600">Dr. Francisco Tavares</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-lg">Vice-Presidente</h4>
-                <p className="text-gray-600">Dra. Eulália Monteiro</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-lg">Secretário</h4>
-                <p className="text-gray-600">Sr. José Carlos Silva</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-cv-blue">Direção Executiva</CardTitle>
-            <p className="text-gray-600">Mandato 2024-2028</p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {direcao.map((membro, index) => (
-                <Card key={index} className="border hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <img 
-                        src={membro.foto} 
-                        alt={membro.nome}
-                        className="w-20 h-20 rounded-full object-cover"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-bold text-lg">{membro.nome}</h3>
-                          <Badge className="bg-cv-blue text-white">{membro.cargo}</Badge>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">{membro.bio}</p>
-                        
-                        <div className="space-y-1 text-sm">
-                          <div className="flex items-center text-gray-500">
-                            <Mail className="w-4 h-4 mr-2" />
-                            <a href={`mailto:${membro.email}`} className="hover:text-cv-blue">
-                              {membro.email}
-                            </a>
-                          </div>
-                          <div className="flex items-center text-gray-500">
-                            <Phone className="w-4 h-4 mr-2" />
-                            <span>{membro.telefone}</span>
-                          </div>
-                        </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {diretores.map((diretor, index) => (
+                <div key={index} className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div className="h-48 bg-gray-200 flex items-center justify-center">
+                    <div className="w-24 h-24 bg-cv-blue rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      {diretor.nome.split(' ').map(n => n[0]).join('')}
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-cv-blue mb-1">{diretor.nome}</h3>
+                    <Badge className="bg-cv-red mb-3">{diretor.cargo}</Badge>
+                    <p className="text-sm text-gray-600 mb-3">{diretor.experiencia}</p>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex items-center">
+                        <Mail className="w-4 h-4 mr-2 text-cv-blue" />
+                        <span>{diretor.email}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Phone className="w-4 h-4 mr-2 text-cv-blue" />
+                        <span>{diretor.telefone}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-2 text-cv-blue" />
+                        <span>Mandato: {diretor.mandato}</span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-cv-blue">Vogais</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {vogais.map((vogal, index) => (
-                <div key={index} className="flex items-center p-4 bg-gray-50 rounded-lg">
-                  <User className="w-5 h-5 text-cv-blue mr-3" />
-                  <span className="font-medium">{vogal}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
+        {/* Departamentos */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-cv-blue">Conselho Fiscal</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <h4 className="font-semibold text-lg">Presidente</h4>
-                <p className="text-gray-600">Dr. Luís Fonseca</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-lg">Vogal</h4>
-                <p className="text-gray-600">Dra. Carla Rodrigues</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-lg">Vogal</h4>
-                <p className="text-gray-600">Sr. Manuel Santos</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-cv-blue">Contactos da Direção</CardTitle>
+            <CardTitle className="text-cv-blue">Estrutura Organizacional</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <MapPin className="w-5 h-5 text-cv-blue mr-3" />
+              {departamentos.map((dept, index) => (
+                <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                  <h3 className="text-lg font-semibold text-cv-blue mb-2">{dept.nome}</h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    <span className="font-medium">Responsável:</span> {dept.responsavel}
+                  </p>
                   <div>
-                    <p className="font-semibold">Sede da FCBB</p>
-                    <p className="text-gray-600">Plateau, Praia - Cabo Verde</p>
+                    <span className="font-medium text-gray-700">Funções:</span>
+                    <ul className="mt-2 space-y-1">
+                      {dept.funcoes.map((funcao, idx) => (
+                        <li key={idx} className="text-sm text-gray-600 flex items-start">
+                          <span className="w-2 h-2 bg-cv-red rounded-full mr-2 mt-2 flex-shrink-0"></span>
+                          {funcao}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-                <div className="flex items-center">
-                  <Phone className="w-5 h-5 text-cv-blue mr-3" />
-                  <div>
-                    <p className="font-semibold">Telefone Geral</p>
-                    <p className="text-gray-600">+238 262 1234</p>
-                  </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Informações de Contacto */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-cv-blue">Contactar a Direção</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-semibold text-cv-blue mb-3">Sede da FCBB</h3>
+                <div className="space-y-2 text-gray-700">
+                  <p>Av. Cidade de Lisboa, CP 540</p>
+                  <p>Praia, Ilha de Santiago</p>
+                  <p>Cabo Verde</p>
                 </div>
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <Mail className="w-5 h-5 text-cv-blue mr-3" />
-                  <div>
-                    <p className="font-semibold">Email Institucional</p>
-                    <p className="text-gray-600">geral@fcbb.cv</p>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <Mail className="w-5 h-5 text-cv-blue mr-3" />
-                  <div>
-                    <p className="font-semibold">Imprensa</p>
-                    <p className="text-gray-600">imprensa@fcbb.cv</p>
-                  </div>
+              <div>
+                <h3 className="font-semibold text-cv-blue mb-3">Horário de Funcionamento</h3>
+                <div className="space-y-2 text-gray-700">
+                  <p><span className="font-medium">Segunda a Sexta:</span> 08:00 - 17:00</p>
+                  <p><span className="font-medium">Sábado:</span> 08:00 - 12:00</p>
+                  <p><span className="font-medium">Domingo:</span> Encerrado</p>
                 </div>
               </div>
             </div>
