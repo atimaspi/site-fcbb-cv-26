@@ -29,6 +29,7 @@ import LigaNacionalPage from "./pages/competitions/LigaNacionalPage";
 import TacaPage from "./pages/competitions/TacaPage";
 import SuperTacaPage from "./pages/competitions/SuperTacaPage";
 import CompeticoesRegionaisPage from "./pages/competitions/CompeticoesRegionaisPage";
+import NacionalMasculinoPage from "./pages/competitions/NacionalMasculinoPage";
 
 // Teams pages
 import SelecaoMasculinaPage from "./pages/teams/SelecaoMasculinaPage";
@@ -66,6 +67,7 @@ const App = () => (
           
           {/* Competitions routes */}
           <Route path="/competicoes/liga-nacional" element={<LigaNacionalPage />} />
+          <Route path="/competicoes/nacional-masculino" element={<NacionalMasculinoPage />} />
           <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
           <Route path="/competicoes/super-taca" element={<SuperTacaPage />} />
           <Route path="/competicoes/competicoes-regionais" element={<CompeticoesRegionaisPage />} />
