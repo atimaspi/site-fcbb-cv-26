@@ -27,6 +27,7 @@ const Breadcrumbs = () => {
     'liga-nacional': 'Liga Nacional',
     'nacional-masculino': 'Nacional Masculino',
     'taca-de-cabo-verde': 'Taça de Cabo Verde',
+    'taca-cabo-verde': 'Taça de Cabo Verde',
     'super-taca': 'Super Taça',
     'competicoes-regionais': 'Competições Regionais',
     'calendario': 'Calendário',

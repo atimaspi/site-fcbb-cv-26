@@ -66,10 +66,11 @@ const App = () => (
           <Route path="/federacao/estatutos" element={<EstatutosPage />} />
           <Route path="/federacao/contactos" element={<ContactosPage />} />
           
-          {/* Competitions routes */}
+          {/* Competitions routes - Fixed routing issues */}
           <Route path="/competicoes/liga-nacional" element={<LigaNacionalPage />} />
           <Route path="/competicoes/nacional-masculino" element={<NacionalMasculinoPage />} />
           <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
+          <Route path="/competicoes/taca-cabo-verde" element={<TacaPage />} />
           <Route path="/competicoes/super-taca" element={<SuperTacaPage />} />
           <Route path="/competicoes/competicoes-regionais" element={<CompeticoesRegionaisPage />} />
           <Route path="/competicoes/calendario" element={<CalendarioPage />} />
@@ -92,7 +93,8 @@ const App = () => (
           <Route path="/transmissoes" element={<TransmissoesPage />} />
           <Route path="/transferencias" element={<TransferenciasPage />} />
           
-          {/* FIBA LiveStats route */}
+          {/* Results and live data routes */}
+          <Route path="/resultados/ao-vivo" element={<ResultadosAoVivoPage />} />
           <Route path="/resultados/fiba-livestats" element={<FibaLiveStatsPage />} />
           
           {/* Multimedia routes */}
