@@ -15,6 +15,7 @@ import ImprensaPage from "./pages/ImprensaPage";
 import CalendarioPage from "./pages/competitions/CalendarioPage";
 import TransferenciasPage from "./pages/TransferenciasPage";
 import FibaLiveStatsPage from "./pages/FibaLiveStatsPage";
+import ResultadosAoVivoPage from "./pages/ResultadosAoVivoPage";
 
 // Federation pages
 import MissaoVisaoPage from "./pages/federation/MissaoVisaoPage";
