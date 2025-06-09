@@ -58,13 +58,21 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           
-          {/* Federation routes - All functional */}
+          {/* Federation routes - Both /federacao and /sobre paths */}
           <Route path="/federacao/historia" element={<HistoriaPage />} />
           <Route path="/federacao/missao-visao" element={<MissaoVisaoPage />} />
           <Route path="/federacao/direcao" element={<DirecaoPage />} />
           <Route path="/federacao/orgaos-sociais" element={<OrgaosSociaisPage />} />
           <Route path="/federacao/estatutos" element={<EstatutosPage />} />
           <Route path="/federacao/contactos" element={<ContactosPage />} />
+          
+          {/* Sobre a FCBB routes (alternative paths) */}
+          <Route path="/sobre/historia" element={<HistoriaPage />} />
+          <Route path="/sobre/missao-visao" element={<MissaoVisaoPage />} />
+          <Route path="/sobre/direcao" element={<DirecaoPage />} />
+          <Route path="/sobre/orgaos-sociais" element={<OrgaosSociaisPage />} />
+          <Route path="/sobre/estatutos" element={<EstatutosPage />} />
+          <Route path="/sobre/contactos" element={<ContactosPage />} />
           
           {/* Competitions routes - All paths covered */}
           <Route path="/competicoes/liga-nacional" element={<LigaNacionalPage />} />

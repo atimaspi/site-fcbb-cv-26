@@ -17,6 +17,7 @@ const Breadcrumbs = () => {
 
   const breadcrumbNameMap: { [key: string]: string } = {
     'federacao': 'Federação',
+    'sobre': 'Sobre a FCBB',
     'historia': 'História',
     'missao-visao': 'Missão e Visão',
     'direcao': 'Direção',
