@@ -1,393 +1,335 @@
 
 import PageLayout from './PageLayout';
-import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  User, 
-  FileText, 
-  Calendar, 
-  Users, 
-  LogIn, 
-  LayoutGrid
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import NewsManagement from '../components/admin/NewsManagement';
-import GalleryManagement from '../components/admin/GalleryManagement';
-import AdsManagement from '../components/admin/AdsManagement';
-import CompetitionsManagement from '../components/admin/CompetitionsManagement';
-import PlayersManagement from '../components/admin/PlayersManagement';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Lock, User, Shield, Download, FileText, Calendar, Users, Trophy, AlertTriangle } from 'lucide-react';
 
 const AreaReservadaPage = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('dashboard');
-  
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    
-    // Simulate API call
-    setTimeout(() => {
-      if (email.includes('@') && password.length > 0) {
-        setIsLoggedIn(true);
-        setError(null);
-      } else {
-        setError('Email ou password inválidos. Por favor tente novamente.');
-      }
-      setIsLoading(false);
-    }, 1000);
-  };
-  
+  const documents = [
+    {
+      title: "Regulamento Liga Nacional 2024/25",
+      type: "PDF",
+      size: "2.4 MB",
+      date: "15/09/2024",
+      access: "Clubes"
+    },
+    {
+      title: "Relatório Arbitragem - Março",
+      type: "PDF",
+      size: "1.8 MB",
+      date: "01/04/2024",
+      access: "Árbitros"
+    },
+    {
+      title: "Formulário Transferência Jogadores",
+      type: "DOC",
+      size: "245 KB",
+      date: "20/08/2024",
+      access: "Clubes"
+    },
+    {
+      title: "Manual do Treinador FCBB",
+      type: "PDF",
+      size: "5.2 MB",
+      date: "10/07/2024",
+      access: "Treinadores"
+    },
+    {
+      title: "Atas Assembleia Geral 2024",
+      type: "PDF",
+      size: "3.1 MB",
+      date: "25/03/2024",
+      access: "Dirigentes"
+    }
+  ];
+
+  const notices = [
+    {
+      title: "Convocatória Assembleia Geral Ordinária",
+      date: "08/06/2025",
+      priority: "high",
+      category: "Assembleia"
+    },
+    {
+      title: "Alteração Calendário Liga Nacional",
+      date: "05/06/2025",
+      priority: "medium",
+      category: "Competições"
+    },
+    {
+      title: "Workshop Arbitragem - São Vicente",
+      date: "02/06/2025",
+      priority: "low",
+      category: "Formação"
+    },
+    {
+      title: "Prazo Inscrições Taça de Cabo Verde",
+      date: "30/05/2025",
+      priority: "high",
+      category: "Competições"
+    }
+  ];
+
+  const services = [
+    {
+      title: "Registo de Jogadores",
+      description: "Sistema online para registo e transferência de atletas",
+      icon: <Users className="w-8 h-8" />,
+      access: "Clubes"
+    },
+    {
+      title: "Calendário de Competições",
+      description: "Consulta e gestão do calendário oficial",
+      icon: <Calendar className="w-8 h-8" />,
+      access: "Todos"
+    },
+    {
+      title: "Resultados e Classificações",
+      description: "Inserção de resultados e consulta de classificações",
+      icon: <Trophy className="w-8 h-8" />,
+      access: "Clubes"
+    },
+    {
+      title: "Biblioteca Documental",
+      description: "Acesso a regulamentos, formulários e documentos oficiais",
+      icon: <FileText className="w-8 h-8" />,
+      access: "Membros"
+    }
+  ];
+
   return (
     <PageLayout title="Área Reservada">
-      {!isLoggedIn ? (
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8 mt-8">
-          <div className="flex justify-center mb-6">
-            <div className="bg-cv-blue rounded-full p-3">
-              <LogIn className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          
-          <h2 className="text-xl font-bold text-cv-blue mb-6 text-center">Login Área Reservada</h2>
-          
-          {error && (
-            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
-              <p>{error}</p>
-            </div>
-          )}
-          
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cv-blue"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cv-blue"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-cv-blue focus:ring-cv-blue border-gray-300 rounded"
-                  disabled={isLoading}
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Lembrar-me
-                </label>
-              </div>
-              
-              <a href="#" className="text-sm text-cv-blue hover:underline">
-                Esqueceu a password?
-              </a>
-            </div>
-            
-            <Button
-              type="submit"
-              className="w-full bg-cv-blue hover:bg-blue-700"
-              disabled={isLoading}
-            >
-              {isLoading ? 'A processar...' : 'Entrar'}
-            </Button>
-          </form>
-          
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Esta área é reservada para clubes, associações e oficiais. <br />
-              Para obter acesso, contacte a FCBB.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="mt-8">
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex justify-between items-center">
+      <div className="space-y-6">
+        {/* Login Section */}
+        <Card className="border-l-4 border-cv-blue">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-3 text-cv-blue">
+              <Lock className="w-6 h-6" />
+              <span>Acesso à Área Reservada</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div>
-                <h2 className="text-xl font-bold text-cv-blue mb-2">Bem-vindo à Área Reservada</h2>
-                <p className="text-gray-700">
-                  Aqui você pode gerir conteúdos, informações e ferramentas do site.
-                </p>
-              </div>
-              <Button
-                onClick={() => setIsLoggedIn(false)}
-                variant="outline"
-                className="border-cv-blue text-cv-blue hover:bg-cv-blue hover:text-white"
-              >
-                Sair
-              </Button>
-            </div>
-          </div>
-          
-          {/* Admin Navigation Tabs */}
-          <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
-            <div className="flex flex-wrap border-b">
-              <button 
-                className={`px-6 py-4 focus:outline-none ${activeTab === 'dashboard' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('dashboard')}
-              >
-                Dashboard
-              </button>
-              <button 
-                className={`px-6 py-4 focus:outline-none ${activeTab === 'news' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('news')}
-              >
-                Notícias
-              </button>
-              <button 
-                className={`px-6 py-4 focus:outline-none ${activeTab === 'gallery' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('gallery')}
-              >
-                Galeria
-              </button>
-              <button 
-                className={`px-6 py-4 focus:outline-none ${activeTab === 'ads' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('ads')}
-              >
-                Publicidade
-              </button>
-              <button 
-                className={`px-6 py-4 focus:outline-none ${activeTab === 'competitions' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('competitions')}
-              >
-                Competições
-              </button>
-              <button 
-                className={`px-6 py-4 focus:outline-none ${activeTab === 'players' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('players')}
-              >
-                Jogadores
-              </button>
-              <button 
-                className={`px-6 py-4 focus:outline-none ${activeTab === 'profile' ? 'bg-cv-blue text-white' : 'hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('profile')}
-              >
-                Perfil
-              </button>
-            </div>
-          </div>
-          
-          {/* Dashboard Content */}
-          {activeTab === 'dashboard' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center mb-4">
-                  <FileText className="h-6 w-6 text-cv-blue mr-2" />
-                  <h3 className="font-semibold text-lg">Documentos</h3>
-                </div>
-                <ul className="space-y-3 text-gray-700">
-                  <li>
-                    <Link to="#" className="hover:text-cv-blue flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                      Regulamento Interno
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="#" className="hover:text-cv-blue flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                      Formulários de Inscrição
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="#" className="hover:text-cv-blue flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                      Calendário Completo
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="#" className="hover:text-cv-blue flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                      Regras Oficiais
-                    </Link>
-                  </li>
-                </ul>
+                <form className="space-y-4">
+                  <div>
+                    <Label htmlFor="username">Nome de Utilizador</Label>
+                    <Input id="username" placeholder="Digite seu nome de utilizador" />
+                  </div>
+                  <div>
+                    <Label htmlFor="password">Palavra-passe</Label>
+                    <Input id="password" type="password" placeholder="Digite sua palavra-passe" />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input type="checkbox" id="remember" className="rounded" />
+                    <Label htmlFor="remember" className="text-sm">Lembrar-me</Label>
+                  </div>
+                  <Button className="w-full bg-cv-blue hover:bg-blue-700">
+                    <User className="w-4 h-4 mr-2" />
+                    Entrar
+                  </Button>
+                  <div className="text-center space-y-2">
+                    <a href="#" className="text-sm text-cv-blue hover:underline block">
+                      Esqueceu a palavra-passe?
+                    </a>
+                    <a href="#" className="text-sm text-cv-blue hover:underline block">
+                      Primeiro acesso? Ativar conta
+                    </a>
+                  </div>
+                </form>
               </div>
               
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center mb-4">
-                  <Calendar className="h-6 w-6 text-cv-blue mr-2" />
-                  <h3 className="font-semibold text-lg">Ferramentas</h3>
-                </div>
-                <ul className="space-y-3 text-gray-700">
-                  <li>
-                    <Link to="#" className="hover:text-cv-blue flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Gerir Jogos
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="#" className="hover:text-cv-blue flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      Gestão de Jogadores
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="#" className="hover:text-cv-blue flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                      </svg>
-                      Relatórios
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="#" className="hover:text-cv-blue flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      Estatísticas Avançadas
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center mb-4">
-                  <Users className="h-6 w-6 text-cv-blue mr-2" />
-                  <h3 className="font-semibold text-lg">Notificações</h3>
-                </div>
-                <ul className="space-y-3 text-gray-700">
-                  <li className="border-l-4 border-cv-blue pl-3 py-1">
-                    <p className="font-medium">Reunião de Clubes</p>
-                    <p className="text-sm text-gray-500">Hoje - 15:00</p>
-                  </li>
-                  <li className="border-l-4 border-gray-300 pl-3 py-1">
-                    <p className="font-medium">Envio de Documentação</p>
-                    <p className="text-sm text-gray-500">Prazo: 25/05/2025</p>
-                  </li>
-                  <li className="border-l-4 border-gray-300 pl-3 py-1">
-                    <p className="font-medium">Workshop de Arbitragem</p>
-                    <p className="text-sm text-gray-500">30/05/2025 - 09:00</p>
-                  </li>
-                  <li className="border-l-4 border-gray-300 pl-3 py-1">
-                    <p className="font-medium">Curso de Treinadores</p>
-                    <p className="text-sm text-gray-500">10/06/2025 - 10:00</p>
-                  </li>
-                </ul>
-                <div className="mt-4">
-                  <Link to="#" className="text-cv-blue hover:underline text-sm flex items-center">
-                    Ver todas as notificações
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
-          
-          {/* Content Management Tabs */}
-          {activeTab === 'news' && <NewsManagement />}
-          {activeTab === 'gallery' && <GalleryManagement />}
-          {activeTab === 'ads' && <AdsManagement />}
-          {activeTab === 'competitions' && <CompetitionsManagement />}
-          {activeTab === 'players' && <PlayersManagement />}
-          
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center mb-4">
-                <User className="h-6 w-6 text-cv-blue mr-2" />
-                <h3 className="font-semibold text-lg">Perfil do Usuário</h3>
-              </div>
-              
-              <div className="flex flex-wrap">
-                <div className="w-full md:w-1/3 mb-4 md:mb-0">
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Informações Pessoais</h4>
-                  <dl className="space-y-2">
-                    <div>
-                      <dt className="text-xs text-gray-500">Nome</dt>
-                      <dd className="font-medium">João Silva</dd>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-cv-blue">Tipos de Acesso</h3>
+                <div className="space-y-3">
+                  <div className="p-3 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Shield className="w-5 h-5 text-green-600" />
+                      <div>
+                        <h4 className="font-medium">Clubes Afiliados</h4>
+                        <p className="text-sm text-gray-600">Gestão de jogadores, resultados e documentação</p>
+                      </div>
                     </div>
-                    <div>
-                      <dt className="text-xs text-gray-500">Email</dt>
-                      <dd>{email}</dd>
+                  </div>
+                  <div className="p-3 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Shield className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <h4 className="font-medium">Árbitros</h4>
+                        <p className="text-sm text-gray-600">Relatórios, formação e escalas</p>
+                      </div>
                     </div>
-                    <div>
-                      <dt className="text-xs text-gray-500">Função</dt>
-                      <dd>Representante de Clube</dd>
+                  </div>
+                  <div className="p-3 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Shield className="w-5 h-5 text-purple-600" />
+                      <div>
+                        <h4 className="font-medium">Dirigentes</h4>
+                        <p className="text-sm text-gray-600">Atas, decisões e documentação executiva</p>
+                      </div>
                     </div>
-                  </dl>
-                </div>
-                
-                <div className="w-full md:w-1/3 mb-4 md:mb-0">
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Organização</h4>
-                  <dl className="space-y-2">
-                    <div>
-                      <dt className="text-xs text-gray-500">Clube</dt>
-                      <dd className="font-medium">ABC Basquete</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-gray-500">Região</dt>
-                      <dd>Santiago</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs text-gray-500">Último Acesso</dt>
-                      <dd>19/05/2025 - 10:30</dd>
-                    </div>
-                  </dl>
-                </div>
-                
-                <div className="w-full md:w-1/3">
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Ações Rápidas</h4>
-                  <div className="flex flex-col space-y-2">
-                    <Button variant="outline" size="sm" className="justify-start">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                      Editar Perfil
-                    </Button>
-                    <Button variant="outline" size="sm" className="justify-start">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Alterar Password
-                    </Button>
                   </div>
                 </div>
               </div>
             </div>
-          )}
-        </div>
-      )}
+          </CardContent>
+        </Card>
+
+        <Tabs defaultValue="services" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="services">Serviços</TabsTrigger>
+            <TabsTrigger value="documents">Documentos</TabsTrigger>
+            <TabsTrigger value="notices">Comunicados</TabsTrigger>
+            <TabsTrigger value="help">Ajuda</TabsTrigger>
+          </TabsList>
+
+          {/* Services */}
+          <TabsContent value="services" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {services.map((service, index) => (
+                <Card key={index} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="text-cv-blue">
+                        {service.icon}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-cv-blue mb-2">{service.title}</h3>
+                        <p className="text-gray-600 text-sm mb-3">{service.description}</p>
+                        <div className="flex justify-between items-center">
+                          <Badge variant="outline">{service.access}</Badge>
+                          <Button size="sm" disabled>
+                            <Lock className="w-4 h-4 mr-1" />
+                            Requer Login
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Documents */}
+          <TabsContent value="documents" className="space-y-4">
+            <div className="space-y-3">
+              {documents.map((doc, index) => (
+                <Card key={index}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <FileText className="w-8 h-8 text-cv-blue" />
+                        <div>
+                          <h3 className="font-medium">{doc.title}</h3>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span>{doc.type} • {doc.size}</span>
+                            <span>{doc.date}</span>
+                            <Badge variant="secondary">{doc.access}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <Button size="sm" disabled>
+                        <Download className="w-4 h-4 mr-1" />
+                        Download
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Notices */}
+          <TabsContent value="notices" className="space-y-4">
+            <div className="space-y-3">
+              {notices.map((notice, index) => (
+                <Card key={index} className={`border-l-4 ${
+                  notice.priority === 'high' ? 'border-red-500' :
+                  notice.priority === 'medium' ? 'border-yellow-500' : 'border-green-500'
+                }`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium">{notice.title}</h3>
+                        <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+                          <span>{notice.date}</span>
+                          <Badge variant="outline">{notice.category}</Badge>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {notice.priority === 'high' && (
+                          <AlertTriangle className="w-5 h-5 text-red-500" />
+                        )}
+                        <Badge variant={
+                          notice.priority === 'high' ? 'destructive' :
+                          notice.priority === 'medium' ? 'default' : 'secondary'
+                        }>
+                          {notice.priority === 'high' ? 'Urgente' :
+                           notice.priority === 'medium' ? 'Importante' : 'Normal'}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Help */}
+          <TabsContent value="help" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-cv-blue">Como Obter Acesso</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <h4 className="font-medium">Clubes Afiliados:</h4>
+                      <p className="text-gray-600">Contacte a secretaria com o certificado de filiação</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Árbitros:</h4>
+                      <p className="text-gray-600">Apresente a licença de arbitragem válida</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Dirigentes:</h4>
+                      <p className="text-gray-600">Credencial de dirigente emitida pela FCBB</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-cv-blue">Suporte Técnico</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <h4 className="font-medium">Email:</h4>
+                      <p className="text-gray-600">suporte@fcbb.cv</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Telefone:</h4>
+                      <p className="text-gray-600">(+238) 261 56 89</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">Horário:</h4>
+                      <p className="text-gray-600">Segunda a Sexta: 08:00 - 17:00</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </PageLayout>
   );
 };
