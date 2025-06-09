@@ -58,7 +58,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           
-          {/* Federation routes */}
+          {/* Federation routes - All functional */}
           <Route path="/federacao/historia" element={<HistoriaPage />} />
           <Route path="/federacao/missao-visao" element={<MissaoVisaoPage />} />
           <Route path="/federacao/direcao" element={<DirecaoPage />} />
@@ -66,7 +66,7 @@ const App = () => (
           <Route path="/federacao/estatutos" element={<EstatutosPage />} />
           <Route path="/federacao/contactos" element={<ContactosPage />} />
           
-          {/* Competitions routes - Fixed routing issues */}
+          {/* Competitions routes - All paths covered */}
           <Route path="/competicoes/liga-nacional" element={<LigaNacionalPage />} />
           <Route path="/competicoes/nacional-masculino" element={<NacionalMasculinoPage />} />
           <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
@@ -77,14 +77,18 @@ const App = () => (
           <Route path="/competicoes/classificacoes" element={<ClassificacoesPage />} />
           <Route path="/competicoes/resultados" element={<ResultadosPage />} />
           
-          {/* Teams routes - Fixed routes */}
+          {/* Teams routes - All variations covered */}
           <Route path="/selecoes/masculina" element={<SelecaoMasculinaPage />} />
           <Route path="/selecoes/senior-masculina" element={<SelecaoMasculinaPage />} />
           <Route path="/selecoes/feminina" element={<SelecaoFemininaPage />} />
           <Route path="/selecoes/senior-feminina" element={<SelecaoFemininaPage />} />
           <Route path="/selecoes/jovens" element={<SelecoesJovensPage />} />
+          <Route path="/selecoes/sub-18-masculina" element={<SelecoesJovensPage />} />
+          <Route path="/selecoes/sub-18-feminina" element={<SelecoesJovensPage />} />
+          <Route path="/selecoes/sub-16-masculina" element={<SelecoesJovensPage />} />
+          <Route path="/selecoes/sub-16-feminina" element={<SelecoesJovensPage />} />
           
-          {/* New feature routes */}
+          {/* Additional feature routes */}
           <Route path="/estatisticas" element={<EstatisticasPage />} />
           <Route path="/arbitragem" element={<ArbitragemPage />} />
           <Route path="/clubes" element={<ClubesPage />} />
@@ -93,13 +97,18 @@ const App = () => (
           <Route path="/transmissoes" element={<TransmissoesPage />} />
           <Route path="/transferencias" element={<TransferenciasPage />} />
           
-          {/* Results and live data routes */}
+          {/* Results and live data routes - All paths covered */}
+          <Route path="/resultados" element={<ResultadosPage />} />
           <Route path="/resultados/ao-vivo" element={<ResultadosAoVivoPage />} />
           <Route path="/resultados/fiba-livestats" element={<FibaLiveStatsPage />} />
+          <Route path="/resultados/liga-nacional" element={<ResultadosPage />} />
+          <Route path="/resultados/taca-cabo-verde" element={<ResultadosPage />} />
           
           {/* Multimedia routes */}
           <Route path="/videos" element={<VideosPage />} />
           <Route path="/imprensa" element={<ImprensaPage />} />
+          <Route path="/media/videos" element={<VideosPage />} />
+          <Route path="/media/imprensa" element={<ImprensaPage />} />
           
           {/* Main routes */}
           <Route path="/noticias" element={<NoticiasPage />} />
