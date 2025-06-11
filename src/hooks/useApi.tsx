@@ -2,6 +2,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+
+type TableName = keyof Database['public']['Tables'];
 
 // Generic API hook for CRUD operations
 export const useApi = () => {
@@ -9,7 +12,7 @@ export const useApi = () => {
   const queryClient = useQueryClient();
 
   // Generic fetch function
-  const fetchData = async (table: string, filters?: Record<string, any>) => {
+  const fetchData = async (table: TableName, filters?: Record<string, any>) => {
     let query = supabase.from(table).select('*');
     
     if (filters) {
@@ -24,7 +27,7 @@ export const useApi = () => {
   };
 
   // Generic create function
-  const createData = async (table: string, data: any) => {
+  const createData = async (table: TableName, data: any) => {
     const { data: result, error } = await supabase
       .from(table)
       .insert(data)
@@ -36,7 +39,7 @@ export const useApi = () => {
   };
 
   // Generic update function
-  const updateData = async (table: string, id: string, data: any) => {
+  const updateData = async (table: TableName, id: string, data: any) => {
     const { data: result, error } = await supabase
       .from(table)
       .update(data)
@@ -49,7 +52,7 @@ export const useApi = () => {
   };
 
   // Generic delete function
-  const deleteData = async (table: string, id: string) => {
+  const deleteData = async (table: TableName, id: string) => {
     const { error } = await supabase
       .from(table)
       .delete()
@@ -59,7 +62,7 @@ export const useApi = () => {
   };
 
   // Hook for fetching data
-  const useFetch = (table: string, filters?: Record<string, any>) => {
+  const useFetch = (table: TableName, filters?: Record<string, any>) => {
     return useQuery({
       queryKey: [table, filters],
       queryFn: () => fetchData(table, filters),
@@ -68,7 +71,7 @@ export const useApi = () => {
   };
 
   // Hook for creating data
-  const useCreate = (table: string) => {
+  const useCreate = (table: TableName) => {
     return useMutation({
       mutationFn: (data: any) => createData(table, data),
       onSuccess: () => {
@@ -89,7 +92,7 @@ export const useApi = () => {
   };
 
   // Hook for updating data
-  const useUpdate = (table: string) => {
+  const useUpdate = (table: TableName) => {
     return useMutation({
       mutationFn: ({ id, data }: { id: string; data: any }) => updateData(table, id, data),
       onSuccess: () => {
@@ -110,7 +113,7 @@ export const useApi = () => {
   };
 
   // Hook for deleting data
-  const useDelete = (table: string) => {
+  const useDelete = (table: TableName) => {
     return useMutation({
       mutationFn: (id: string) => deleteData(table, id),
       onSuccess: () => {
