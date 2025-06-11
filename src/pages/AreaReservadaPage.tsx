@@ -2,11 +2,13 @@
 import { useState } from 'react';
 import PageLayout from '@/pages/PageLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import PermissionGuard from '@/components/auth/PermissionGuard';
 import UserProfile from '@/components/auth/UserProfile';
 import AdminUserRegistration from '@/components/auth/AdminUserRegistration';
 import Dashboard from '@/components/admin/Dashboard';
 import NewsManagementAdvanced from '@/components/admin/NewsManagementAdvanced';
 import EventsManagement from '@/components/admin/EventsManagement';
+import { usePermissions } from '@/hooks/usePermissions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -24,156 +26,206 @@ import {
 
 const AreaReservadaPage = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const { canAccessAdminArea, canManageNews, canManageEvents, canManageUsers } = usePermissions();
 
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'profile', label: 'Perfil', icon: User },
-    { id: 'news', label: 'Notícias', icon: FileText },
-    { id: 'events', label: 'Eventos', icon: Calendar },
-    { id: 'competitions', label: 'Competições', icon: Trophy },
-    { id: 'clubs', label: 'Clubes', icon: Users },
-    { id: 'gallery', label: 'Galeria', icon: Upload },
-    { id: 'stats', label: 'Estatísticas', icon: BarChart3 },
-    { id: 'referees', label: 'Arbitragem', icon: Shield },
-    { id: 'settings', label: 'Configurações', icon: Settings },
-  ];
+  // Filtrar itens do menu baseado nas permissões
+  const getAvailableMenuItems = () => {
+    const baseItems = [
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'profile', label: 'Perfil', icon: User, permission: null }, // Sempre disponível para usuários logados
+    ];
+
+    const adminItems = [
+      { id: 'news', label: 'Notícias', icon: FileText, permission: { resource: 'news', action: 'create' } },
+      { id: 'events', label: 'Eventos', icon: Calendar, permission: { resource: 'events', action: 'create' } },
+      { id: 'competitions', label: 'Competições', icon: Trophy, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'clubs', label: 'Clubes', icon: Users, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'gallery', label: 'Galeria', icon: Upload, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'stats', label: 'Estatísticas', icon: BarChart3, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'referees', label: 'Arbitragem', icon: Shield, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'settings', label: 'Configurações', icon: Settings, permission: { resource: 'settings', action: 'edit' } },
+    ];
+
+    // Filtrar itens baseado nas permissões
+    const filteredItems = [...baseItems];
+    
+    adminItems.forEach(item => {
+      if (!item.permission || canAccessAdminArea()) {
+        filteredItems.push(item);
+      }
+    });
+
+    return filteredItems;
+  };
+
+  const menuItems = getAvailableMenuItems();
 
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard />;
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <Dashboard />
+          </PermissionGuard>
+        );
       case 'profile':
         return (
           <div className="space-y-6">
             <UserProfile />
-            <AdminUserRegistration />
+            <PermissionGuard permission={{ resource: 'users', action: 'create' }} showError={false}>
+              <AdminUserRegistration />
+            </PermissionGuard>
           </div>
         );
       case 'news':
-        return <NewsManagementAdvanced />;
+        return (
+          <PermissionGuard permission={{ resource: 'news', action: 'create' }}>
+            <NewsManagementAdvanced />
+          </PermissionGuard>
+        );
       case 'events':
-        return <EventsManagement />;
+        return (
+          <PermissionGuard permission={{ resource: 'events', action: 'create' }}>
+            <EventsManagement />
+          </PermissionGuard>
+        );
       case 'competitions':
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-cv-blue" />
-                Gestão de Competições
-              </CardTitle>
-              <CardDescription>
-                Funcionalidade em desenvolvimento
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Esta secção permitirá gerir campeonatos, jogos e resultados.
-              </p>
-            </CardContent>
-          </Card>
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-cv-blue" />
+                  Gestão de Competições
+                </CardTitle>
+                <CardDescription>
+                  Funcionalidade em desenvolvimento
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Esta secção permitirá gerir campeonatos, jogos e resultados.
+                </p>
+              </CardContent>
+            </Card>
+          </PermissionGuard>
         );
       case 'clubs':
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-cv-blue" />
-                Gestão de Clubes
-              </CardTitle>
-              <CardDescription>
-                Funcionalidade em desenvolvimento
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Esta secção permitirá gerir clubes, equipas e jogadores.
-              </p>
-            </CardContent>
-          </Card>
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-cv-blue" />
+                  Gestão de Clubes
+                </CardTitle>
+                <CardDescription>
+                  Funcionalidade em desenvolvimento
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Esta secção permitirá gerir clubes, equipas e jogadores.
+                </p>
+              </CardContent>
+            </Card>
+          </PermissionGuard>
         );
       case 'gallery':
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="h-5 w-5 text-cv-blue" />
-                Gestão de Galeria
-              </CardTitle>
-              <CardDescription>
-                Funcionalidade em desenvolvimento
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Esta secção permitirá fazer upload e gerir imagens da galeria.
-              </p>
-            </CardContent>
-          </Card>
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5 text-cv-blue" />
+                  Gestão de Galeria
+                </CardTitle>
+                <CardDescription>
+                  Funcionalidade em desenvolvimento
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Esta secção permitirá fazer upload e gerir imagens da galeria.
+                </p>
+              </CardContent>
+            </Card>
+          </PermissionGuard>
         );
       case 'stats':
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-cv-blue" />
-                Estatísticas e Relatórios
-              </CardTitle>
-              <CardDescription>
-                Funcionalidade em desenvolvimento
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Esta secção mostrará estatísticas detalhadas e relatórios.
-              </p>
-            </CardContent>
-          </Card>
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-cv-blue" />
+                  Estatísticas e Relatórios
+                </CardTitle>
+                <CardDescription>
+                  Funcionalidade em desenvolvimento
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Esta secção mostrará estatísticas detalhadas e relatórios.
+                </p>
+              </CardContent>
+            </Card>
+          </PermissionGuard>
         );
       case 'referees':
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-cv-blue" />
-                Gestão de Arbitragem
-              </CardTitle>
-              <CardDescription>
-                Funcionalidade em desenvolvimento
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Esta secção permitirá gerir árbitros e designações.
-              </p>
-            </CardContent>
-          </Card>
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-cv-blue" />
+                  Gestão de Arbitragem
+                </CardTitle>
+                <CardDescription>
+                  Funcionalidade em desenvolvimento
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Esta secção permitirá gerir árbitros e designações.
+                </p>
+              </CardContent>
+            </Card>
+          </PermissionGuard>
         );
       case 'settings':
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-cv-blue" />
-                Configurações do Sistema
-              </CardTitle>
-              <CardDescription>
-                Funcionalidade em desenvolvimento
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Esta secção permitirá configurar parâmetros do sistema.
-              </p>
-            </CardContent>
-          </Card>
+          <PermissionGuard permission={{ resource: 'settings', action: 'edit' }}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-cv-blue" />
+                  Configurações do Sistema
+                </CardTitle>
+                <CardDescription>
+                  Funcionalidade em desenvolvimento
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Esta secção permitirá configurar parâmetros do sistema.
+                </p>
+              </CardContent>
+            </Card>
+          </PermissionGuard>
         );
       default:
-        return <Dashboard />;
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <Dashboard />
+          </PermissionGuard>
+        );
     }
   };
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute permission={{ resource: 'dashboard', action: 'view' }}>
       <PageLayout 
         title="Área Reservada" 
         description="Painel de controle administrativo da FCBB"
