@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,17 @@ interface NewsArticle {
   author?: string;
 }
 
+// Type guard function to check if an item is a valid NewsArticle
+const isValidNewsArticle = (item: any): item is NewsArticle => {
+  return item != null && 
+    typeof item === 'object' && 
+    typeof item.id === 'string' &&
+    typeof item.title === 'string' &&
+    typeof item.content === 'string' &&
+    typeof item.category === 'string' &&
+    typeof item.created_at === 'string';
+};
+
 const NewsManagementAdvanced = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -69,26 +81,13 @@ const NewsManagementAdvanced = () => {
     'Internacional'
   ];
 
-  // Verificação mais segura dos dados
+  // Verificação mais segura dos dados com type assertion
   const newsList = React.useMemo(() => {
     if (!news || !Array.isArray(news)) {
-      return [];
+      return [] as NewsArticle[];
     }
     
-    return news.filter((article: any): article is NewsArticle => {
-      return article != null && 
-        typeof article === 'object' && 
-        'id' in article && 
-        'title' in article &&
-        'content' in article &&
-        'category' in article &&
-        'created_at' in article &&
-        typeof article.id === 'string' &&
-        typeof article.title === 'string' &&
-        typeof article.content === 'string' &&
-        typeof article.category === 'string' &&
-        typeof article.created_at === 'string';
-    });
+    return news.filter(isValidNewsArticle);
   }, [news]);
 
   const filteredNews = newsList.filter(article => {

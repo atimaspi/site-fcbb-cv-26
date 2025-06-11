@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,6 +42,16 @@ interface Event {
   type: string;
 }
 
+// Type guard function to check if an item is a valid Event
+const isValidEvent = (item: any): item is Event => {
+  return item != null && 
+    typeof item === 'object' && 
+    typeof item.id === 'string' &&
+    typeof item.title === 'string' &&
+    typeof item.event_date === 'string' &&
+    typeof item.type === 'string';
+};
+
 const EventsManagement = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,24 +76,13 @@ const EventsManagement = () => {
     'Outro'
   ];
 
-  // Verificação mais segura dos dados
+  // Verificação mais segura dos dados com type assertion
   const eventsList = React.useMemo(() => {
     if (!events || !Array.isArray(events)) {
-      return [];
+      return [] as Event[];
     }
     
-    return events.filter((event: any): event is Event => {
-      return event != null && 
-        typeof event === 'object' && 
-        'id' in event && 
-        'title' in event &&
-        'event_date' in event &&
-        'type' in event &&
-        typeof event.id === 'string' &&
-        typeof event.title === 'string' &&
-        typeof event.event_date === 'string' &&
-        typeof event.type === 'string';
-    });
+    return events.filter(isValidEvent);
   }, [events]);
 
   const handleCreateEvent = async (data: EventForm) => {
