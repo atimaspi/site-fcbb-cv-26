@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -75,20 +76,20 @@ const NewsManagementAdvanced = () => {
       return [];
     }
     
-    return news.filter((article): article is NewsArticle => 
-      article != null && 
-      typeof article === 'object' && 
-      'id' in article && 
-      'title' in article &&
-      'content' in article &&
-      'category' in article &&
-      'created_at' in article &&
-      typeof article.id === 'string' &&
-      typeof article.title === 'string' &&
-      typeof article.content === 'string' &&
-      typeof article.category === 'string' &&
-      typeof article.created_at === 'string'
-    );
+    return news.filter((article: any): article is NewsArticle => {
+      return article != null && 
+        typeof article === 'object' && 
+        'id' in article && 
+        'title' in article &&
+        'content' in article &&
+        'category' in article &&
+        'created_at' in article &&
+        typeof article.id === 'string' &&
+        typeof article.title === 'string' &&
+        typeof article.content === 'string' &&
+        typeof article.category === 'string' &&
+        typeof article.created_at === 'string';
+    });
   }, [news]);
 
   const filteredNews = newsList.filter(article => {
@@ -124,11 +125,12 @@ const NewsManagementAdvanced = () => {
   };
 
   const startEdit = (article: NewsArticle) => {
+    if (!article) return;
     setEditingId(article.id);
-    setValue('title', article.title);
-    setValue('content', article.content);
+    setValue('title', article.title || '');
+    setValue('content', article.content || '');
     setValue('excerpt', article.excerpt || '');
-    setValue('category', article.category);
+    setValue('category', article.category || '');
     setValue('featured', article.featured || false);
     setValue('published', article.published || false);
     setValue('image_url', article.image_url || '');

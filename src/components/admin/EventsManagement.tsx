@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,18 +72,18 @@ const EventsManagement = () => {
       return [];
     }
     
-    return events.filter((event): event is Event => 
-      event != null && 
-      typeof event === 'object' && 
-      'id' in event && 
-      'title' in event &&
-      'event_date' in event &&
-      'type' in event &&
-      typeof event.id === 'string' &&
-      typeof event.title === 'string' &&
-      typeof event.event_date === 'string' &&
-      typeof event.type === 'string'
-    );
+    return events.filter((event: any): event is Event => {
+      return event != null && 
+        typeof event === 'object' && 
+        'id' in event && 
+        'title' in event &&
+        'event_date' in event &&
+        'type' in event &&
+        typeof event.id === 'string' &&
+        typeof event.title === 'string' &&
+        typeof event.event_date === 'string' &&
+        typeof event.type === 'string';
+    });
   }, [events]);
 
   const handleCreateEvent = async (data: EventForm) => {
@@ -108,14 +109,15 @@ const EventsManagement = () => {
   };
 
   const startEdit = (event: Event) => {
+    if (!event) return;
     setEditingId(event.id);
-    setValue('title', event.title);
+    setValue('title', event.title || '');
     setValue('description', event.description || '');
-    setValue('event_date', event.event_date);
+    setValue('event_date', event.event_date || '');
     setValue('end_date', event.end_date || '');
     setValue('location', event.location || '');
     setValue('organizer', event.organizer || '');
-    setValue('type', event.type);
+    setValue('type', event.type || '');
     setIsCreating(true);
   };
 
