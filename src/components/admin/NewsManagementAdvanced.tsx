@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,7 +53,8 @@ const isValidNewsArticle = (item: any): item is NewsArticle => {
     typeof item.title === 'string' &&
     typeof item.content === 'string' &&
     typeof item.category === 'string' &&
-    typeof item.created_at === 'string';
+    typeof item.created_at === 'string' &&
+    !('error' in item); // Explicitly exclude error objects
 };
 
 const NewsManagementAdvanced = () => {
@@ -82,21 +82,28 @@ const NewsManagementAdvanced = () => {
     'Internacional'
   ];
 
-  // Verificação mais segura dos dados com type assertion
-  const newsList = React.useMemo(() => {
+  // Safe filtering with proper type narrowing
+  const newsList: NewsArticle[] = React.useMemo(() => {
     if (!news || !Array.isArray(news)) {
-      return [] as NewsArticle[];
+      return [];
     }
     
-    return news.filter(isValidNewsArticle) as NewsArticle[];
+    // Filter and narrow types properly
+    const validArticles: NewsArticle[] = [];
+    for (const item of news) {
+      if (isValidNewsArticle(item)) {
+        validArticles.push(item);
+      }
+    }
+    return validArticles;
   }, [news]);
 
-  const filteredNews = React.useMemo(() => {
+  const filteredNews: NewsArticle[] = React.useMemo(() => {
     return newsList.filter((article: NewsArticle) => {
       const matchesSearch = article.title?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = filterCategory === 'all' || article.category === filterCategory;
       return matchesSearch && matchesCategory;
-    }) as NewsArticle[];
+    });
   }, [newsList, searchTerm, filterCategory]);
 
   const handleCreateNews = async (data: NewsForm) => {
@@ -372,4 +379,3 @@ const NewsManagementAdvanced = () => {
 };
 
 export default NewsManagementAdvanced;
-
