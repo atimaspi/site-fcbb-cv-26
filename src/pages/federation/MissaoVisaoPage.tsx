@@ -1,4 +1,3 @@
-
 import PageLayout from '../PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target, Eye, Heart, Award, Users, Globe } from 'lucide-react';
@@ -39,7 +38,11 @@ const MissaoVisaoPage = () => {
   ];
 
   return (
-    <PageLayout title="Missão e Visão">
+    <PageLayout 
+      title="Missão e Visão" 
+      description="Conheça a missão, visão e valores da Federação Cabo-verdiana de Basquetebol (FCBB), nossos objetivos estratégicos e compromisso com o desenvolvimento do basquetebol em Cabo Verde."
+      keywords="missão fcbb, visão fcbb, valores basquetebol cabo verde, objetivos estratégicos, desenvolvimento desportivo"
+    >
       <div className="space-y-8">
         {/* Missão */}
         <Card>

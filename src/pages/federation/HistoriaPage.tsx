@@ -1,4 +1,3 @@
-
 import PageLayout from '../PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,7 +63,11 @@ const HistoriaPage = () => {
   ];
 
   return (
-    <PageLayout title="História da FCBB">
+    <PageLayout 
+      title="História da FCBB"
+      description="Descubra a rica história da Federação Cabo-verdiana de Basquetebol desde a sua fundação em 1986, marcos históricos, presidentes e conquistas ao longo de mais de três décadas."
+      keywords="história fcbb, fundação 1986, basquetebol cabo verde, marcos históricos, presidentes fcbb, desenvolvimento desportivo"
+    >
       <div className="space-y-8">
         {/* Introdução */}
         <Card>

@@ -3,8 +3,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AnimatePresence } from "framer-motion";
+import { PageTransition } from "@/components/ui/smooth-transition";
+import ResponsiveContainer from "@/components/ui/responsive-container";
+
+// Page imports
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import NoticiasPage from "./pages/NoticiasPage";
@@ -50,86 +55,98 @@ import TransmissoesPage from "./pages/TransmissoesPage";
 
 const queryClient = new QueryClient();
 
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        
+        {/* Federation routes - Both /federacao and /sobre paths */}
+        <Route path="/federacao/historia" element={<PageTransition><HistoriaPage /></PageTransition>} />
+        <Route path="/federacao/missao-visao" element={<PageTransition><MissaoVisaoPage /></PageTransition>} />
+        <Route path="/federacao/direcao" element={<PageTransition><DirecaoPage /></PageTransition>} />
+        <Route path="/federacao/orgaos-sociais" element={<PageTransition><OrgaosSociaisPage /></PageTransition>} />
+        <Route path="/federacao/estatutos" element={<PageTransition><EstatutosPage /></PageTransition>} />
+        <Route path="/federacao/contactos" element={<PageTransition><ContactosPage /></PageTransition>} />
+        
+        {/* Sobre a FCBB routes (alternative paths) */}
+        <Route path="/sobre/historia" element={<PageTransition><HistoriaPage /></PageTransition>} />
+        <Route path="/sobre/missao-visao" element={<PageTransition><MissaoVisaoPage /></PageTransition>} />
+        <Route path="/sobre/direcao" element={<PageTransition><DirecaoPage /></PageTransition>} />
+        <Route path="/sobre/orgaos-sociais" element={<PageTransition><OrgaosSociaisPage /></PageTransition>} />
+        <Route path="/sobre/estatutos" element={<PageTransition><EstatutosPage /></PageTransition>} />
+        <Route path="/sobre/contactos" element={<PageTransition><ContactosPage /></PageTransition>} />
+        
+        {/* Competitions routes - All paths covered */}
+        <Route path="/competicoes/liga-nacional" element={<PageTransition><LigaNacionalPage /></PageTransition>} />
+        <Route path="/competicoes/nacional-masculino" element={<PageTransition><NacionalMasculinoPage /></PageTransition>} />
+        <Route path="/competicoes/taca-de-cabo-verde" element={<PageTransition><TacaPage /></PageTransition>} />
+        <Route path="/competicoes/taca-cabo-verde" element={<PageTransition><TacaPage /></PageTransition>} />
+        <Route path="/competicoes/super-taca" element={<PageTransition><SuperTacaPage /></PageTransition>} />
+        <Route path="/competicoes/competicoes-regionais" element={<PageTransition><CompeticoesRegionaisPage /></PageTransition>} />
+        <Route path="/competicoes/calendario" element={<PageTransition><CalendarioPage /></PageTransition>} />
+        <Route path="/competicoes/classificacoes" element={<PageTransition><ClassificacoesPage /></PageTransition>} />
+        <Route path="/competicoes/resultados" element={<PageTransition><ResultadosPage /></PageTransition>} />
+        
+        {/* Teams routes - All variations covered */}
+        <Route path="/selecoes/masculina" element={<PageTransition><SelecaoMasculinaPage /></PageTransition>} />
+        <Route path="/selecoes/senior-masculina" element={<PageTransition><SelecaoMasculinaPage /></PageTransition>} />
+        <Route path="/selecoes/feminina" element={<PageTransition><SelecaoFemininaPage /></PageTransition>} />
+        <Route path="/selecoes/senior-feminina" element={<PageTransition><SelecaoFemininaPage /></PageTransition>} />
+        <Route path="/selecoes/jovens" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
+        <Route path="/selecoes/sub-18-masculina" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
+        <Route path="/selecoes/sub-18-feminina" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
+        <Route path="/selecoes/sub-16-masculina" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
+        <Route path="/selecoes/sub-16-feminina" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
+        
+        {/* Additional feature routes */}
+        <Route path="/estatisticas" element={<PageTransition><EstatisticasPage /></PageTransition>} />
+        <Route path="/arbitragem" element={<PageTransition><ArbitragemPage /></PageTransition>} />
+        <Route path="/clubes" element={<PageTransition><ClubesPage /></PageTransition>} />
+        <Route path="/formacao" element={<PageTransition><FormacaoPage /></PageTransition>} />
+        <Route path="/eventos" element={<PageTransition><EventosPage /></PageTransition>} />
+        <Route path="/transmissoes" element={<PageTransition><TransmissoesPage /></PageTransition>} />
+        <Route path="/transferencias" element={<PageTransition><TransferenciasPage /></PageTransition>} />
+        
+        {/* Results and live data routes - All paths covered */}
+        <Route path="/resultados" element={<PageTransition><ResultadosPage /></PageTransition>} />
+        <Route path="/resultados/ao-vivo" element={<PageTransition><ResultadosAoVivoPage /></PageTransition>} />
+        <Route path="/resultados/fiba-livestats" element={<PageTransition><FibaLiveStatsPage /></PageTransition>} />
+        <Route path="/resultados/liga-nacional" element={<PageTransition><ResultadosPage /></PageTransition>} />
+        <Route path="/resultados/taca-cabo-verde" element={<PageTransition><ResultadosPage /></PageTransition>} />
+        
+        {/* Multimedia routes */}
+        <Route path="/videos" element={<PageTransition><VideosPage /></PageTransition>} />
+        <Route path="/imprensa" element={<PageTransition><ImprensaPage /></PageTransition>} />
+        <Route path="/media/videos" element={<PageTransition><VideosPage /></PageTransition>} />
+        <Route path="/media/imprensa" element={<PageTransition><ImprensaPage /></PageTransition>} />
+        
+        {/* Main routes */}
+        <Route path="/noticias" element={<PageTransition><NoticiasPage /></PageTransition>} />
+        <Route path="/galeria" element={<PageTransition><GaleriaPage /></PageTransition>} />
+        <Route path="/area-reservada" element={<PageTransition><AreaReservadaPage /></PageTransition>} />
+        <Route path="/contacto" element={<PageTransition><ContactoPage /></PageTransition>} />
+        
+        {/* Catch-all route */}
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            
-            {/* Federation routes - Both /federacao and /sobre paths */}
-            <Route path="/federacao/historia" element={<HistoriaPage />} />
-            <Route path="/federacao/missao-visao" element={<MissaoVisaoPage />} />
-            <Route path="/federacao/direcao" element={<DirecaoPage />} />
-            <Route path="/federacao/orgaos-sociais" element={<OrgaosSociaisPage />} />
-            <Route path="/federacao/estatutos" element={<EstatutosPage />} />
-            <Route path="/federacao/contactos" element={<ContactosPage />} />
-            
-            {/* Sobre a FCBB routes (alternative paths) */}
-            <Route path="/sobre/historia" element={<HistoriaPage />} />
-            <Route path="/sobre/missao-visao" element={<MissaoVisaoPage />} />
-            <Route path="/sobre/direcao" element={<DirecaoPage />} />
-            <Route path="/sobre/orgaos-sociais" element={<OrgaosSociaisPage />} />
-            <Route path="/sobre/estatutos" element={<EstatutosPage />} />
-            <Route path="/sobre/contactos" element={<ContactosPage />} />
-            
-            {/* Competitions routes - All paths covered */}
-            <Route path="/competicoes/liga-nacional" element={<LigaNacionalPage />} />
-            <Route path="/competicoes/nacional-masculino" element={<NacionalMasculinoPage />} />
-            <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
-            <Route path="/competicoes/taca-cabo-verde" element={<TacaPage />} />
-            <Route path="/competicoes/super-taca" element={<SuperTacaPage />} />
-            <Route path="/competicoes/competicoes-regionais" element={<CompeticoesRegionaisPage />} />
-            <Route path="/competicoes/calendario" element={<CalendarioPage />} />
-            <Route path="/competicoes/classificacoes" element={<ClassificacoesPage />} />
-            <Route path="/competicoes/resultados" element={<ResultadosPage />} />
-            
-            {/* Teams routes - All variations covered */}
-            <Route path="/selecoes/masculina" element={<SelecaoMasculinaPage />} />
-            <Route path="/selecoes/senior-masculina" element={<SelecaoMasculinaPage />} />
-            <Route path="/selecoes/feminina" element={<SelecaoFemininaPage />} />
-            <Route path="/selecoes/senior-feminina" element={<SelecaoFemininaPage />} />
-            <Route path="/selecoes/jovens" element={<SelecoesJovensPage />} />
-            <Route path="/selecoes/sub-18-masculina" element={<SelecoesJovensPage />} />
-            <Route path="/selecoes/sub-18-feminina" element={<SelecoesJovensPage />} />
-            <Route path="/selecoes/sub-16-masculina" element={<SelecoesJovensPage />} />
-            <Route path="/selecoes/sub-16-feminina" element={<SelecoesJovensPage />} />
-            
-            {/* Additional feature routes */}
-            <Route path="/estatisticas" element={<EstatisticasPage />} />
-            <Route path="/arbitragem" element={<ArbitragemPage />} />
-            <Route path="/clubes" element={<ClubesPage />} />
-            <Route path="/formacao" element={<FormacaoPage />} />
-            <Route path="/eventos" element={<EventosPage />} />
-            <Route path="/transmissoes" element={<TransmissoesPage />} />
-            <Route path="/transferencias" element={<TransferenciasPage />} />
-            
-            {/* Results and live data routes - All paths covered */}
-            <Route path="/resultados" element={<ResultadosPage />} />
-            <Route path="/resultados/ao-vivo" element={<ResultadosAoVivoPage />} />
-            <Route path="/resultados/fiba-livestats" element={<FibaLiveStatsPage />} />
-            <Route path="/resultados/liga-nacional" element={<ResultadosPage />} />
-            <Route path="/resultados/taca-cabo-verde" element={<ResultadosPage />} />
-            
-            {/* Multimedia routes */}
-            <Route path="/videos" element={<VideosPage />} />
-            <Route path="/imprensa" element={<ImprensaPage />} />
-            <Route path="/media/videos" element={<VideosPage />} />
-            <Route path="/media/imprensa" element={<ImprensaPage />} />
-            
-            {/* Main routes */}
-            <Route path="/noticias" element={<NoticiasPage />} />
-            <Route path="/galeria" element={<GaleriaPage />} />
-            <Route path="/area-reservada" element={<AreaReservadaPage />} />
-            <Route path="/contacto" element={<ContactoPage />} />
-            
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <ResponsiveContainer maxWidth="full" padding="none">
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AnimatedRoutes />
+          </BrowserRouter>
+        </ResponsiveContainer>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>

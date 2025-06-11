@@ -1,4 +1,3 @@
-
 import PageLayout from '../PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -86,7 +85,11 @@ const DirecaoPage = () => {
   ];
 
   return (
-    <PageLayout title="Direção da FCBB">
+    <PageLayout 
+      title="Direção da FCBB"
+      description="Conheça os membros da direção da FCBB, departamentos organizacionais e estrutura administrativa da federação para o mandato 2020-2024."
+      keywords="direção fcbb, presidente fcbb, vice-presidente, departamentos fcbb, estrutura organizacional, contactos direção"
+    >
       <div className="space-y-8">
         {/* Membros da Direção */}
         <Card>
