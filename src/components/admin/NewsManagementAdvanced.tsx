@@ -32,6 +32,19 @@ interface NewsForm {
   image_url?: string;
 }
 
+interface NewsArticle {
+  id: string;
+  title: string;
+  content: string;
+  excerpt?: string;
+  category: string;
+  featured?: boolean;
+  published?: boolean;
+  image_url?: string;
+  created_at: string;
+  author?: string;
+}
+
 const NewsManagementAdvanced = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -57,8 +70,11 @@ const NewsManagementAdvanced = () => {
     'Internacional'
   ];
 
-  const filteredNews = news?.filter(article => {
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase());
+  // Garantir que news é um array válido
+  const newsList = Array.isArray(news) ? news as NewsArticle[] : [];
+
+  const filteredNews = newsList.filter(article => {
+    const matchesSearch = article.title?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filterCategory === 'all' || article.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -89,7 +105,7 @@ const NewsManagementAdvanced = () => {
     }
   };
 
-  const startEdit = (article: any) => {
+  const startEdit = (article: NewsArticle) => {
     setEditingId(article.id);
     setValue('title', article.title);
     setValue('content', article.content);
@@ -265,7 +281,7 @@ const NewsManagementAdvanced = () => {
       {/* Lista de notícias */}
       <Card>
         <CardHeader>
-          <CardTitle>Notícias ({filteredNews?.length || 0})</CardTitle>
+          <CardTitle>Notícias ({filteredNews.length})</CardTitle>
           <CardDescription>
             Gerir todas as notícias publicadas
           </CardDescription>
@@ -282,7 +298,7 @@ const NewsManagementAdvanced = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredNews?.map((article) => (
+              {filteredNews.map((article) => (
                 <TableRow key={article.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">

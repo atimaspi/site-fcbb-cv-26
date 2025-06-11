@@ -31,6 +31,17 @@ interface EventForm {
   type: string;
 }
 
+interface Event {
+  id: string;
+  title: string;
+  description?: string;
+  event_date: string;
+  end_date?: string;
+  location?: string;
+  organizer?: string;
+  type: string;
+}
+
 const EventsManagement = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -55,6 +66,9 @@ const EventsManagement = () => {
     'Outro'
   ];
 
+  // Garantir que events é um array válido
+  const eventsList = Array.isArray(events) ? events as Event[] : [];
+
   const handleCreateEvent = async (data: EventForm) => {
     await createEvent.mutateAsync(data);
     setIsCreating(false);
@@ -77,7 +91,7 @@ const EventsManagement = () => {
     }
   };
 
-  const startEdit = (event: any) => {
+  const startEdit = (event: Event) => {
     setEditingId(event.id);
     setValue('title', event.title);
     setValue('description', event.description || '');
@@ -229,7 +243,7 @@ const EventsManagement = () => {
       {/* Lista de eventos */}
       <Card>
         <CardHeader>
-          <CardTitle>Eventos ({events?.length || 0})</CardTitle>
+          <CardTitle>Eventos ({eventsList.length})</CardTitle>
           <CardDescription>
             Todos os eventos organizados pela FCBB
           </CardDescription>
@@ -247,7 +261,7 @@ const EventsManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {events?.map((event) => {
+              {eventsList.map((event) => {
                 const { status, variant } = getEventStatus(event.event_date, event.end_date);
                 return (
                   <TableRow key={event.id}>

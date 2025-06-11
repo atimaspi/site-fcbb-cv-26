@@ -22,31 +22,37 @@ const Dashboard = () => {
   const { data: clubs, isLoading: clubsLoading } = useFetch('clubs');
   const { data: players, isLoading: playersLoading } = useFetch('players');
 
+  // Garantir que os dados são arrays válidos antes de acessar propriedades
+  const newsList = Array.isArray(news) ? news : [];
+  const eventsList = Array.isArray(events) ? events : [];
+  const clubsList = Array.isArray(clubs) ? clubs : [];
+  const playersList = Array.isArray(players) ? players : [];
+
   const stats = [
     {
       title: 'Total de Notícias',
-      value: news?.length || 0,
+      value: newsList.length,
       description: 'Artigos publicados',
       icon: FileText,
       color: 'text-blue-600'
     },
     {
       title: 'Eventos Ativos',
-      value: events?.length || 0,
+      value: eventsList.length,
       description: 'Próximos eventos',
       icon: Calendar,
       color: 'text-green-600'
     },
     {
       title: 'Clubes Registados',
-      value: clubs?.length || 0,
+      value: clubsList.length,
       description: 'Clubes ativos',
       icon: Trophy,
       color: 'text-yellow-600'
     },
     {
       title: 'Jogadores',
-      value: players?.length || 0,
+      value: playersList.length,
       description: 'Atletas registados',
       icon: Users,
       color: 'text-purple-600'
