@@ -10,6 +10,7 @@ interface ExternalLinkProps {
   showIcon?: boolean;
   ariaLabel?: string;
   title?: string;
+  onClick?: () => void;
 }
 
 const ExternalLink = ({
@@ -18,7 +19,8 @@ const ExternalLink = ({
   className,
   showIcon = true,
   ariaLabel,
-  title
+  title,
+  onClick
 }: ExternalLinkProps) => {
   const defaultAriaLabel = `${children} (abre numa nova janela)`;
 
@@ -33,6 +35,7 @@ const ExternalLink = ({
       )}
       aria-label={ariaLabel || defaultAriaLabel}
       title={title || `Visitar ${href}`}
+      onClick={onClick}
     >
       {children}
       {showIcon && (
