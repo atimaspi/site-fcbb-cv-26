@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,7 +72,7 @@ const NewsManagementAdvanced = () => {
   ];
 
   // Verificação mais segura dos dados
-  const newsList = React.useMemo(() => {
+  const newsList: NewsArticle[] = React.useMemo(() => {
     if (!news || !Array.isArray(news)) {
       return [];
     }
@@ -371,3 +372,4 @@ const NewsManagementAdvanced = () => {
 };
 
 export default NewsManagementAdvanced;
+
