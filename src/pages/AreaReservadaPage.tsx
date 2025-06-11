@@ -2,6 +2,7 @@
 import PageLayout from '@/pages/PageLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import UserProfile from '@/components/auth/UserProfile';
+import AdminUserRegistration from '@/components/auth/AdminUserRegistration';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -25,6 +26,9 @@ const AreaReservadaPage = () => {
         <div className="space-y-8">
           {/* Perfil do usuário */}
           <UserProfile />
+          
+          {/* Registro de usuários (apenas para admins) */}
+          <AdminUserRegistration />
           
           {/* Painel administrativo */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

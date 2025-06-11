@@ -17,7 +17,7 @@ const AuthForm = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, isAdmin } = useAuth();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,11 +46,16 @@ const AuthForm = () => {
     if (error) {
       if (error.message.includes('already registered')) {
         setError('Este email já está registado');
+      } else if (error.message.includes('Apenas administradores')) {
+        setError('Apenas administradores podem registrar novos usuários');
       } else {
         setError(error.message);
       }
     } else {
-      setMessage('Verifique o seu email para confirmar a conta');
+      setMessage('Usuário registado com sucesso');
+      setEmail('');
+      setPassword('');
+      setFullName('');
     }
     
     setLoading(false);
@@ -78,7 +83,9 @@ const AuthForm = () => {
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Registar</TabsTrigger>
+              <TabsTrigger value="signup" disabled={!isAdmin}>
+                Registar {!isAdmin && '(Admin)'}
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
@@ -121,59 +128,68 @@ const AuthForm = () => {
             </TabsContent>
             
             <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Nome Completo</Label>
-                  <Input
-                    id="fullName"
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                    placeholder="Seu nome completo"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signupEmail">Email</Label>
-                  <Input
-                    id="signupEmail"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="seu@email.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signupPassword">Palavra-passe</Label>
-                  <Input
-                    id="signupPassword"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="••••••••"
-                    minLength={6}
-                  />
-                </div>
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-                {message && (
-                  <Alert>
-                    <AlertDescription>{message}</AlertDescription>
-                  </Alert>
-                )}
-                <Button 
-                  type="submit" 
-                  className="w-full bg-cv-blue hover:bg-cv-blue/90"
-                  disabled={loading}
-                >
-                  {loading ? <LoadingSpinner size="sm" /> : 'Registar'}
-                </Button>
-              </form>
+              {!isAdmin ? (
+                <Alert>
+                  <AlertDescription>
+                    Apenas administradores podem registar novos usuários. 
+                    Faça login como administrador para aceder a esta funcionalidade.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Nome Completo</Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                      placeholder="Nome completo do usuário"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signupEmail">Email</Label>
+                    <Input
+                      id="signupEmail"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      placeholder="email@exemplo.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signupPassword">Palavra-passe</Label>
+                    <Input
+                      id="signupPassword"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      placeholder="••••••••"
+                      minLength={6}
+                    />
+                  </div>
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+                  {message && (
+                    <Alert>
+                      <AlertDescription>{message}</AlertDescription>
+                    </Alert>
+                  )}
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-cv-blue hover:bg-cv-blue/90"
+                    disabled={loading}
+                  >
+                    {loading ? <LoadingSpinner size="sm" /> : 'Registar Usuário'}
+                  </Button>
+                </form>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
