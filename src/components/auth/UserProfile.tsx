@@ -12,10 +12,12 @@ import { User, LogOut } from 'lucide-react';
 
 interface Profile {
   id: string;
-  email: string;
-  full_name: string;
+  full_name: string | null;
   role: string;
-  created_at: string;
+  updated_at: string | null;
+  avatar_url: string | null;
+  club_id: string | null;
+  regional_association_id: string | null;
 }
 
 const UserProfile = () => {
@@ -99,7 +101,7 @@ const UserProfile = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium text-gray-500">Email</Label>
-              <p className="mt-1 text-sm text-gray-900">{profile?.email}</p>
+              <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
             </div>
             <div>
               <Label className="text-sm font-medium text-gray-500">Função</Label>
