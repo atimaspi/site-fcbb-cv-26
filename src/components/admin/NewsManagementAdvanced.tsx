@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -76,15 +75,20 @@ const NewsManagementAdvanced = () => {
       return [];
     }
     
-    return news.filter(article => 
-      article && 
+    return news.filter((article): article is NewsArticle => 
+      article != null && 
       typeof article === 'object' && 
       'id' in article && 
       'title' in article &&
       'content' in article &&
       'category' in article &&
-      'created_at' in article
-    ) as NewsArticle[];
+      'created_at' in article &&
+      typeof article.id === 'string' &&
+      typeof article.title === 'string' &&
+      typeof article.content === 'string' &&
+      typeof article.category === 'string' &&
+      typeof article.created_at === 'string'
+    );
   }, [news]);
 
   const filteredNews = newsList.filter(article => {

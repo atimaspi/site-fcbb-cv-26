@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,14 +71,18 @@ const EventsManagement = () => {
       return [];
     }
     
-    return events.filter(event => 
-      event && 
+    return events.filter((event): event is Event => 
+      event != null && 
       typeof event === 'object' && 
       'id' in event && 
       'title' in event &&
       'event_date' in event &&
-      'type' in event
-    ) as Event[];
+      'type' in event &&
+      typeof event.id === 'string' &&
+      typeof event.title === 'string' &&
+      typeof event.event_date === 'string' &&
+      typeof event.type === 'string'
+    );
   }, [events]);
 
   const handleCreateEvent = async (data: EventForm) => {
