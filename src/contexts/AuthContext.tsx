@@ -34,6 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Configurar listener de mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
@@ -60,6 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAdminStatus = async (userId: string) => {
     try {
+      console.log('Verificando status de admin para:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('role')
@@ -67,7 +69,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (!error && data) {
+        console.log('Role do usuário:', data.role);
         setIsAdmin(data.role === 'admin');
+      } else {
+        console.log('Erro ao verificar role ou usuário sem perfil:', error);
+        setIsAdmin(false);
       }
     } catch (error) {
       console.log('Erro ao verificar status de admin:', error);
@@ -78,22 +84,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const createAdminUser = async (email: string, password: string, fullName: string) => {
     console.log('Criando usuário admin:', email);
     
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
         }
+      });
+      
+      if (error) {
+        console.log('Erro no registro:', error);
+        return { error };
       }
-    });
-    
-    if (!error && data.user) {
-      // Promover o usuário a admin imediatamente
-      try {
+
+      if (data.user) {
+        console.log('Usuário criado, promovendo a admin:', data.user.id);
+        
+        // Aguardar um pouco para o trigger criar o perfil
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Promover o usuário a admin
         const { error: profileError } = await supabase
           .from('profiles')
           .update({ role: 'admin' })
@@ -101,15 +114,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (profileError) {
           console.log('Erro ao promover usuário a admin:', profileError);
+          return { error: profileError };
         } else {
           console.log('Usuário promovido a admin com sucesso');
         }
-      } catch (err) {
-        console.log('Erro na promoção:', err);
       }
+      
+      return { error: null };
+    } catch (err) {
+      console.log('Erro geral na criação:', err);
+      return { error: err };
     }
-    
-    return { error };
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
@@ -118,32 +133,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: { message: 'Apenas administradores podem registrar novos usuários' } };
     }
 
-    const redirectUrl = `${window.location.origin}/`;
+    console.log('Admin criando novo usuário:', email);
     
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
         }
+      });
+      
+      if (error) {
+        console.log('Erro ao criar usuário:', error);
+      } else {
+        console.log('Usuário criado com sucesso');
       }
-    });
-    
-    return { error };
+      
+      return { error };
+    } catch (err) {
+      console.log('Erro geral no signUp:', err);
+      return { error: err };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
+    console.log('Tentando fazer login:', email);
+    
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
     
+    if (error) {
+      console.log('Erro no login:', error);
+    } else {
+      console.log('Login realizado com sucesso');
+    }
+    
     return { error };
   };
 
   const signOut = async () => {
+    console.log('Fazendo logout');
     await supabase.auth.signOut();
   };
 
