@@ -1,30 +1,64 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown, Lock, Globe, Search } from 'lucide-react';
+import { Menu, X, ChevronDown, Lock, Search } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
+import ExternalLink from './ExternalLink';
+import { AccessibleButton } from '@/components/ui/accessible-button';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [focusedItemIndex, setFocusedItemIndex] = useState(-1);
   const location = useLocation();
   const headerRef = useRef<HTMLElement>(null);
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
-  const toggleDropdown = (dropdown: string) => {
-    if (activeDropdown === dropdown) {
-      setActiveDropdown(null);
-    } else {
-      setActiveDropdown(dropdown);
-    }
-  };
+  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const closeAllDropdowns = () => {
     setActiveDropdown(null);
     setMobileMenuOpen(false);
+    setFocusedItemIndex(-1);
+  };
+
+  // Enhanced keyboard navigation
+  useKeyboardNavigation({
+    onEscape: closeAllDropdowns,
+    onArrowDown: () => {
+      if (activeDropdown) {
+        const currentDropdown = navItems.find(item => item.key === activeDropdown);
+        if (currentDropdown) {
+          const maxIndex = currentDropdown.items.length - 1;
+          setFocusedItemIndex(prev => Math.min(prev + 1, maxIndex));
+        }
+      }
+    },
+    onArrowUp: () => {
+      if (activeDropdown) {
+        setFocusedItemIndex(prev => Math.max(prev - 1, -1));
+      }
+    },
+    onEnter: () => {
+      if (activeDropdown && focusedItemIndex >= 0) {
+        const currentDropdown = navItems.find(item => item.key === activeDropdown);
+        if (currentDropdown) {
+          const focusedItem = currentDropdown.items[focusedItemIndex];
+          if (focusedItem) {
+            window.location.href = focusedItem.path;
+          }
+        }
+      }
+    },
+    enabled: true
+  });
+
+  const toggleDropdown = (dropdown: string) => {
+    if (activeDropdown === dropdown) {
+      setActiveDropdown(null);
+      setFocusedItemIndex(-1);
+    } else {
+      setActiveDropdown(dropdown);
+      setFocusedItemIndex(-1);
+    }
   };
 
   // Close dropdowns when clicking outside
@@ -46,19 +80,7 @@ const Header = () => {
     closeAllDropdowns();
   }, [location.pathname]);
 
-  // Handle keyboard navigation
-  const handleKeyDown = (event: React.KeyboardEvent, dropdown?: string) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      if (dropdown) {
-        toggleDropdown(dropdown);
-      }
-    }
-    if (event.key === 'Escape') {
-      closeAllDropdowns();
-    }
-  };
-
+  // Enhanced navigation items with better accessibility
   const navItems = [
     {
       title: "Sobre a FCBB",
@@ -144,7 +166,16 @@ const Header = () => {
 
   return (
     <header ref={headerRef} className="bg-white shadow-md relative z-50" role="banner">
-      {/* Top utility bar */}
+      {/* Skip navigation link for screen readers */}
+      <a 
+        href="#main-content" 
+        className="skip-nav focus:top-0"
+        aria-label="Saltar para o conteúdo principal"
+      >
+        Saltar para o conteúdo principal
+      </a>
+
+      {/* Top utility bar with enhanced security */}
       <div className="bg-cv-blue text-white">
         <div className="cv-container">
           <div className="flex justify-between items-center py-2 text-sm">
@@ -152,14 +183,16 @@ const Header = () => {
               <span aria-label="Ranking FIBA atual">FIBA Ranking: #52 (Masculino) | #78 (Feminino)</span>
             </div>
             <div className="flex items-center space-x-4">
-              <button 
-                className="flex items-center gap-1 hover:text-cv-yellow focus-visible-cv transition-colors"
-                aria-label="Pesquisar no site"
-                title="Pesquisar"
+              <AccessibleButton 
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1 hover:text-cv-yellow text-white h-auto p-1"
+                ariaLabel="Pesquisar no site"
+                description="Abrir pesquisa"
+                icon={<Search size={14} />}
               >
-                <Search size={14} aria-hidden="true" />
                 Pesquisar
-              </button>
+              </AccessibleButton>
               <Link 
                 to="?lang=pt" 
                 className="hover:text-cv-yellow focus-visible-cv transition-colors"
@@ -191,7 +224,7 @@ const Header = () => {
       </div>
 
       <div className="cv-container">
-        {/* Main header with logo and primary navigation */}
+        {/* Main header with improved logo and CTAs */}
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
             <Link to="/" className="flex items-center focus-visible-cv" aria-label="Página inicial da FCBB">
@@ -201,6 +234,7 @@ const Header = () => {
                 className="h-16 w-auto mr-3"
                 width="64"
                 height="64"
+                loading="eager"
               />
               <div className="flex flex-col">
                 <h1 className="text-xl font-bold text-cv-blue">FCBB</h1>
@@ -210,44 +244,42 @@ const Header = () => {
           </div>
           
           <div className="hidden lg:flex items-center space-x-6">
-            <Button 
+            <AccessibleButton 
               variant="outline" 
               size="sm" 
-              className="border-cv-red text-cv-red hover:bg-cv-red hover:text-white focus-visible-cv transition-colors"
+              className="border-cv-red text-cv-red hover:bg-cv-red hover:text-white"
               asChild
             >
-              <Link 
-                to="/resultados/fiba-livestats"
-                title="Aceder às estatísticas FIBA em tempo real"
-                aria-label="FIBA LiveStats - Estatísticas em tempo real"
+              <ExternalLink 
+                href="/resultados/fiba-livestats"
+                showIcon={false}
+                ariaLabel="FIBA LiveStats - Estatísticas em tempo real"
               >
                 FIBA LiveStats
-              </Link>
-            </Button>
-            <Button 
+              </ExternalLink>
+            </AccessibleButton>
+            <AccessibleButton 
               size="sm" 
-              className="bg-cv-red hover:bg-red-700 focus-visible-cv transition-colors" 
+              className="bg-cv-red hover:bg-red-700" 
               asChild
             >
               <Link 
                 to="/contacto"
-                title="Página de contactos da FCBB"
                 aria-label="Contactar a FCBB"
               >
                 Contactos
               </Link>
-            </Button>
+            </AccessibleButton>
           </div>
         </div>
         
-        {/* Main navigation */}
+        {/* Enhanced main navigation with improved keyboard support */}
         <nav className="hidden lg:block border-t border-gray-200" role="navigation" aria-label="Menu principal">
           <ul className="flex">
             <li>
               <Link 
                 to="/" 
                 className="block px-4 py-4 text-cv-dark hover:bg-cv-blue hover:text-white font-medium border-r border-gray-200 focus-visible-cv transition-colors"
-                title="Página inicial da FCBB"
                 aria-label="Ir para a página inicial"
               >
                 Início
@@ -258,33 +290,33 @@ const Header = () => {
                 <div>
                   <button 
                     onClick={() => toggleDropdown(item.key || "")}
-                    onKeyDown={(e) => handleKeyDown(e, item.key)}
-                    className="flex items-center px-4 py-4 text-cv-dark hover:bg-cv-blue hover:text-white font-medium focus-visible-cv transition-colors"
+                    className="flex items-center px-4 py-4 text-cv-dark hover:bg-cv-blue hover:text-white font-medium focus-visible-cv transition-colors w-full"
                     aria-expanded={activeDropdown === item.key}
                     aria-haspopup="menu"
                     aria-label={item.ariaLabel}
-                    title={`Abrir menu ${item.title}`}
                   >
                     {item.title} 
                     <ChevronDown 
-                      className={`ml-1 w-4 h-4 transition-transform ${activeDropdown === item.key ? 'rotate-180' : ''}`} 
+                      className={`ml-1 w-4 h-4 transition-transform duration-200 ${activeDropdown === item.key ? 'rotate-180' : ''}`} 
                       aria-hidden="true"
                     />
                   </button>
                   <div 
-                    className={`absolute left-0 top-full w-64 bg-white shadow-xl border border-gray-200 z-50
-                              ${activeDropdown === item.key ? 'block' : 'hidden'} group-hover:block`}
+                    ref={el => dropdownRefs.current[item.key || ""] = el}
+                    className={`absolute left-0 top-full w-64 bg-white shadow-xl border border-gray-200 z-50 transition-all duration-200
+                              ${activeDropdown === item.key ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}
                     role="menu"
                     aria-label={`Submenu ${item.title}`}
                   >
                     <div className="py-2">
-                      {item.items?.map((subItem) => (
+                      {item.items?.map((subItem, index) => (
                         <Link 
                           key={subItem.name} 
                           to={subItem.path}
-                          className="block px-4 py-3 text-sm text-cv-dark hover:bg-cv-blue hover:text-white border-b border-gray-100 last:border-0 focus-visible-cv transition-colors"
+                          className={`block px-4 py-3 text-sm text-cv-dark hover:bg-cv-blue hover:text-white border-b border-gray-100 last:border-0 focus-visible-cv transition-colors ${
+                            focusedItemIndex === index ? 'bg-cv-blue text-white' : ''
+                          }`}
                           onClick={() => setActiveDropdown(null)}
-                          title={subItem.description}
                           aria-label={subItem.description}
                           role="menuitem"
                         >
@@ -299,24 +331,26 @@ const Header = () => {
           </ul>
         </nav>
 
-        {/* Mobile menu button */}
+        {/* Enhanced mobile menu button */}
         <div className="lg:hidden flex justify-end py-3">
-          <button 
-            onClick={toggleMobileMenu} 
-            onKeyDown={(e) => handleKeyDown(e)}
-            className="p-2 focus-visible-cv rounded-md"
-            aria-expanded={mobileMenuOpen}
-            aria-label={mobileMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
-            title={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
-          >
-            {mobileMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-          </button>
+          <AccessibleButton
+            variant="ghost"
+            size="sm"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            ariaLabel={mobileMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
+            icon={mobileMenuOpen ? <X /> : <Menu />}
+            className="p-2"
+          />
         </div>
       </div>
 
-      {/* Mobile navigation */}
+      {/* Enhanced mobile navigation */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t" role="navigation" aria-label="Menu móvel">
+        <div 
+          className="lg:hidden bg-white border-t animate-slide-in-right" 
+          role="navigation" 
+          aria-label="Menu móvel"
+        >
           <div className="cv-container py-2">
             <ul>
               <li className="py-2">
@@ -324,7 +358,6 @@ const Header = () => {
                   to="/" 
                   className="block py-2 px-4 text-cv-dark font-medium focus-visible-cv transition-colors" 
                   onClick={() => setMobileMenuOpen(false)}
-                  title="Página inicial da FCBB"
                   aria-label="Ir para a página inicial"
                 >
                   Início
@@ -335,31 +368,32 @@ const Header = () => {
                   <div>
                     <button 
                       onClick={() => toggleDropdown(item.key || "")}
-                      onKeyDown={(e) => handleKeyDown(e, item.key)}
                       className="w-full text-left flex justify-between items-center py-2 px-4 text-cv-dark font-medium focus-visible-cv transition-colors"
                       aria-expanded={activeDropdown === item.key}
                       aria-haspopup="menu"
                       aria-label={item.ariaLabel}
-                      title={`${activeDropdown === item.key ? 'Fechar' : 'Abrir'} menu ${item.title}`}
                     >
                       {item.title}
                       <ChevronDown 
-                        className={`w-4 h-4 transition-transform ${activeDropdown === item.key ? 'transform rotate-180' : ''}`} 
+                        className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === item.key ? 'rotate-180' : ''}`} 
                         aria-hidden="true"
                       />
                     </button>
                     {activeDropdown === item.key && (
-                      <div className="pl-4 bg-gray-50" role="menu" aria-label={`Submenu ${item.title}`}>
+                      <div 
+                        className="pl-4 bg-gray-50 animate-fade-in" 
+                        role="menu" 
+                        aria-label={`Submenu ${item.title}`}
+                      >
                         {item.items?.map((subItem) => (
                           <Link 
                             key={subItem.name} 
                             to={subItem.path}
-                            className="block py-2 px-4 text-sm text-cv-dark focus-visible-cv transition-colors"
+                            className="block py-2 px-4 text-sm text-cv-dark focus-visible-cv transition-colors hover:bg-cv-blue hover:text-white"
                             onClick={() => {
                               setActiveDropdown(null);
                               setMobileMenuOpen(false);
                             }}
-                            title={subItem.description}
                             aria-label={subItem.description}
                             role="menuitem"
                           >
@@ -372,35 +406,34 @@ const Header = () => {
                 </li>
               ))}
               <li className="pt-4 border-t mt-2 flex space-x-4 px-4">
-                <Button 
+                <AccessibleButton 
                   variant="outline" 
                   size="sm" 
-                  className="border-cv-red text-cv-red hover:bg-cv-red hover:text-white focus-visible-cv transition-colors"
+                  className="border-cv-red text-cv-red hover:bg-cv-red hover:text-white"
                   asChild
                 >
-                  <Link 
-                    to="/resultados/fiba-livestats"
+                  <ExternalLink 
+                    href="/resultados/fiba-livestats"
+                    showIcon={false}
                     onClick={() => setMobileMenuOpen(false)}
-                    title="Aceder às estatísticas FIBA em tempo real"
-                    aria-label="FIBA LiveStats - Estatísticas em tempo real"
+                    ariaLabel="FIBA LiveStats - Estatísticas em tempo real"
                   >
                     FIBA LiveStats
-                  </Link>
-                </Button>
-                <Button 
+                  </ExternalLink>
+                </AccessibleButton>
+                <AccessibleButton 
                   size="sm" 
-                  className="bg-cv-red hover:bg-red-700 focus-visible-cv transition-colors" 
+                  className="bg-cv-red hover:bg-red-700" 
                   asChild
                 >
                   <Link 
                     to="/contacto" 
                     onClick={() => setMobileMenuOpen(false)}
-                    title="Página de contactos da FCBB"
                     aria-label="Contactar a FCBB"
                   >
                     Contactos
                   </Link>
-                </Button>
+                </AccessibleButton>
               </li>
             </ul>
           </div>
@@ -411,3 +444,5 @@ const Header = () => {
 };
 
 export default Header;
+
+</edits_to_apply>
