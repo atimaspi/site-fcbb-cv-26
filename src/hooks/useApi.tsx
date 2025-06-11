@@ -2,9 +2,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { Database } from '@/integrations/supabase/types';
 
-type TableName = keyof Database['public']['Tables'];
+// Simplified type approach to avoid infinite type instantiation
+type TableName = string;
 
 // Generic API hook for CRUD operations
 export const useApi = () => {
@@ -13,7 +13,7 @@ export const useApi = () => {
 
   // Generic fetch function
   const fetchData = async (table: TableName, filters?: Record<string, any>) => {
-    let query = supabase.from(table).select('*');
+    let query = supabase.from(table as any).select('*');
     
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
@@ -29,7 +29,7 @@ export const useApi = () => {
   // Generic create function
   const createData = async (table: TableName, data: any) => {
     const { data: result, error } = await supabase
-      .from(table)
+      .from(table as any)
       .insert(data)
       .select()
       .single();
@@ -41,7 +41,7 @@ export const useApi = () => {
   // Generic update function
   const updateData = async (table: TableName, id: string, data: any) => {
     const { data: result, error } = await supabase
-      .from(table)
+      .from(table as any)
       .update(data)
       .eq('id', id)
       .select()
@@ -54,7 +54,7 @@ export const useApi = () => {
   // Generic delete function
   const deleteData = async (table: TableName, id: string) => {
     const { error } = await supabase
-      .from(table)
+      .from(table as any)
       .delete()
       .eq('id', id);
     
