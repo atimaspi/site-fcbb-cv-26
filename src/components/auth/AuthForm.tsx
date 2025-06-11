@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import CreateAdminUser from './CreateAdminUser';
 
 const AuthForm = () => {
   const [email, setEmail] = useState('');
@@ -81,11 +82,12 @@ const AuthForm = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="signin">Entrar</TabsTrigger>
               <TabsTrigger value="signup" disabled={!isAdmin}>
                 Registar {!isAdmin && '(Admin)'}
               </TabsTrigger>
+              <TabsTrigger value="createadmin">Criar Admin</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
@@ -98,7 +100,7 @@ const AuthForm = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="seu@email.com"
+                    placeholder="admin@fcbb.cv"
                   />
                 </div>
                 <div className="space-y-2">
@@ -109,7 +111,7 @@ const AuthForm = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder="••••••••"
+                    placeholder="Spokers@1"
                   />
                 </div>
                 {error && (
@@ -190,6 +192,10 @@ const AuthForm = () => {
                   </Button>
                 </form>
               )}
+            </TabsContent>
+
+            <TabsContent value="createadmin">
+              <CreateAdminUser />
             </TabsContent>
           </Tabs>
         </CardContent>

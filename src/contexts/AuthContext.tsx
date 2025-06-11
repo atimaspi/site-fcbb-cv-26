@@ -11,6 +11,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   loading: boolean;
   isAdmin: boolean;
+  createAdminUser: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -74,6 +75,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const createAdminUser = async (email: string, password: string, fullName: string) => {
+    console.log('Criando usuário admin:', email);
+    
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          full_name: fullName
+        }
+      }
+    });
+    
+    if (!error && data.user) {
+      // Promover o usuário a admin imediatamente
+      try {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ role: 'admin' })
+          .eq('id', data.user.id);
+        
+        if (profileError) {
+          console.log('Erro ao promover usuário a admin:', profileError);
+        } else {
+          console.log('Usuário promovido a admin com sucesso');
+        }
+      } catch (err) {
+        console.log('Erro na promoção:', err);
+      }
+    }
+    
+    return { error };
+  };
+
   const signUp = async (email: string, password: string, fullName: string) => {
     // Verificar se o usuário atual é admin
     if (!isAdmin) {
@@ -116,7 +154,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signOut,
     loading,
-    isAdmin
+    isAdmin,
+    createAdminUser
   };
 
   return (
