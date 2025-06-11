@@ -70,8 +70,22 @@ const NewsManagementAdvanced = () => {
     'Internacional'
   ];
 
-  // Garantir que news é um array válido
-  const newsList = Array.isArray(news) ? news as NewsArticle[] : [];
+  // Verificação mais segura dos dados
+  const newsList = React.useMemo(() => {
+    if (!news || !Array.isArray(news)) {
+      return [];
+    }
+    
+    return news.filter(article => 
+      article && 
+      typeof article === 'object' && 
+      'id' in article && 
+      'title' in article &&
+      'content' in article &&
+      'category' in article &&
+      'created_at' in article
+    ) as NewsArticle[];
+  }, [news]);
 
   const filteredNews = newsList.filter(article => {
     const matchesSearch = article.title?.toLowerCase().includes(searchTerm.toLowerCase());

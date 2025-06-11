@@ -66,8 +66,21 @@ const EventsManagement = () => {
     'Outro'
   ];
 
-  // Garantir que events é um array válido
-  const eventsList = Array.isArray(events) ? events as Event[] : [];
+  // Verificação mais segura dos dados
+  const eventsList = React.useMemo(() => {
+    if (!events || !Array.isArray(events)) {
+      return [];
+    }
+    
+    return events.filter(event => 
+      event && 
+      typeof event === 'object' && 
+      'id' in event && 
+      'title' in event &&
+      'event_date' in event &&
+      'type' in event
+    ) as Event[];
+  }, [events]);
 
   const handleCreateEvent = async (data: EventForm) => {
     await createEvent.mutateAsync(data);
