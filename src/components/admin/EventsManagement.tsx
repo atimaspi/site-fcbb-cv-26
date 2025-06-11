@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -68,7 +66,7 @@ const EventsManagement = () => {
   ];
 
   // Verificação mais segura dos dados
-  const eventsList: Event[] = React.useMemo(() => {
+  const eventsList = React.useMemo(() => {
     if (!events || !Array.isArray(events)) {
       return [];
     }
@@ -350,4 +348,3 @@ const EventsManagement = () => {
 };
 
 export default EventsManagement;
-
