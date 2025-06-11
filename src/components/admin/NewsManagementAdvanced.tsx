@@ -88,15 +88,15 @@ const NewsManagementAdvanced = () => {
       return [] as NewsArticle[];
     }
     
-    return news.filter(isValidNewsArticle);
+    return news.filter(isValidNewsArticle) as NewsArticle[];
   }, [news]);
 
   const filteredNews = React.useMemo(() => {
-    return newsList.filter(article => {
+    return newsList.filter((article: NewsArticle) => {
       const matchesSearch = article.title?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = filterCategory === 'all' || article.category === filterCategory;
       return matchesSearch && matchesCategory;
-    });
+    }) as NewsArticle[];
   }, [newsList, searchTerm, filterCategory]);
 
   const handleCreateNews = async (data: NewsForm) => {
@@ -319,7 +319,7 @@ const NewsManagementAdvanced = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredNews.map((article) => (
+              {filteredNews.map((article: NewsArticle) => (
                 <TableRow key={article.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
