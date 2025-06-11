@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -90,11 +91,13 @@ const NewsManagementAdvanced = () => {
     return news.filter(isValidNewsArticle);
   }, [news]);
 
-  const filteredNews = newsList.filter(article => {
-    const matchesSearch = article.title?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || article.category === filterCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredNews = React.useMemo(() => {
+    return newsList.filter(article => {
+      const matchesSearch = article.title?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory === 'all' || article.category === filterCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [newsList, searchTerm, filterCategory]);
 
   const handleCreateNews = async (data: NewsForm) => {
     await createNews.mutateAsync({
@@ -369,3 +372,4 @@ const NewsManagementAdvanced = () => {
 };
 
 export default NewsManagementAdvanced;
+
