@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown, Lock, Search } from 'lucide-react';
@@ -444,5 +445,3 @@ const Header = () => {
 };
 
 export default Header;
-
-</edits_to_apply>
