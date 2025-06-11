@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import NoticiasPage from "./pages/NoticiasPage";
@@ -51,84 +52,86 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          
-          {/* Federation routes - Both /federacao and /sobre paths */}
-          <Route path="/federacao/historia" element={<HistoriaPage />} />
-          <Route path="/federacao/missao-visao" element={<MissaoVisaoPage />} />
-          <Route path="/federacao/direcao" element={<DirecaoPage />} />
-          <Route path="/federacao/orgaos-sociais" element={<OrgaosSociaisPage />} />
-          <Route path="/federacao/estatutos" element={<EstatutosPage />} />
-          <Route path="/federacao/contactos" element={<ContactosPage />} />
-          
-          {/* Sobre a FCBB routes (alternative paths) */}
-          <Route path="/sobre/historia" element={<HistoriaPage />} />
-          <Route path="/sobre/missao-visao" element={<MissaoVisaoPage />} />
-          <Route path="/sobre/direcao" element={<DirecaoPage />} />
-          <Route path="/sobre/orgaos-sociais" element={<OrgaosSociaisPage />} />
-          <Route path="/sobre/estatutos" element={<EstatutosPage />} />
-          <Route path="/sobre/contactos" element={<ContactosPage />} />
-          
-          {/* Competitions routes - All paths covered */}
-          <Route path="/competicoes/liga-nacional" element={<LigaNacionalPage />} />
-          <Route path="/competicoes/nacional-masculino" element={<NacionalMasculinoPage />} />
-          <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
-          <Route path="/competicoes/taca-cabo-verde" element={<TacaPage />} />
-          <Route path="/competicoes/super-taca" element={<SuperTacaPage />} />
-          <Route path="/competicoes/competicoes-regionais" element={<CompeticoesRegionaisPage />} />
-          <Route path="/competicoes/calendario" element={<CalendarioPage />} />
-          <Route path="/competicoes/classificacoes" element={<ClassificacoesPage />} />
-          <Route path="/competicoes/resultados" element={<ResultadosPage />} />
-          
-          {/* Teams routes - All variations covered */}
-          <Route path="/selecoes/masculina" element={<SelecaoMasculinaPage />} />
-          <Route path="/selecoes/senior-masculina" element={<SelecaoMasculinaPage />} />
-          <Route path="/selecoes/feminina" element={<SelecaoFemininaPage />} />
-          <Route path="/selecoes/senior-feminina" element={<SelecaoFemininaPage />} />
-          <Route path="/selecoes/jovens" element={<SelecoesJovensPage />} />
-          <Route path="/selecoes/sub-18-masculina" element={<SelecoesJovensPage />} />
-          <Route path="/selecoes/sub-18-feminina" element={<SelecoesJovensPage />} />
-          <Route path="/selecoes/sub-16-masculina" element={<SelecoesJovensPage />} />
-          <Route path="/selecoes/sub-16-feminina" element={<SelecoesJovensPage />} />
-          
-          {/* Additional feature routes */}
-          <Route path="/estatisticas" element={<EstatisticasPage />} />
-          <Route path="/arbitragem" element={<ArbitragemPage />} />
-          <Route path="/clubes" element={<ClubesPage />} />
-          <Route path="/formacao" element={<FormacaoPage />} />
-          <Route path="/eventos" element={<EventosPage />} />
-          <Route path="/transmissoes" element={<TransmissoesPage />} />
-          <Route path="/transferencias" element={<TransferenciasPage />} />
-          
-          {/* Results and live data routes - All paths covered */}
-          <Route path="/resultados" element={<ResultadosPage />} />
-          <Route path="/resultados/ao-vivo" element={<ResultadosAoVivoPage />} />
-          <Route path="/resultados/fiba-livestats" element={<FibaLiveStatsPage />} />
-          <Route path="/resultados/liga-nacional" element={<ResultadosPage />} />
-          <Route path="/resultados/taca-cabo-verde" element={<ResultadosPage />} />
-          
-          {/* Multimedia routes */}
-          <Route path="/videos" element={<VideosPage />} />
-          <Route path="/imprensa" element={<ImprensaPage />} />
-          <Route path="/media/videos" element={<VideosPage />} />
-          <Route path="/media/imprensa" element={<ImprensaPage />} />
-          
-          {/* Main routes */}
-          <Route path="/noticias" element={<NoticiasPage />} />
-          <Route path="/galeria" element={<GaleriaPage />} />
-          <Route path="/area-reservada" element={<AreaReservadaPage />} />
-          <Route path="/contacto" element={<ContactoPage />} />
-          
-          {/* Catch-all route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            
+            {/* Federation routes - Both /federacao and /sobre paths */}
+            <Route path="/federacao/historia" element={<HistoriaPage />} />
+            <Route path="/federacao/missao-visao" element={<MissaoVisaoPage />} />
+            <Route path="/federacao/direcao" element={<DirecaoPage />} />
+            <Route path="/federacao/orgaos-sociais" element={<OrgaosSociaisPage />} />
+            <Route path="/federacao/estatutos" element={<EstatutosPage />} />
+            <Route path="/federacao/contactos" element={<ContactosPage />} />
+            
+            {/* Sobre a FCBB routes (alternative paths) */}
+            <Route path="/sobre/historia" element={<HistoriaPage />} />
+            <Route path="/sobre/missao-visao" element={<MissaoVisaoPage />} />
+            <Route path="/sobre/direcao" element={<DirecaoPage />} />
+            <Route path="/sobre/orgaos-sociais" element={<OrgaosSociaisPage />} />
+            <Route path="/sobre/estatutos" element={<EstatutosPage />} />
+            <Route path="/sobre/contactos" element={<ContactosPage />} />
+            
+            {/* Competitions routes - All paths covered */}
+            <Route path="/competicoes/liga-nacional" element={<LigaNacionalPage />} />
+            <Route path="/competicoes/nacional-masculino" element={<NacionalMasculinoPage />} />
+            <Route path="/competicoes/taca-de-cabo-verde" element={<TacaPage />} />
+            <Route path="/competicoes/taca-cabo-verde" element={<TacaPage />} />
+            <Route path="/competicoes/super-taca" element={<SuperTacaPage />} />
+            <Route path="/competicoes/competicoes-regionais" element={<CompeticoesRegionaisPage />} />
+            <Route path="/competicoes/calendario" element={<CalendarioPage />} />
+            <Route path="/competicoes/classificacoes" element={<ClassificacoesPage />} />
+            <Route path="/competicoes/resultados" element={<ResultadosPage />} />
+            
+            {/* Teams routes - All variations covered */}
+            <Route path="/selecoes/masculina" element={<SelecaoMasculinaPage />} />
+            <Route path="/selecoes/senior-masculina" element={<SelecaoMasculinaPage />} />
+            <Route path="/selecoes/feminina" element={<SelecaoFemininaPage />} />
+            <Route path="/selecoes/senior-feminina" element={<SelecaoFemininaPage />} />
+            <Route path="/selecoes/jovens" element={<SelecoesJovensPage />} />
+            <Route path="/selecoes/sub-18-masculina" element={<SelecoesJovensPage />} />
+            <Route path="/selecoes/sub-18-feminina" element={<SelecoesJovensPage />} />
+            <Route path="/selecoes/sub-16-masculina" element={<SelecoesJovensPage />} />
+            <Route path="/selecoes/sub-16-feminina" element={<SelecoesJovensPage />} />
+            
+            {/* Additional feature routes */}
+            <Route path="/estatisticas" element={<EstatisticasPage />} />
+            <Route path="/arbitragem" element={<ArbitragemPage />} />
+            <Route path="/clubes" element={<ClubesPage />} />
+            <Route path="/formacao" element={<FormacaoPage />} />
+            <Route path="/eventos" element={<EventosPage />} />
+            <Route path="/transmissoes" element={<TransmissoesPage />} />
+            <Route path="/transferencias" element={<TransferenciasPage />} />
+            
+            {/* Results and live data routes - All paths covered */}
+            <Route path="/resultados" element={<ResultadosPage />} />
+            <Route path="/resultados/ao-vivo" element={<ResultadosAoVivoPage />} />
+            <Route path="/resultados/fiba-livestats" element={<FibaLiveStatsPage />} />
+            <Route path="/resultados/liga-nacional" element={<ResultadosPage />} />
+            <Route path="/resultados/taca-cabo-verde" element={<ResultadosPage />} />
+            
+            {/* Multimedia routes */}
+            <Route path="/videos" element={<VideosPage />} />
+            <Route path="/imprensa" element={<ImprensaPage />} />
+            <Route path="/media/videos" element={<VideosPage />} />
+            <Route path="/media/imprensa" element={<ImprensaPage />} />
+            
+            {/* Main routes */}
+            <Route path="/noticias" element={<NoticiasPage />} />
+            <Route path="/galeria" element={<GaleriaPage />} />
+            <Route path="/area-reservada" element={<AreaReservadaPage />} />
+            <Route path="/contacto" element={<ContactoPage />} />
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
