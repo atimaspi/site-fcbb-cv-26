@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApi } from '@/hooks/useApi';
@@ -10,12 +11,14 @@ import {
   TrendingUp,
   Eye,
   MessageSquare,
-  Star
+  Star,
+  ImageIcon
 } from 'lucide-react';
 
 import GamesManagement from './GamesManagement';
 import ResultsManagement from './ResultsManagement';
 import IntegrationsManagement from './IntegrationsManagement';
+import GalleryManagement from './GalleryManagement';
 
 const Dashboard = () => {
   const { useFetch } = useApi();
@@ -171,6 +174,8 @@ const Dashboard = () => {
         return <ResultsManagement />;
       case 'integrations':
         return <IntegrationsManagement />;
+      case 'gallery':
+        return <GalleryManagement />;
       default:
         return <div className="text-center py-8">Selecione uma opção no menu lateral</div>;
     }
@@ -213,6 +218,14 @@ const Dashboard = () => {
             }`}
           >
             Gestão de Resultados
+          </button>
+          <button
+            onClick={() => setActiveTab('gallery')}
+            className={`w-full text-left p-3 rounded-lg transition-colors ${
+              activeTab === 'gallery' ? 'bg-blue-600' : 'hover:bg-blue-600'
+            }`}
+          >
+            Gestão de Galeria
           </button>
           <button
             onClick={() => setActiveTab('integrations')}

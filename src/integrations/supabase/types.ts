@@ -308,6 +308,119 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_images: {
+        Row: {
+          alt_text: string | null
+          caption: string | null
+          created_at: string | null
+          file_size: number | null
+          gallery_id: string | null
+          height: number | null
+          id: string
+          image_url: string
+          order_index: number | null
+          thumbnail_url: string | null
+          width: number | null
+        }
+        Insert: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string | null
+          file_size?: number | null
+          gallery_id?: string | null
+          height?: number | null
+          id?: string
+          image_url: string
+          order_index?: number | null
+          thumbnail_url?: string | null
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string | null
+          file_size?: number | null
+          gallery_id?: string | null
+          height?: number | null
+          id?: string
+          image_url?: string
+          order_index?: number | null
+          thumbnail_url?: string | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_images_gallery_id_fkey"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "gallery"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_results: {
+        Row: {
+          away_team_score: number
+          created_at: string | null
+          end_time: string | null
+          game_id: string | null
+          game_status: string | null
+          home_team_score: number
+          id: string
+          player_stats: Json | null
+          quarter_scores: Json | null
+          referee_id: string | null
+          start_time: string | null
+          team_stats: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          away_team_score?: number
+          created_at?: string | null
+          end_time?: string | null
+          game_id?: string | null
+          game_status?: string | null
+          home_team_score?: number
+          id?: string
+          player_stats?: Json | null
+          quarter_scores?: Json | null
+          referee_id?: string | null
+          start_time?: string | null
+          team_stats?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          away_team_score?: number
+          created_at?: string | null
+          end_time?: string | null
+          game_id?: string | null
+          game_status?: string | null
+          home_team_score?: number
+          id?: string
+          player_stats?: Json | null
+          quarter_scores?: Json | null
+          referee_id?: string | null
+          start_time?: string | null
+          team_stats?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_results_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_results_referee_id_fkey"
+            columns: ["referee_id"]
+            isOneToOne: false
+            referencedRelation: "referees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           away_score: number | null
@@ -371,6 +484,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      integrations: {
+        Row: {
+          config: Json
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync: string | null
+          name: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          config?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          name: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          config?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          name?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       news: {
         Row: {
@@ -615,6 +761,41 @@ export type Database = {
             columns: ["federation_id"]
             isOneToOne: false
             referencedRelation: "federations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sync_logs: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          integration_id: string | null
+          message: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          integration_id?: string | null
+          message?: string | null
+          status: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          integration_id?: string | null
+          message?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_logs_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "integrations"
             referencedColumns: ["id"]
           },
         ]
