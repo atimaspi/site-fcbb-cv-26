@@ -54,30 +54,19 @@ const IntegrationsManagement = () => {
   const fetchIntegrations = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('exec_sql', {
-        sql: 'SELECT * FROM integrations ORDER BY name',
-        params: []
-      });
+      const { data, error } = await supabase
+        .from('integrations')
+        .select('*')
+        .order('name');
 
       if (error) throw error;
       setIntegrations(data || []);
     } catch (error: any) {
-      // Fallback for direct query
-      try {
-        const { data, error } = await supabase
-          .from('integrations' as any)
-          .select('*')
-          .order('name');
-
-        if (error) throw error;
-        setIntegrations(data || []);
-      } catch (fallbackError: any) {
-        toast({
-          title: "Erro",
-          description: `Erro ao carregar integrações: ${fallbackError.message}`,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Erro",
+        description: `Erro ao carregar integrações: ${error.message}`,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -98,22 +87,12 @@ const IntegrationsManagement = () => {
 
   const handleToggleActive = async (integrationId: string, isActive: boolean) => {
     try {
-      try {
-        const { error } = await supabase.rpc('exec_sql', {
-          sql: 'UPDATE integrations SET is_active = $1 WHERE id = $2',
-          params: [isActive, integrationId]
-        });
+      const { error } = await supabase
+        .from('integrations')
+        .update({ is_active: isActive })
+        .eq('id', integrationId);
 
-        if (error) throw error;
-      } catch {
-        // Fallback
-        const { error } = await supabase
-          .from('integrations' as any)
-          .update({ is_active: isActive })
-          .eq('id', integrationId);
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Sucesso",
@@ -157,29 +136,15 @@ const IntegrationsManagement = () => {
         };
       }
 
-      try {
-        const { error } = await supabase.rpc('exec_sql', {
-          sql: `
-            UPDATE integrations 
-            SET config = $1, updated_at = NOW() 
-            WHERE id = $2
-          `,
-          params: [JSON.stringify(config), editingIntegration.id]
-        });
+      const { error } = await supabase
+        .from('integrations')
+        .update({
+          config: config,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingIntegration.id);
 
-        if (error) throw error;
-      } catch {
-        // Fallback
-        const { error } = await supabase
-          .from('integrations' as any)
-          .update({
-            config: config,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', editingIntegration.id);
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Sucesso",

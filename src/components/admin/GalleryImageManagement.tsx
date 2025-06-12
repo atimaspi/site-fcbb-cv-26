@@ -47,37 +47,20 @@ const GalleryImageManagement: React.FC<GalleryImageManagementProps> = ({
   const fetchImages = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('exec_sql', {
-        sql: `
-          SELECT id, image_url, thumbnail_url, caption, alt_text, order_index
-          FROM gallery_images 
-          WHERE gallery_id = $1 
-          ORDER BY order_index
-        `,
-        params: [galleryId]
-      });
+      const { data, error } = await supabase
+        .from('gallery_images')
+        .select('*')
+        .eq('gallery_id', galleryId)
+        .order('order_index');
 
       if (error) throw error;
       setImages(data || []);
     } catch (error: any) {
-      console.log('Fetching images with direct query...');
-      // Fallback: use direct query
-      try {
-        const { data, error } = await supabase
-          .from('gallery_images' as any)
-          .select('*')
-          .eq('gallery_id', galleryId)
-          .order('order_index');
-
-        if (error) throw error;
-        setImages(data || []);
-      } catch (fallbackError: any) {
-        toast({
-          title: "Erro",
-          description: `Erro ao carregar imagens: ${fallbackError.message}`,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Erro",
+        description: `Erro ao carregar imagens: ${error.message}`,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -111,28 +94,17 @@ const GalleryImageManagement: React.FC<GalleryImageManagementProps> = ({
           .from('gallery-images')
           .getPublicUrl(fileName);
 
-        // Salvar na base de dados usando query direta
-        const { error: dbError } = await supabase.rpc('exec_sql', {
-          sql: `
-            INSERT INTO gallery_images (gallery_id, image_url, alt_text, order_index)
-            VALUES ($1, $2, $3, $4)
-          `,
-          params: [galleryId, publicUrl, file.name, images.length + index]
-        });
+        // Salvar na base de dados
+        const { error: dbError } = await supabase
+          .from('gallery_images')
+          .insert({
+            gallery_id: galleryId,
+            image_url: publicUrl,
+            alt_text: file.name,
+            order_index: images.length + index
+          });
 
-        if (dbError) {
-          // Fallback para inserção direta
-          const { error: fallbackError } = await supabase
-            .from('gallery_images' as any)
-            .insert({
-              gallery_id: galleryId,
-              image_url: publicUrl,
-              alt_text: file.name,
-              order_index: images.length + index
-            });
-
-          if (fallbackError) throw fallbackError;
-        }
+        if (dbError) throw dbError;
       });
 
       await Promise.all(uploadPromises);
@@ -169,22 +141,12 @@ const GalleryImageManagement: React.FC<GalleryImageManagementProps> = ({
         .remove([fileName]);
 
       // Eliminar da base de dados
-      try {
-        const { error } = await supabase.rpc('exec_sql', {
-          sql: 'DELETE FROM gallery_images WHERE id = $1',
-          params: [imageId]
-        });
+      const { error } = await supabase
+        .from('gallery_images')
+        .delete()
+        .eq('id', imageId);
 
-        if (error) throw error;
-      } catch {
-        // Fallback
-        const { error } = await supabase
-          .from('gallery_images' as any)
-          .delete()
-          .eq('id', imageId);
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Sucesso",
@@ -203,22 +165,12 @@ const GalleryImageManagement: React.FC<GalleryImageManagementProps> = ({
 
   const updateImageOrder = async (imageId: string, newOrder: number) => {
     try {
-      try {
-        const { error } = await supabase.rpc('exec_sql', {
-          sql: 'UPDATE gallery_images SET order_index = $1 WHERE id = $2',
-          params: [newOrder, imageId]
-        });
+      const { error } = await supabase
+        .from('gallery_images')
+        .update({ order_index: newOrder })
+        .eq('id', imageId);
 
-        if (error) throw error;
-      } catch {
-        // Fallback
-        const { error } = await supabase
-          .from('gallery_images' as any)
-          .update({ order_index: newOrder })
-          .eq('id', imageId);
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       await fetchImages();
     } catch (error: any) {
