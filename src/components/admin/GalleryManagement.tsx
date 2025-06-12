@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +20,8 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import GalleryImageManagement from './GalleryImageManagement';
+import { ImageIcon } from 'lucide-react';
 
 interface GalleryItem {
   id: string;
@@ -43,6 +44,8 @@ const GalleryManagement = () => {
     event: '',
     status: 'draft'
   });
+  const [showImageManager, setShowImageManager] = useState(false);
+  const [selectedGallery, setSelectedGallery] = useState<GalleryItem | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -145,6 +148,11 @@ const GalleryManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleManageImages = (gallery: GalleryItem) => {
+    setSelectedGallery(gallery);
+    setShowImageManager(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -267,6 +275,13 @@ const GalleryManagement = () => {
                   <TableCell>
                     <div className="flex space-x-2">
                       <button 
+                        onClick={() => handleManageImages(gallery)}
+                        className="text-purple-600 hover:text-purple-800"
+                        title="Gerir Imagens"
+                      >
+                        <ImageIcon size={16} />
+                      </button>
+                      <button 
                         onClick={() => handleEdit(gallery)}
                         className="text-blue-600 hover:text-blue-800"
                         title="Editar"
@@ -363,6 +378,19 @@ const GalleryManagement = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Image Management Dialog */}
+      {showImageManager && selectedGallery && (
+        <GalleryImageManagement
+          galleryId={selectedGallery.id}
+          galleryTitle={selectedGallery.title}
+          onClose={() => {
+            setShowImageManager(false);
+            setSelectedGallery(null);
+            fetchGallery(); // Refresh to update image counts
+          }}
+        />
+      )}
     </div>
   );
 };
