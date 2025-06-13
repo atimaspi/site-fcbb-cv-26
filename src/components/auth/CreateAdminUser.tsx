@@ -28,10 +28,12 @@ const CreateAdminUser = () => {
     const { error } = await createAdminUser(email, password, fullName);
     
     if (error) {
-      if (error.message.includes('already registered')) {
+      if (error.message && error.message.includes('already registered')) {
+        setError('Este email já está registado. Tente fazer login.');
+      } else if (error.message && error.message.includes('User already registered')) {
         setError('Este email já está registado. Tente fazer login.');
       } else {
-        setError(error.message);
+        setError(error.message || 'Erro ao criar usuário');
       }
     } else {
       setSuccess(true);
@@ -78,7 +80,7 @@ const CreateAdminUser = () => {
           Criar Usuário Admin Inicial
         </CardTitle>
         <CardDescription>
-          Crie o primeiro administrador do sistema
+          Crie o primeiro administrador do sistema. Se não consegue criar conta, use esta opção.
         </CardDescription>
       </CardHeader>
       <CardContent>
