@@ -74,8 +74,12 @@ export interface Event {
 }
 
 // Type guard functions
-const isDataArray = (data: any): data is any[] => {
-  return Array.isArray(data) && !data.error;
+const isValidDataArray = (data: any): data is any[] => {
+  return Array.isArray(data) && data.length >= 0;
+};
+
+const isValidData = (data: any): boolean => {
+  return data && !data.error && (Array.isArray(data) || typeof data === 'object');
 };
 
 export const useBackendData = () => {
@@ -95,69 +99,107 @@ export const useBackendData = () => {
 
   // Safe data arrays with proper type checking
   const teams: Team[] = useMemo(() => {
-    return isDataArray(teamsData) ? teamsData : [];
+    if (isValidData(teamsData) && isValidDataArray(teamsData)) {
+      return teamsData as Team[];
+    }
+    return [];
   }, [teamsData]);
 
   const competitions: Competition[] = useMemo(() => {
-    return isDataArray(competitionsData) ? competitionsData : [];
+    if (isValidData(competitionsData) && isValidDataArray(competitionsData)) {
+      return competitionsData as Competition[];
+    }
+    return [];
   }, [competitionsData]);
 
   const games: Game[] = useMemo(() => {
-    return isDataArray(gamesData) ? gamesData : [];
+    if (isValidData(gamesData) && isValidDataArray(gamesData)) {
+      return gamesData as Game[];
+    }
+    return [];
   }, [gamesData]);
 
   const players: Player[] = useMemo(() => {
-    return isDataArray(playersData) ? playersData : [];
+    if (isValidData(playersData) && isValidDataArray(playersData)) {
+      return playersData as Player[];
+    }
+    return [];
   }, [playersData]);
 
   const news: NewsItem[] = useMemo(() => {
-    return isDataArray(newsData) ? newsData : [];
+    if (isValidData(newsData) && isValidDataArray(newsData)) {
+      return newsData as NewsItem[];
+    }
+    return [];
   }, [newsData]);
 
   const events: Event[] = useMemo(() => {
-    return isDataArray(eventsData) ? eventsData : [];
+    if (isValidData(eventsData) && isValidDataArray(eventsData)) {
+      return eventsData as Event[];
+    }
+    return [];
   }, [eventsData]);
 
   const nationalTeams = useMemo(() => {
-    return isDataArray(nationalTeamsData) ? nationalTeamsData : [];
+    if (isValidData(nationalTeamsData) && isValidDataArray(nationalTeamsData)) {
+      return nationalTeamsData;
+    }
+    return [];
   }, [nationalTeamsData]);
 
   const mediaGallery = useMemo(() => {
-    return isDataArray(mediaGalleryData) ? mediaGalleryData : [];
+    if (isValidData(mediaGalleryData) && isValidDataArray(mediaGalleryData)) {
+      return mediaGalleryData;
+    }
+    return [];
   }, [mediaGalleryData]);
 
   const referees = useMemo(() => {
-    return isDataArray(refereesData) ? refereesData : [];
+    if (isValidData(refereesData) && isValidDataArray(refereesData)) {
+      return refereesData;
+    }
+    return [];
   }, [refereesData]);
 
   const coaches = useMemo(() => {
-    return isDataArray(coachesData) ? coachesData : [];
+    if (isValidData(coachesData) && isValidDataArray(coachesData)) {
+      return coachesData;
+    }
+    return [];
   }, [coachesData]);
 
   // Computed data with proper type safety
   const recentGames = useMemo(() => {
+    if (!games || games.length === 0) return [];
+    
     return games
-      .filter((game: Game) => game.status === 'finalizado')
+      .filter((game: Game) => game && game.status === 'finalizado')
       .sort((a: Game, b: Game) => new Date(b.game_date).getTime() - new Date(a.game_date).getTime())
       .slice(0, 10);
   }, [games]);
 
   const upcomingGames = useMemo(() => {
+    if (!games || games.length === 0) return [];
+    
     return games
-      .filter((game: Game) => game.status === 'agendado')
+      .filter((game: Game) => game && game.status === 'agendado')
       .sort((a: Game, b: Game) => new Date(a.game_date).getTime() - new Date(b.game_date).getTime())
       .slice(0, 10);
   }, [games]);
 
   const publishedNews = useMemo(() => {
+    if (!news || news.length === 0) return [];
+    
     return news
-      .filter((newsItem: NewsItem) => newsItem.status === 'publicado')
+      .filter((newsItem: NewsItem) => newsItem && newsItem.status === 'publicado')
       .sort((a: NewsItem, b: NewsItem) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
   }, [news]);
 
   const activeEvents = useMemo(() => {
+    if (!events || events.length === 0) return [];
+    
     return events
-      .filter((event: Event) => event.status === 'ativo')
+      .filter((event: Event) => event && event.status === 'ativo')
       .sort((a: Event, b: Event) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
   }, [events]);
 
