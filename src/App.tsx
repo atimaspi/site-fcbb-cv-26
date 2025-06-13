@@ -23,6 +23,13 @@ import TransferenciasPage from "./pages/TransferenciasPage";
 import FibaLiveStatsPage from "./pages/FibaLiveStatsPage";
 import ResultadosAoVivoPage from "./pages/ResultadosAoVivoPage";
 
+// New main pages to fix 404 issues
+import SobreFCBBPage from "./pages/SobreFCBBPage";
+import CompeticoesPage from "./pages/CompeticoesPage";
+import SelecoesPage from "./pages/SelecoesPage";
+import ClubesCompletePage from "./pages/ClubesCompletePage";
+import MultimediaPage from "./pages/MultimediaPage";
+
 // Federation pages
 import MissaoVisaoPage from "./pages/federation/MissaoVisaoPage";
 import DirecaoPage from "./pages/federation/DirecaoPage";
@@ -62,6 +69,13 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        
+        {/* Main navigation routes - Fixing 404 issues */}
+        <Route path="/sobre" element={<PageTransition><SobreFCBBPage /></PageTransition>} />
+        <Route path="/competicoes" element={<PageTransition><CompeticoesPage /></PageTransition>} />
+        <Route path="/selecoes" element={<PageTransition><SelecoesPage /></PageTransition>} />
+        <Route path="/clubes" element={<PageTransition><ClubesCompletePage /></PageTransition>} />
+        <Route path="/multimedia" element={<PageTransition><MultimediaPage /></PageTransition>} />
         
         {/* Federation routes - Both /federacao and /sobre paths */}
         <Route path="/federacao/historia" element={<PageTransition><HistoriaPage /></PageTransition>} />
@@ -104,7 +118,7 @@ const AnimatedRoutes = () => {
         {/* Additional feature routes */}
         <Route path="/estatisticas" element={<PageTransition><EstatisticasPage /></PageTransition>} />
         <Route path="/arbitragem" element={<PageTransition><ArbitragemPage /></PageTransition>} />
-        <Route path="/clubes" element={<PageTransition><ClubesPage /></PageTransition>} />
+        <Route path="/clubes-old" element={<PageTransition><ClubesPage /></PageTransition>} />
         <Route path="/formacao" element={<PageTransition><FormacaoPage /></PageTransition>} />
         <Route path="/eventos" element={<PageTransition><EventosPage /></PageTransition>} />
         <Route path="/transmissoes" element={<PageTransition><TransmissoesPage /></PageTransition>} />
