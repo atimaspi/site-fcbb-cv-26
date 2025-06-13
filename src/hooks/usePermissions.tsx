@@ -1,6 +1,6 @@
 
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export type UserRole = 'admin' | 'user' | 'moderator' | 'editor';
@@ -50,40 +50,83 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 export const usePermissions = () => {
   const { user, isAdmin } = useAuth();
   const [userRole, setUserRole] = useState<UserRole>('user');
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasAttempted, setHasAttempted] = useState(false);
 
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      if (!user) {
-        setUserRole('user');
+  const fetchUserRole = useCallback(async () => {
+    if (!user || isLoading || hasAttempted) {
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // First check if user email is admin (fast check)
+      if (user.email === 'admin@fcbb.cv') {
+        console.log('Usuário identificado como admin pelo email');
+        setUserRole('admin');
+        setHasAttempted(true);
         return;
       }
 
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+      // Try to fetch role from database with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-        if (!error && data) {
-          console.log('Role do usuário obtida:', data.role);
-          setUserRole(data.role as UserRole);
-        } else {
-          console.log('Erro ao obter role ou perfil não encontrado:', error);
-          setUserRole('user');
-        }
-      } catch (error) {
-        console.log('Erro ao verificar role do usuário:', error);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+        .abortSignal(controller.signal);
+
+      clearTimeout(timeoutId);
+
+      if (!error && data && data.role) {
+        console.log('Role do usuário obtida da base de dados:', data.role);
+        setUserRole(data.role as UserRole);
+      } else {
+        console.log('Erro ao obter role ou perfil não encontrado, usando role padrão');
         setUserRole('user');
       }
-    };
+    } catch (error: any) {
+      console.log('Erro ao verificar role, usando fallbacks:', error.message);
+      
+      // Fallback strategies
+      if (user.email === 'admin@fcbb.cv' || isAdmin) {
+        setUserRole('admin');
+      } else {
+        setUserRole('user');
+      }
+    } finally {
+      setIsLoading(false);
+      setHasAttempted(true);
+    }
+  }, [user, isAdmin, isLoading, hasAttempted]);
 
-    fetchUserRole();
-  }, [user]);
+  useEffect(() => {
+    if (user && !hasAttempted) {
+      // Add a small delay to prevent rapid repeated calls
+      const timeout = setTimeout(() => {
+        fetchUserRole();
+      }, 100);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [user, fetchUserRole, hasAttempted]);
+
+  // Reset when user changes
+  useEffect(() => {
+    setHasAttempted(false);
+    setIsLoading(false);
+    if (!user) {
+      setUserRole('user');
+    }
+  }, [user?.id]);
 
   const getUserRole = (): UserRole => {
-    // Usar o estado local primeiro, depois o isAdmin como fallback
-    if (userRole === 'admin' || isAdmin) {
+    // Use multiple fallback strategies
+    if (user?.email === 'admin@fcbb.cv' || isAdmin || userRole === 'admin') {
       return 'admin';
     }
     return userRole;
@@ -93,7 +136,7 @@ export const usePermissions = () => {
     if (!user) return false;
     
     const currentRole = getUserRole();
-    console.log('Verificando permissão:', { resource, action, currentRole });
+    console.log('Verificando permissão:', { resource, action, currentRole, userEmail: user.email });
     
     const permissions = ROLE_PERMISSIONS[currentRole] || [];
     
@@ -138,6 +181,7 @@ export const usePermissions = () => {
   return {
     user,
     userRole: getUserRole(),
+    isLoading,
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
@@ -147,3 +191,4 @@ export const usePermissions = () => {
     canManageEvents,
   };
 };
+
