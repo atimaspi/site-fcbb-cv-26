@@ -73,6 +73,11 @@ export interface Event {
   status: string;
 }
 
+// Type guard functions
+const isDataArray = (data: any): data is any[] => {
+  return Array.isArray(data) && !data.error;
+};
+
 export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
 
@@ -88,57 +93,48 @@ export const useBackendData = () => {
   const { data: refereesData, isLoading: refereesLoading } = useFetch('referees');
   const { data: coachesData, isLoading: coachesLoading } = useFetch('coaches');
 
-  // CRUD operations
-  const createTeam = useCreate('teams');
-  const updateTeam = useUpdate('teams');
-  const deleteTeam = useDelete('teams');
+  // Safe data arrays with proper type checking
+  const teams: Team[] = useMemo(() => {
+    return isDataArray(teamsData) ? teamsData : [];
+  }, [teamsData]);
 
-  const createCompetition = useCreate('competitions');
-  const updateCompetition = useUpdate('competitions');
-  const deleteCompetition = useDelete('competitions');
+  const competitions: Competition[] = useMemo(() => {
+    return isDataArray(competitionsData) ? competitionsData : [];
+  }, [competitionsData]);
 
-  const createGame = useCreate('games');
-  const updateGame = useUpdate('games');
-  const deleteGame = useDelete('games');
+  const games: Game[] = useMemo(() => {
+    return isDataArray(gamesData) ? gamesData : [];
+  }, [gamesData]);
 
-  const createPlayer = useCreate('players');
-  const updatePlayer = useUpdate('players');
-  const deletePlayer = useDelete('players');
+  const players: Player[] = useMemo(() => {
+    return isDataArray(playersData) ? playersData : [];
+  }, [playersData]);
 
-  const createNews = useCreate('news');
-  const updateNews = useUpdate('news');
-  const deleteNews = useDelete('news');
+  const news: NewsItem[] = useMemo(() => {
+    return isDataArray(newsData) ? newsData : [];
+  }, [newsData]);
 
-  const createEvent = useCreate('events');
-  const updateEvent = useUpdate('events');
-  const deleteEvent = useDelete('events');
+  const events: Event[] = useMemo(() => {
+    return isDataArray(eventsData) ? eventsData : [];
+  }, [eventsData]);
 
-  const createNationalTeam = useCreate('national_teams');
-  const updateNationalTeam = useUpdate('national_teams');
+  const nationalTeams = useMemo(() => {
+    return isDataArray(nationalTeamsData) ? nationalTeamsData : [];
+  }, [nationalTeamsData]);
 
-  const createMedia = useCreate('media_gallery');
-  const updateMedia = useUpdate('media_gallery');
-  const deleteMedia = useDelete('media_gallery');
+  const mediaGallery = useMemo(() => {
+    return isDataArray(mediaGalleryData) ? mediaGalleryData : [];
+  }, [mediaGalleryData]);
 
-  const createReferee = useCreate('referees');
-  const updateReferee = useUpdate('referees');
+  const referees = useMemo(() => {
+    return isDataArray(refereesData) ? refereesData : [];
+  }, [refereesData]);
 
-  const createCoach = useCreate('coaches');
-  const updateCoach = useUpdate('coaches');
+  const coaches = useMemo(() => {
+    return isDataArray(coachesData) ? coachesData : [];
+  }, [coachesData]);
 
-  // Safe data arrays
-  const teams = Array.isArray(teamsData) ? teamsData : [];
-  const competitions = Array.isArray(competitionsData) ? competitionsData : [];
-  const games = Array.isArray(gamesData) ? gamesData : [];
-  const players = Array.isArray(playersData) ? playersData : [];
-  const news = Array.isArray(newsData) ? newsData : [];
-  const events = Array.isArray(eventsData) ? eventsData : [];
-  const nationalTeams = Array.isArray(nationalTeamsData) ? nationalTeamsData : [];
-  const mediaGallery = Array.isArray(mediaGalleryData) ? mediaGalleryData : [];
-  const referees = Array.isArray(refereesData) ? refereesData : [];
-  const coaches = Array.isArray(coachesData) ? coachesData : [];
-
-  // Computed data
+  // Computed data with proper type safety
   const recentGames = useMemo(() => {
     return games
       .filter((game: Game) => game.status === 'finalizado')
@@ -165,8 +161,59 @@ export const useBackendData = () => {
       .sort((a: Event, b: Event) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
   }, [events]);
 
+  // CRUD operations
+  const operations = {
+    teams: {
+      create: useCreate('teams'),
+      update: useUpdate('teams'),
+      delete: useDelete('teams')
+    },
+    competitions: {
+      create: useCreate('competitions'),
+      update: useUpdate('competitions'),
+      delete: useDelete('competitions')
+    },
+    games: {
+      create: useCreate('games'),
+      update: useUpdate('games'),
+      delete: useDelete('games')
+    },
+    players: {
+      create: useCreate('players'),
+      update: useUpdate('players'),
+      delete: useDelete('players')
+    },
+    news: {
+      create: useCreate('news'),
+      update: useUpdate('news'),
+      delete: useDelete('news')
+    },
+    events: {
+      create: useCreate('events'),
+      update: useUpdate('events'),
+      delete: useDelete('events')
+    },
+    nationalTeams: {
+      create: useCreate('national_teams'),
+      update: useUpdate('national_teams')
+    },
+    media: {
+      create: useCreate('media_gallery'),
+      update: useUpdate('media_gallery'),
+      delete: useDelete('media_gallery')
+    },
+    referees: {
+      create: useCreate('referees'),
+      update: useUpdate('referees')
+    },
+    coaches: {
+      create: useCreate('coaches'),
+      update: useUpdate('coaches')
+    }
+  };
+
   return {
-    // Data arrays
+    // Data arrays (now properly typed)
     teams,
     competitions,
     games,
@@ -189,55 +236,7 @@ export const useBackendData = () => {
                newsLoading || eventsLoading || nationalTeamsLoading || mediaLoading || 
                refereesLoading || coachesLoading,
 
-    // CRUD operations grouped
-    operations: {
-      teams: {
-        create: createTeam,
-        update: updateTeam,
-        delete: deleteTeam
-      },
-      competitions: {
-        create: createCompetition,
-        update: updateCompetition,
-        delete: deleteCompetition
-      },
-      games: {
-        create: createGame,
-        update: updateGame,
-        delete: deleteGame
-      },
-      players: {
-        create: createPlayer,
-        update: updatePlayer,
-        delete: deletePlayer
-      },
-      news: {
-        create: createNews,
-        update: updateNews,
-        delete: deleteNews
-      },
-      events: {
-        create: createEvent,
-        update: updateEvent,
-        delete: deleteEvent
-      },
-      nationalTeams: {
-        create: createNationalTeam,
-        update: updateNationalTeam
-      },
-      media: {
-        create: createMedia,
-        update: updateMedia,
-        delete: deleteMedia
-      },
-      referees: {
-        create: createReferee,
-        update: updateReferee
-      },
-      coaches: {
-        create: createCoach,
-        update: updateCoach
-      }
-    }
+    // CRUD operations
+    operations
   };
 };

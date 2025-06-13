@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApi } from '@/hooks/useApi';
-import { useBackendData } from '@/hooks/useBackendData';
+import { useBackendData, Team, Game } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { 
   Users, 
@@ -171,12 +171,12 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentGames.slice(0, 3).map((game: any) => (
+                    {recentGames.slice(0, 3).map((game: Game) => (
                       <div key={game.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                         <Trophy className="h-4 w-4 text-cv-blue" />
                         <div className="flex-1">
                           <p className="text-sm font-medium">
-                            {teams.find((t: any) => t.id === game.home_team_id)?.name || 'Casa'} {game.home_score} - {game.away_score} {teams.find((t: any) => t.id === game.away_team_id)?.name || 'Visitante'}
+                            {teams.find((t: Team) => t.id === game.home_team_id)?.name || 'Casa'} {game.home_score} - {game.away_score} {teams.find((t: Team) => t.id === game.away_team_id)?.name || 'Visitante'}
                           </p>
                           <p className="text-xs text-gray-500">
                             {new Date(game.game_date).toLocaleDateString('pt-PT')}

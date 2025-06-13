@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useBackendData } from '@/hooks/useBackendData';
+import { useBackendData, Game, Team } from '@/hooks/useBackendData';
 import { 
   Play, 
   Pause, 
@@ -27,11 +26,11 @@ const LiveScoring = () => {
   const [currentPeriod, setCurrentPeriod] = useState(1);
   const [timeRemaining, setTimeRemaining] = useState('10:00');
 
-  const liveGames = games.filter((game: any) => game.status === 'ao_vivo');
-  const upcomingGames = games.filter((game: any) => game.status === 'agendado');
+  const liveGames = games.filter((game: Game) => game.status === 'ao_vivo');
+  const upcomingGames = games.filter((game: Game) => game.status === 'agendado');
 
   const getTeamName = (teamId: string) => {
-    const team = teams.find((t: any) => t.id === teamId);
+    const team = teams.find((t: Team) => t.id === teamId);
     return team?.name || 'Equipa Desconhecida';
   };
 
@@ -80,7 +79,7 @@ const LiveScoring = () => {
                   <SelectValue placeholder="Selecionar jogo..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {upcomingGames.map((game: any) => (
+                  {upcomingGames.map((game: Game) => (
                     <SelectItem key={game.id} value={game.id}>
                       {getTeamName(game.home_team_id)} vs {getTeamName(game.away_team_id)}
                     </SelectItem>
@@ -265,7 +264,7 @@ const LiveScoring = () => {
               </div>
             ) : (
               <div className="space-y-3">
-                {liveGames.map((game: any) => (
+                {liveGames.map((game: Game) => (
                   <div key={game.id} className="p-3 border rounded-lg">
                     <div className="flex justify-between items-center">
                       <div className="text-sm">
