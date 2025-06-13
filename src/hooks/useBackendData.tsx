@@ -1,3 +1,4 @@
+
 import { useApi } from '@/hooks/useApi';
 import { useMemo } from 'react';
 
@@ -12,6 +13,10 @@ export interface Team {
   website?: string;
   email?: string;
   phone?: string;
+  address?: string;
+  president_name?: string;
+  coach_name?: string;
+  home_venue?: string;
   status: string;
 }
 
@@ -24,6 +29,7 @@ export interface Competition {
   start_date?: string;
   end_date?: string;
   description?: string;
+  regulations_url?: string;
 }
 
 export interface Game {
@@ -72,6 +78,28 @@ export interface Event {
   status: string;
 }
 
+export interface Referee {
+  id: string;
+  name: string;
+  license_number?: string;
+  category: string;
+  phone?: string;
+  email?: string;
+  island: string;
+  status: string;
+}
+
+export interface Coach {
+  id: string;
+  name: string;
+  team_id?: string;
+  license_number?: string;
+  phone?: string;
+  email?: string;
+  experience_years?: number;
+  status: string;
+}
+
 // Improved type guards
 const isValidArray = (data: any): data is any[] => {
   return Array.isArray(data);
@@ -90,6 +118,7 @@ const hasValidStructure = (data: any, requiredFields: string[]): boolean => {
 };
 
 function safeArrayCast<T>(data: any, requiredFields: string[]): T[] {
+  console.log('safeArrayCast called with:', { data, requiredFields });
   if (isValidArray(data) && hasValidStructure(data, requiredFields)) {
     return data as T[];
   }
@@ -99,21 +128,26 @@ function safeArrayCast<T>(data: any, requiredFields: string[]): T[] {
 export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
 
-  // Data fetching
-  const { data: teamsData, isLoading: teamsLoading } = useFetch('teams');
+  // Data fetching with detailed logging
+  const { data: teamsData, isLoading: teamsLoading, error: teamsError } = useFetch('teams');
   const { data: competitionsData, isLoading: competitionsLoading } = useFetch('competitions');
   const { data: gamesData, isLoading: gamesLoading } = useFetch('games');
   const { data: playersData, isLoading: playersLoading } = useFetch('players');
   const { data: newsData, isLoading: newsLoading } = useFetch('news');
   const { data: eventsData, isLoading: eventsLoading } = useFetch('events');
-  const { data: nationalTeamsData, isLoading: nationalTeamsLoading } = useFetch('national_teams');
-  const { data: mediaGalleryData, isLoading: mediaLoading } = useFetch('media_gallery');
   const { data: refereesData, isLoading: refereesLoading } = useFetch('referees');
   const { data: coachesData, isLoading: coachesLoading } = useFetch('coaches');
 
+  // Log data for debugging
+  console.log('Teams data:', { teamsData, teamsError, teamsLoading });
+  console.log('Competitions data:', { competitionsData, competitionsLoading });
+  console.log('Games data:', { gamesData, gamesLoading });
+
   // Safe data arrays with proper type checking
   const teams: Team[] = useMemo(() => {
-    return safeArrayCast<Team>(teamsData, ['id', 'name', 'city', 'island', 'status']);
+    const result = safeArrayCast<Team>(teamsData, ['id', 'name', 'city', 'island', 'status']);
+    console.log('Teams processed:', result);
+    return result;
   }, [teamsData]);
 
   const competitions: Competition[] = useMemo(() => {
@@ -136,20 +170,12 @@ export const useBackendData = () => {
     return safeArrayCast<Event>(eventsData, ['id', 'title', 'event_date', 'event_type', 'status']);
   }, [eventsData]);
 
-  const nationalTeams = useMemo(() => {
-    return isValidArray(nationalTeamsData) ? nationalTeamsData : [];
-  }, [nationalTeamsData]);
-
-  const mediaGallery = useMemo(() => {
-    return isValidArray(mediaGalleryData) ? mediaGalleryData : [];
-  }, [mediaGalleryData]);
-
-  const referees = useMemo(() => {
-    return isValidArray(refereesData) ? refereesData : [];
+  const referees: Referee[] = useMemo(() => {
+    return safeArrayCast<Referee>(refereesData, ['id', 'name', 'category', 'island', 'status']);
   }, [refereesData]);
 
-  const coaches = useMemo(() => {
-    return isValidArray(coachesData) ? coachesData : [];
+  const coaches: Coach[] = useMemo(() => {
+    return safeArrayCast<Coach>(coachesData, ['id', 'name', 'status']);
   }, [coachesData]);
 
   // Computed data with proper type safety
@@ -187,7 +213,7 @@ export const useBackendData = () => {
       .sort((a: Event, b: Event) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
   }, [events]);
 
-  // CRUD operations
+  // CRUD operations with better error handling
   const operations = {
     teams: {
       create: useCreate('teams'),
@@ -219,16 +245,6 @@ export const useBackendData = () => {
       update: useUpdate('events'),
       delete: useDelete('events')
     },
-    nationalTeams: {
-      create: useCreate('national_teams'),
-      update: useUpdate('national_teams'),
-      delete: useDelete('national_teams')
-    },
-    media: {
-      create: useCreate('media_gallery'),
-      update: useUpdate('media_gallery'),
-      delete: useDelete('media_gallery')
-    },
     referees: {
       create: useCreate('referees'),
       update: useUpdate('referees'),
@@ -249,8 +265,6 @@ export const useBackendData = () => {
     players,
     newsData: news,
     eventsData: events,
-    nationalTeams,
-    mediaGallery,
     referees,
     coaches,
 
@@ -262,8 +276,17 @@ export const useBackendData = () => {
 
     // Loading states
     isLoading: teamsLoading || competitionsLoading || gamesLoading || playersLoading || 
-               newsLoading || eventsLoading || nationalTeamsLoading || mediaLoading || 
-               refereesLoading || coachesLoading,
+               newsLoading || eventsLoading || refereesLoading || coachesLoading,
+
+    // Individual loading states for better UX
+    teamsLoading,
+    competitionsLoading,
+    gamesLoading,
+    playersLoading,
+    newsLoading,
+    eventsLoading,
+    refereesLoading,
+    coachesLoading,
 
     // CRUD operations
     operations

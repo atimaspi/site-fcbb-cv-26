@@ -7,40 +7,29 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Shield, CalendarIcon, UserCheck } from 'lucide-react';
+import { Plus, Edit, Trash2, Shield, Phone, Mail, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
 
 const RefereesManagement = () => {
-  const { referees, isLoading, operations } = useBackendData();
+  const { referees, refereesLoading, operations } = useBackendData();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingReferee, setEditingReferee] = useState(null);
-  const [birthDate, setBirthDate] = useState<Date>();
-  const [licenseExpiry, setLicenseExpiry] = useState<Date>();
+  const [editingReferee, setEditingReferee] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     license_number: '',
-    level: '',
-    email: '',
+    category: '',
     phone: '',
-    address: '',
+    email: '',
+    island: '',
     status: 'ativo'
   });
 
-  const refereeLevels = [
-    { value: 'Local', label: 'Local' },
-    { value: 'Regional', label: 'Regional' },
-    { value: 'Nacional', label: 'Nacional' },
-    { value: 'Internacional', label: 'Internacional' }
-  ];
+  const islands = ['Santiago', 'São Vicente', 'Santo Antão', 'Fogo', 'Maio', 'Sal', 'Boa Vista', 'Brava', 'São Nicolau'];
+  const categories = ['Nacional', 'Regional', 'Distrital', 'Juventude', 'Formação'];
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -49,24 +38,27 @@ const RefereesManagement = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      const refereeData = {
-        ...formData,
-        birth_date: birthDate?.toISOString().split('T')[0] || null,
-        license_expiry: licenseExpiry?.toISOString().split('T')[0] || null
-      };
+    if (!formData.name || !formData.category || !formData.island) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
 
+    try {
       if (editingReferee) {
         await operations.referees.update.mutateAsync({ 
           id: editingReferee.id, 
-          data: refereeData 
+          data: formData 
         });
         toast({
           title: "Sucesso",
           description: "Árbitro atualizado com sucesso!"
         });
       } else {
-        await operations.referees.create.mutateAsync(refereeData);
+        await operations.referees.create.mutateAsync(formData);
         toast({
           title: "Sucesso", 
           description: "Árbitro criado com sucesso!"
@@ -75,10 +67,10 @@ const RefereesManagement = () => {
       
       setIsDialogOpen(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Erro",
-        description: "Erro ao salvar árbitro",
+        description: `Erro ao salvar árbitro: ${error.message || 'Erro desconhecido'}`,
         variant: "destructive"
       });
     }
@@ -89,18 +81,12 @@ const RefereesManagement = () => {
     setFormData({
       name: referee.name || '',
       license_number: referee.license_number || '',
-      level: referee.level || '',
-      email: referee.email || '',
+      category: referee.category || '',
       phone: referee.phone || '',
-      address: referee.address || '',
+      email: referee.email || '',
+      island: referee.island || '',
       status: referee.status || 'ativo'
     });
-    if (referee.birth_date) {
-      setBirthDate(new Date(referee.birth_date));
-    }
-    if (referee.license_expiry) {
-      setLicenseExpiry(new Date(referee.license_expiry));
-    }
     setIsDialogOpen(true);
   };
 
@@ -112,10 +98,10 @@ const RefereesManagement = () => {
           title: "Sucesso",
           description: "Árbitro eliminado com sucesso!"
         });
-      } catch (error) {
+      } catch (error: any) {
         toast({
           title: "Erro",
-          description: "Erro ao eliminar árbitro",
+          description: `Erro ao eliminar árbitro: ${error.message || 'Erro desconhecido'}`,
           variant: "destructive"
         });
       }
@@ -126,26 +112,16 @@ const RefereesManagement = () => {
     setFormData({
       name: '',
       license_number: '',
-      level: '',
-      email: '',
+      category: '',
       phone: '',
-      address: '',
+      email: '',
+      island: '',
       status: 'ativo'
     });
-    setBirthDate(undefined);
-    setLicenseExpiry(undefined);
     setEditingReferee(null);
   };
 
-  const isLicenseExpiring = (expiryDate: string) => {
-    if (!expiryDate) return false;
-    const expiry = new Date(expiryDate);
-    const now = new Date();
-    const monthsUntilExpiry = (expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30);
-    return monthsUntilExpiry <= 3;
-  };
-
-  if (isLoading) {
+  if (refereesLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" />
@@ -161,17 +137,17 @@ const RefereesManagement = () => {
             <Shield className="h-6 w-6" />
             Gestão de Arbitragem
           </h2>
-          <p className="text-gray-600">Gerir árbitros e licenças</p>
+          <p className="text-gray-600">Gerir árbitros e oficiais de mesa</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button onClick={resetForm} className="bg-cv-blue hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-2" />
               Novo Árbitro
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>
                 {editingReferee ? 'Editar Árbitro' : 'Novo Árbitro'}
@@ -188,28 +164,29 @@ const RefereesManagement = () => {
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   required
+                  placeholder="Ex: João Silva Santos"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="license_number">Número da Licença *</Label>
+                  <Label htmlFor="license_number">Número de Licença</Label>
                   <Input
                     id="license_number"
                     value={formData.license_number}
                     onChange={(e) => handleInputChange('license_number', e.target.value)}
-                    required
+                    placeholder="Ex: ARB2024001"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="level">Nível *</Label>
-                  <Select value={formData.level} onValueChange={(value) => handleInputChange('level', value)}>
+                  <Label htmlFor="category">Categoria *</Label>
+                  <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecionar nível" />
+                      <SelectValue placeholder="Selecionar categoria" />
                     </SelectTrigger>
                     <SelectContent>
-                      {refereeLevels.map((level) => (
-                        <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>{category}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -218,104 +195,57 @@ const RefereesManagement = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <Label htmlFor="phone">Telefone</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                    placeholder="Ex: +238 123 45 67"
+                  />
+                </div>
+                <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
+                    placeholder="arbitro@email.com"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="phone">Telefone</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="address">Morada</Label>
-                <Textarea
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Data de Nascimento</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !birthDate && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {birthDate ? format(birthDate, "dd/MM/yyyy") : <span>Selecionar data</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={birthDate}
-                        onSelect={setBirthDate}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <Label htmlFor="island">Ilha *</Label>
+                  <Select value={formData.island} onValueChange={(value) => handleInputChange('island', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar ilha" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {islands.map((island) => (
+                        <SelectItem key={island} value={island}>{island}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
-                  <Label>Validade da Licença</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !licenseExpiry && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {licenseExpiry ? format(licenseExpiry, "dd/MM/yyyy") : <span>Selecionar data</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={licenseExpiry}
-                        onSelect={setLicenseExpiry}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ativo">Ativo</SelectItem>
+                      <SelectItem value="inativo">Inativo</SelectItem>
+                      <SelectItem value="suspenso">Suspenso</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ativo">Ativo</SelectItem>
-                    <SelectItem value="inativo">Inativo</SelectItem>
-                    <SelectItem value="suspenso">Suspenso</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1 bg-cv-blue hover:bg-blue-700">
                   {editingReferee ? 'Atualizar' : 'Criar'} Árbitro
                 </Button>
                 <Button 
@@ -331,51 +261,55 @@ const RefereesManagement = () => {
         </Dialog>
       </div>
 
-      {/* Estatísticas rápidas */}
+      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <UserCheck className="h-4 w-4" />
-              Árbitros Ativos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-cv-blue">
-              {referees.filter((r: any) => r.status === 'ativo').length}
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Shield className="h-5 w-5 text-cv-blue" />
+              <div>
+                <p className="text-sm font-medium">Total de Árbitros</p>
+                <p className="text-2xl font-bold text-cv-blue">{referees.length}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
-        
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Nível Nacional</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {referees.filter((r: any) => r.level === 'Nacional').length}
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Shield className="h-5 w-5 text-green-600" />
+              <div>
+                <p className="text-sm font-medium">Árbitros Ativos</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {referees.filter(ref => ref.status === 'ativo').length}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
-        
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Nível Internacional</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {referees.filter((r: any) => r.level === 'Internacional').length}
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Shield className="h-5 w-5 text-orange-600" />
+              <div>
+                <p className="text-sm font-medium">Categoria Nacional</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {referees.filter(ref => ref.category === 'Nacional').length}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
-        
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Licenças a Expirar</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {referees.filter((r: any) => isLicenseExpiring(r.license_expiry)).length}
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <MapPin className="h-5 w-5 text-purple-600" />
+              <div>
+                <p className="text-sm font-medium">Ilhas Cobertas</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {new Set(referees.map(ref => ref.island)).size}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -394,9 +328,9 @@ const RefereesManagement = () => {
               <TableRow>
                 <TableHead>Nome</TableHead>
                 <TableHead>Licença</TableHead>
-                <TableHead>Nível</TableHead>
+                <TableHead>Categoria</TableHead>
                 <TableHead>Contacto</TableHead>
-                <TableHead>Validade</TableHead>
+                <TableHead>Ilha</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
@@ -405,24 +339,31 @@ const RefereesManagement = () => {
               {referees.map((referee: any) => (
                 <TableRow key={referee.id}>
                   <TableCell className="font-medium">{referee.name}</TableCell>
-                  <TableCell>{referee.license_number}</TableCell>
+                  <TableCell>{referee.license_number || '—'}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{referee.level}</Badge>
+                    <Badge variant="outline">{referee.category}</Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm">
-                      {referee.email && <div>{referee.email}</div>}
-                      {referee.phone && <div>{referee.phone}</div>}
+                    <div className="space-y-1">
+                      {referee.phone && (
+                        <div className="flex items-center space-x-1 text-sm">
+                          <Phone className="h-3 w-3 text-gray-400" />
+                          <span>{referee.phone}</span>
+                        </div>
+                      )}
+                      {referee.email && (
+                        <div className="flex items-center space-x-1 text-sm">
+                          <Mail className="h-3 w-3 text-gray-400" />
+                          <span>{referee.email}</span>
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    {referee.license_expiry ? (
-                      <div className={isLicenseExpiring(referee.license_expiry) ? 'text-red-600 font-medium' : ''}>
-                        {format(new Date(referee.license_expiry), 'dd/MM/yyyy')}
-                      </div>
-                    ) : (
-                      'Não definido'
-                    )}
+                    <div className="flex items-center space-x-1">
+                      <MapPin className="h-3 w-3 text-gray-400" />
+                      <span>{referee.island}</span>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={referee.status === 'ativo' ? 'default' : 'secondary'}>

@@ -11,14 +11,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, MapPin, Calendar, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ClubsManagement = () => {
-  const { teams, isLoading, operations } = useBackendData();
+  const { teams, teamsLoading, operations } = useBackendData();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingClub, setEditingClub] = useState(null);
+  const [editingClub, setEditingClub] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     abbreviation: '',
@@ -44,6 +44,17 @@ const ClubsManagement = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.name || !formData.city || !formData.island) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    console.log('Submitting club data:', formData);
+    
     try {
       const clubData = {
         ...formData,
@@ -51,6 +62,7 @@ const ClubsManagement = () => {
       };
 
       if (editingClub) {
+        console.log('Updating club:', editingClub.id, clubData);
         await operations.teams.update.mutateAsync({ 
           id: editingClub.id, 
           data: clubData 
@@ -60,6 +72,7 @@ const ClubsManagement = () => {
           description: "Clube atualizado com sucesso!"
         });
       } else {
+        console.log('Creating new club:', clubData);
         await operations.teams.create.mutateAsync(clubData);
         toast({
           title: "Sucesso", 
@@ -69,16 +82,18 @@ const ClubsManagement = () => {
       
       setIsDialogOpen(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error saving club:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar clube",
+        description: `Erro ao salvar clube: ${error.message || 'Erro desconhecido'}`,
         variant: "destructive"
       });
     }
   };
 
   const handleEdit = (club: any) => {
+    console.log('Editing club:', club);
     setEditingClub(club);
     setFormData({
       name: club.name || '',
@@ -101,15 +116,17 @@ const ClubsManagement = () => {
   const handleDelete = async (clubId: string) => {
     if (confirm('Tem certeza que deseja eliminar este clube?')) {
       try {
+        console.log('Deleting club:', clubId);
         await operations.teams.delete.mutateAsync(clubId);
         toast({
           title: "Sucesso",
           description: "Clube eliminado com sucesso!"
         });
-      } catch (error) {
+      } catch (error: any) {
+        console.error('Error deleting club:', error);
         toast({
           title: "Erro",
-          description: "Erro ao eliminar clube",
+          description: `Erro ao eliminar clube: ${error.message || 'Erro desconhecido'}`,
           variant: "destructive"
         });
       }
@@ -135,7 +152,7 @@ const ClubsManagement = () => {
     setEditingClub(null);
   };
 
-  if (isLoading) {
+  if (teamsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" />
@@ -156,12 +173,12 @@ const ClubsManagement = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm}>
+            <Button onClick={resetForm} className="bg-cv-blue hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-2" />
               Novo Clube
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingClub ? 'Editar Clube' : 'Novo Clube'}
@@ -179,6 +196,7 @@ const ClubsManagement = () => {
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     required
+                    placeholder="Ex: Sporting Clube da Praia"
                   />
                 </div>
                 <div>
@@ -188,6 +206,7 @@ const ClubsManagement = () => {
                     value={formData.abbreviation}
                     onChange={(e) => handleInputChange('abbreviation', e.target.value)}
                     maxLength={10}
+                    placeholder="Ex: SCP"
                   />
                 </div>
               </div>
@@ -200,6 +219,7 @@ const ClubsManagement = () => {
                     value={formData.city}
                     onChange={(e) => handleInputChange('city', e.target.value)}
                     required
+                    placeholder="Ex: Praia"
                   />
                 </div>
                 <div>
@@ -227,6 +247,7 @@ const ClubsManagement = () => {
                     onChange={(e) => handleInputChange('founded_year', e.target.value)}
                     min="1900"
                     max={new Date().getFullYear()}
+                    placeholder="Ex: 1985"
                   />
                 </div>
                 <div>
@@ -252,6 +273,7 @@ const ClubsManagement = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
+                    placeholder="clube@email.com"
                   />
                 </div>
                 <div>
@@ -260,6 +282,7 @@ const ClubsManagement = () => {
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
+                    placeholder="Ex: +238 123 45 67"
                   />
                 </div>
               </div>
@@ -271,6 +294,7 @@ const ClubsManagement = () => {
                   type="url"
                   value={formData.website}
                   onChange={(e) => handleInputChange('website', e.target.value)}
+                  placeholder="https://www.clubeexemplo.cv"
                 />
               </div>
 
@@ -280,6 +304,7 @@ const ClubsManagement = () => {
                   id="address"
                   value={formData.address}
                   onChange={(e) => handleInputChange('address', e.target.value)}
+                  placeholder="Endereço completo do clube..."
                 />
               </div>
 
@@ -290,6 +315,7 @@ const ClubsManagement = () => {
                     id="president_name"
                     value={formData.president_name}
                     onChange={(e) => handleInputChange('president_name', e.target.value)}
+                    placeholder="Nome do presidente"
                   />
                 </div>
                 <div>
@@ -298,6 +324,7 @@ const ClubsManagement = () => {
                     id="coach_name"
                     value={formData.coach_name}
                     onChange={(e) => handleInputChange('coach_name', e.target.value)}
+                    placeholder="Nome do treinador"
                   />
                 </div>
               </div>
@@ -308,11 +335,12 @@ const ClubsManagement = () => {
                   id="home_venue"
                   value={formData.home_venue}
                   onChange={(e) => handleInputChange('home_venue', e.target.value)}
+                  placeholder="Nome do pavilhão onde joga"
                 />
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button type="submit" className="flex-1">
+                <Button type="submit" className="flex-1 bg-cv-blue hover:bg-blue-700">
                   {editingClub ? 'Atualizar' : 'Criar'} Clube
                 </Button>
                 <Button 
@@ -326,6 +354,60 @@ const ClubsManagement = () => {
             </form>
           </DialogContent>
         </Dialog>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Users className="h-5 w-5 text-cv-blue" />
+              <div>
+                <p className="text-sm font-medium">Total de Clubes</p>
+                <p className="text-2xl font-bold text-cv-blue">{teams.length}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <MapPin className="h-5 w-5 text-green-600" />
+              <div>
+                <p className="text-sm font-medium">Clubes Ativos</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {teams.filter(team => team.status === 'ativo').length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Calendar className="h-5 w-5 text-orange-600" />
+              <div>
+                <p className="text-sm font-medium">Fundados Este Ano</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {teams.filter(team => team.founded_year === new Date().getFullYear()).length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <User className="h-5 w-5 text-purple-600" />
+              <div>
+                <p className="text-sm font-medium">Ilhas Representadas</p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {new Set(teams.map(team => team.island)).size}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
@@ -351,9 +433,14 @@ const ClubsManagement = () => {
               {teams.map((club: any) => (
                 <TableRow key={club.id}>
                   <TableCell className="font-medium">{club.name}</TableCell>
-                  <TableCell>{club.abbreviation}</TableCell>
-                  <TableCell>{club.city}, {club.island}</TableCell>
-                  <TableCell>{club.founded_year}</TableCell>
+                  <TableCell>{club.abbreviation || '—'}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-1">
+                      <MapPin className="h-3 w-3 text-gray-400" />
+                      <span>{club.city}, {club.island}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{club.founded_year || '—'}</TableCell>
                   <TableCell>
                     <Badge variant={club.status === 'ativo' ? 'default' : 'secondary'}>
                       {club.status}
