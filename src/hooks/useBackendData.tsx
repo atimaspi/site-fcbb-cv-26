@@ -1,4 +1,3 @@
-
 import { useApi } from '@/hooks/useApi';
 import { useMemo } from 'react';
 
@@ -222,7 +221,8 @@ export const useBackendData = () => {
     },
     nationalTeams: {
       create: useCreate('national_teams'),
-      update: useUpdate('national_teams')
+      update: useUpdate('national_teams'),
+      delete: useDelete('national_teams')
     },
     media: {
       create: useCreate('media_gallery'),
@@ -231,11 +231,13 @@ export const useBackendData = () => {
     },
     referees: {
       create: useCreate('referees'),
-      update: useUpdate('referees')
+      update: useUpdate('referees'),
+      delete: useDelete('referees')
     },
     coaches: {
       create: useCreate('coaches'),
-      update: useUpdate('coaches')
+      update: useUpdate('coaches'),
+      delete: useDelete('coaches')
     }
   };
 
