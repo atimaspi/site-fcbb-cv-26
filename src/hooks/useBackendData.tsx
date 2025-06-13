@@ -73,13 +73,28 @@ export interface Event {
   status: string;
 }
 
-// Type guard functions
-const isValidDataArray = (data: any): data is any[] => {
-  return Array.isArray(data) && data.length >= 0;
+// Improved type guards
+const isValidArray = (data: any): data is any[] => {
+  return Array.isArray(data);
 };
 
-const isValidData = (data: any): boolean => {
-  return data && !data.error && (Array.isArray(data) || typeof data === 'object');
+const hasValidStructure = (data: any, requiredFields: string[]): boolean => {
+  if (!Array.isArray(data)) return false;
+  if (data.length === 0) return true; // Empty arrays are valid
+  
+  // Check if first item has required fields and is not an error object
+  const firstItem = data[0];
+  if (!firstItem || typeof firstItem !== 'object') return false;
+  if (firstItem.error === true) return false; // Supabase error object
+  
+  return requiredFields.every(field => field in firstItem);
+};
+
+const safeArrayCast = <T>(data: any, requiredFields: string[]): T[] => {
+  if (isValidArray(data) && hasValidStructure(data, requiredFields)) {
+    return data as T[];
+  }
+  return [];
 };
 
 export const useBackendData = () => {
@@ -99,73 +114,43 @@ export const useBackendData = () => {
 
   // Safe data arrays with proper type checking
   const teams: Team[] = useMemo(() => {
-    if (isValidData(teamsData) && isValidDataArray(teamsData)) {
-      return teamsData as Team[];
-    }
-    return [];
+    return safeArrayCast<Team>(teamsData, ['id', 'name', 'city', 'island', 'status']);
   }, [teamsData]);
 
   const competitions: Competition[] = useMemo(() => {
-    if (isValidData(competitionsData) && isValidDataArray(competitionsData)) {
-      return competitionsData as Competition[];
-    }
-    return [];
+    return safeArrayCast<Competition>(competitionsData, ['id', 'name', 'type', 'season', 'status']);
   }, [competitionsData]);
 
   const games: Game[] = useMemo(() => {
-    if (isValidData(gamesData) && isValidDataArray(gamesData)) {
-      return gamesData as Game[];
-    }
-    return [];
+    return safeArrayCast<Game>(gamesData, ['id', 'competition_id', 'home_team_id', 'away_team_id', 'status']);
   }, [gamesData]);
 
   const players: Player[] = useMemo(() => {
-    if (isValidData(playersData) && isValidDataArray(playersData)) {
-      return playersData as Player[];
-    }
-    return [];
+    return safeArrayCast<Player>(playersData, ['id', 'team_id', 'name', 'nationality']);
   }, [playersData]);
 
   const news: NewsItem[] = useMemo(() => {
-    if (isValidData(newsData) && isValidDataArray(newsData)) {
-      return newsData as NewsItem[];
-    }
-    return [];
+    return safeArrayCast<NewsItem>(newsData, ['id', 'title', 'content', 'category', 'published_at', 'status']);
   }, [newsData]);
 
   const events: Event[] = useMemo(() => {
-    if (isValidData(eventsData) && isValidDataArray(eventsData)) {
-      return eventsData as Event[];
-    }
-    return [];
+    return safeArrayCast<Event>(eventsData, ['id', 'title', 'event_date', 'event_type', 'status']);
   }, [eventsData]);
 
   const nationalTeams = useMemo(() => {
-    if (isValidData(nationalTeamsData) && isValidDataArray(nationalTeamsData)) {
-      return nationalTeamsData;
-    }
-    return [];
+    return isValidArray(nationalTeamsData) ? nationalTeamsData : [];
   }, [nationalTeamsData]);
 
   const mediaGallery = useMemo(() => {
-    if (isValidData(mediaGalleryData) && isValidDataArray(mediaGalleryData)) {
-      return mediaGalleryData;
-    }
-    return [];
+    return isValidArray(mediaGalleryData) ? mediaGalleryData : [];
   }, [mediaGalleryData]);
 
   const referees = useMemo(() => {
-    if (isValidData(refereesData) && isValidDataArray(refereesData)) {
-      return refereesData;
-    }
-    return [];
+    return isValidArray(refereesData) ? refereesData : [];
   }, [refereesData]);
 
   const coaches = useMemo(() => {
-    if (isValidData(coachesData) && isValidDataArray(coachesData)) {
-      return coachesData;
-    }
-    return [];
+    return isValidArray(coachesData) ? coachesData : [];
   }, [coachesData]);
 
   // Computed data with proper type safety
