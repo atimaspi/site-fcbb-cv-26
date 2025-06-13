@@ -37,8 +37,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
+        
         if (session?.user) {
-          await checkAdminStatus(session.user.id);
+          // Aguardar um pouco para garantir que o perfil foi criado
+          setTimeout(() => {
+            checkAdminStatus(session.user.id);
+          }, 1000);
         } else {
           setIsAdmin(false);
         }
@@ -51,7 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdminStatus(session.user.id);
+        setTimeout(() => {
+          checkAdminStatus(session.user.id);
+        }, 1000);
       }
       setLoading(false);
     });
@@ -62,18 +68,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const checkAdminStatus = async (userId: string) => {
     try {
       console.log('Verificando status de admin para:', userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
+      
+      // Tentar múltiplas vezes em caso de delay na criação do perfil
+      let attempts = 0;
+      const maxAttempts = 5;
+      
+      while (attempts < maxAttempts) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', userId)
+          .single();
 
-      if (!error && data) {
-        console.log('Role do usuário:', data.role);
-        setIsAdmin(data.role === 'admin');
-      } else {
-        console.log('Erro ao verificar role ou usuário sem perfil:', error);
-        setIsAdmin(false);
+        if (!error && data) {
+          console.log('Role do usuário:', data.role);
+          setIsAdmin(data.role === 'admin');
+          return;
+        } else if (attempts === maxAttempts - 1) {
+          console.log('Erro ao verificar role após várias tentativas:', error);
+          setIsAdmin(false);
+          return;
+        }
+        
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     } catch (error) {
       console.log('Erro ao verificar status de admin:', error);

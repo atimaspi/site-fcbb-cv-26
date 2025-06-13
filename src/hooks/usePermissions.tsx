@@ -1,5 +1,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export type UserRole = 'admin' | 'user' | 'moderator' | 'editor';
 
@@ -47,23 +49,60 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 
 export const usePermissions = () => {
   const { user, isAdmin } = useAuth();
+  const [userRole, setUserRole] = useState<UserRole>('user');
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (!user) {
+        setUserRole('user');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (!error && data) {
+          console.log('Role do usuário obtida:', data.role);
+          setUserRole(data.role as UserRole);
+        } else {
+          console.log('Erro ao obter role ou perfil não encontrado:', error);
+          setUserRole('user');
+        }
+      } catch (error) {
+        console.log('Erro ao verificar role do usuário:', error);
+        setUserRole('user');
+      }
+    };
+
+    fetchUserRole();
+  }, [user]);
 
   const getUserRole = (): UserRole => {
-    if (isAdmin) return 'admin';
-    // Por agora, todos os não-admins são 'user'
-    // Isso pode ser expandido para verificar roles específicos do banco de dados
-    return 'user';
+    // Usar o estado local primeiro, depois o isAdmin como fallback
+    if (userRole === 'admin' || isAdmin) {
+      return 'admin';
+    }
+    return userRole;
   };
 
   const hasPermission = (resource: string, action: string): boolean => {
     if (!user) return false;
     
-    const userRole = getUserRole();
-    const permissions = ROLE_PERMISSIONS[userRole] || [];
+    const currentRole = getUserRole();
+    console.log('Verificando permissão:', { resource, action, currentRole });
     
-    return permissions.some(
+    const permissions = ROLE_PERMISSIONS[currentRole] || [];
+    
+    const hasAccess = permissions.some(
       permission => permission.resource === resource && permission.action === action
     );
+    
+    console.log('Permissão concedida:', hasAccess);
+    return hasAccess;
   };
 
   const hasAnyPermission = (permissions: Permission[]): boolean => {
@@ -79,7 +118,9 @@ export const usePermissions = () => {
   };
 
   const canAccessAdminArea = (): boolean => {
-    return hasPermission('dashboard', 'view');
+    const canAccess = hasPermission('dashboard', 'view');
+    console.log('Pode aceder à área admin:', canAccess);
+    return canAccess;
   };
 
   const canManageUsers = (): boolean => {
