@@ -90,12 +90,12 @@ const hasValidStructure = (data: any, requiredFields: string[]): boolean => {
   return requiredFields.every(field => field in firstItem);
 };
 
-const safeArrayCast = <T>(data: any, requiredFields: string[]): T[] => {
+function safeArrayCast<T>(data: any, requiredFields: string[]): T[] {
   if (isValidArray(data) && hasValidStructure(data, requiredFields)) {
     return data as T[];
   }
   return [];
-};
+}
 
 export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
