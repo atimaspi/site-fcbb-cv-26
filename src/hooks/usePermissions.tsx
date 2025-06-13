@@ -69,24 +69,18 @@ export const usePermissions = () => {
         return;
       }
 
-      // Try to fetch role from database with timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
+      // Try to fetch role from database
       const { data, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
-        .single()
-        .abortSignal(controller.signal);
-
-      clearTimeout(timeoutId);
+        .single();
 
       if (!error && data && data.role) {
         console.log('Role do usuário obtida da base de dados:', data.role);
         setUserRole(data.role as UserRole);
       } else {
-        console.log('Erro ao obter role ou perfil não encontrado, usando role padrão');
+        console.log('Erro ao obter role ou perfil não encontrado:', error);
         setUserRole('user');
       }
     } catch (error: any) {
@@ -191,4 +185,3 @@ export const usePermissions = () => {
     canManageEvents,
   };
 };
-
