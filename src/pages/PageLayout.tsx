@@ -33,22 +33,22 @@ const PageLayout = ({ title, children, description, keywords, image }: PageLayou
           role="main"
           aria-labelledby="page-title"
         >
-          <ResponsiveContainer maxWidth="xl" padding="md" className="py-6">
+          <ResponsiveContainer maxWidth="xl" padding="md" className="py-2">
             <SmoothTransition direction="up" duration={0.3}>
-              <header className="mb-4">
+              <header className="mb-3">
                 <h1 
                   id="page-title"
-                  className="section-title text-2xl md:text-3xl font-bold text-cv-blue mb-2"
+                  className="text-xl md:text-2xl font-bold text-cv-blue mb-1"
                 >
                   {title}
                 </h1>
                 {description && (
-                  <p className="text-lg text-gray-600 max-w-3xl">
+                  <p className="text-base text-gray-600 max-w-3xl">
                     {description}
                   </p>
                 )}
               </header>
-              <section className="content-spacing">
+              <section className="space-y-4">
                 {children}
               </section>
             </SmoothTransition>

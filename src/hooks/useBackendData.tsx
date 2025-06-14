@@ -1,43 +1,35 @@
+
 import { useApi } from '@/hooks/useApi';
 import { useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 export interface Team {
   id: string;
   name: string;
-  category: string;
-  club_id?: string;
-  division?: string;
-  created_at?: string;
+  category?: string;
+  abbreviation?: string;
+  city?: string;
+  island?: string;
+  status?: string;
 }
 
 export interface Club {
   id: string;
   name: string;
-  island: string;
-  founded_year?: number;
-  logo_url?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  address?: string;
-  website?: string;
-  description?: string;
+  island?: string;
+  abbreviation?: string;
+  city?: string;
   status?: string;
   active?: boolean;
-  regional_association_id?: string;
 }
 
 export interface Competition {
   id: string;
   name: string;
-  type: string;
-  season: string;
-  status: string;
+  type?: string;
+  season?: string;
+  status?: string;
   start_date?: string;
   end_date?: string;
-  description?: string;
-  federation_id?: string;
-  regional_association_id?: string;
 }
 
 export interface Game {
@@ -60,10 +52,6 @@ export interface Player {
   team_id?: string;
   jersey_number?: number;
   position?: string;
-  height_cm?: number;
-  weight_kg?: number;
-  birth_date?: string;
-  nationality?: string;
   status?: string;
   active?: boolean;
 }
@@ -73,17 +61,13 @@ export interface NewsItem {
   title: string;
   content: string;
   excerpt?: string;
-  image_url?: string;
   featured_image_url?: string;
   category?: string;
   published?: boolean;
   published_at?: string;
   status?: string;
   author?: string;
-  author_id?: string;
   featured?: boolean;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface Event {
@@ -91,12 +75,9 @@ export interface Event {
   title: string;
   description?: string;
   event_date: string;
-  end_date?: string;
   location?: string;
   type?: string;
-  organizer?: string;
   status?: string;
-  created_at?: string;
 }
 
 export interface Referee {
@@ -109,7 +90,6 @@ export interface Referee {
   email?: string;
   island?: string;
   active?: boolean;
-  certified_date?: string;
 }
 
 export interface Coach {
@@ -119,217 +99,55 @@ export interface Coach {
   license_number?: string;
   phone?: string;
   email?: string;
-  experience_years?: number;
   status: string;
 }
 
-export interface RegionalAssociation {
-  id: string;
-  name: string;
-  island?: string;
-  acronym?: string;
-  address?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  logo_url?: string;
-  federation_id: string;
-}
-
-export interface Federation {
-  id: string;
-  name: string;
-  acronym?: string;
-  address?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  website?: string;
-  logo_url?: string;
-  foundation_date?: string;
-}
-
-// Funções de validação melhoradas
+// Funções de validação simplificadas
 const isValidArray = (data: any): data is any[] => {
-  return Array.isArray(data);
+  return Array.isArray(data) && data.length >= 0;
 };
 
-const hasValidStructure = (data: any, requiredFields: string[]): boolean => {
-  if (!Array.isArray(data)) return false;
-  if (data.length === 0) return true;
-  
-  const firstItem = data[0];
-  if (!firstItem || typeof firstItem !== 'object') return false;
-  if (firstItem.error === true) return false;
-  
-  return requiredFields.every(field => field in firstItem);
-};
-
-function safeArrayCast<T>(data: any, requiredFields: string[]): T[] {
-  if (isValidArray(data) && hasValidStructure(data, requiredFields)) {
-    return data as T[];
+function safeArrayCast<T>(data: any): T[] {
+  if (isValidArray(data)) {
+    return data.filter(item => item && typeof item === 'object' && 'id' in item);
   }
   return [];
 }
 
 export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
-  const queryClient = useQueryClient();
 
-  // Otimizar configurações de cache para melhor performance
-  const cacheConfig = useMemo(() => ({
-    // Cache mais agressivo para dados que mudam raramente
-    static: {
-      staleTime: 15 * 60 * 1000, // 15 minutos
-      gcTime: 30 * 60 * 1000, // 30 minutos
-    },
-    // Cache moderado para dados que mudam ocasionalmente
-    moderate: {
-      staleTime: 5 * 60 * 1000, // 5 minutos
-      gcTime: 10 * 60 * 1000, // 10 minutos
-    },
-    // Cache dinâmico para dados que mudam frequentemente
-    dynamic: {
-      staleTime: 2 * 60 * 1000, // 2 minutos
-      gcTime: 5 * 60 * 1000, // 5 minutos
-    }
-  }), []);
+  // Configuração otimizada de cache
+  const cacheConfig = {
+    staleTime: 2 * 60 * 1000, // 2 minutos
+    gcTime: 5 * 60 * 1000, // 5 minutos
+    retry: 1,
+    refetchOnWindowFocus: false,
+  };
 
-  // Fetch dados das tabelas principais - otimizado para performance
-  const { data: teamsData, isLoading: teamsLoading, error: teamsError, refetch: refetchTeams } = useFetch('teams', {
-    ...cacheConfig.moderate,
-    select: (data) => data?.map(team => ({
-      id: team.id,
-      name: team.name,
-      category: team.category,
-      club_id: team.club_id,
-      division: team.division
-    }))
-  });
+  // Fetch dados com configuração otimizada
+  const { data: teamsData, isLoading: teamsLoading } = useFetch('teams', cacheConfig);
+  const { data: clubsData, isLoading: clubsLoading } = useFetch('clubs', cacheConfig);
+  const { data: competitionsData, isLoading: competitionsLoading } = useFetch('championships', cacheConfig);
+  const { data: gamesData, isLoading: gamesLoading } = useFetch('games', cacheConfig);
+  const { data: playersData, isLoading: playersLoading } = useFetch('players', cacheConfig);
+  const { data: newsData, isLoading: newsLoading } = useFetch('news', cacheConfig);
+  const { data: eventsData, isLoading: eventsLoading } = useFetch('events', cacheConfig);
+  const { data: refereesData, isLoading: refereesLoading } = useFetch('referees', cacheConfig);
+  const { data: coachesData, isLoading: coachesLoading } = useFetch('coaches', cacheConfig);
 
-  const { data: clubsData, isLoading: clubsLoading, refetch: refetchClubs } = useFetch('clubs', {
-    ...cacheConfig.static,
-    select: (data) => data?.map(club => ({
-      id: club.id,
-      name: club.name,
-      island: club.island,
-      founded_year: club.founded_year,
-      logo_url: club.logo_url,
-      status: club.status,
-      active: club.active
-    }))
-  });
+  // Arrays processados com memoização
+  const teams: Team[] = useMemo(() => safeArrayCast<Team>(teamsData), [teamsData]);
+  const clubs: Club[] = useMemo(() => safeArrayCast<Club>(clubsData), [clubsData]);
+  const competitions: Competition[] = useMemo(() => safeArrayCast<Competition>(competitionsData), [competitionsData]);
+  const games: Game[] = useMemo(() => safeArrayCast<Game>(gamesData), [gamesData]);
+  const players: Player[] = useMemo(() => safeArrayCast<Player>(playersData), [playersData]);
+  const news: NewsItem[] = useMemo(() => safeArrayCast<NewsItem>(newsData), [newsData]);
+  const events: Event[] = useMemo(() => safeArrayCast<Event>(eventsData), [eventsData]);
+  const referees: Referee[] = useMemo(() => safeArrayCast<Referee>(refereesData), [refereesData]);
+  const coaches: Coach[] = useMemo(() => safeArrayCast<Coach>(coachesData), [coachesData]);
 
-  const { data: competitionsData, isLoading: competitionsLoading, refetch: refetchCompetitions } = useFetch('championships', {
-    ...cacheConfig.moderate,
-    select: (data) => data?.map(comp => ({
-      id: comp.id,
-      name: comp.name,
-      type: comp.type,
-      season: comp.season,
-      status: comp.status,
-      start_date: comp.start_date,
-      end_date: comp.end_date
-    }))
-  });
-
-  const { data: gamesData, isLoading: gamesLoading, refetch: refetchGames } = useFetch('games', {
-    ...cacheConfig.dynamic,
-    select: (data) => data?.map(game => ({
-      id: game.id,
-      competition_id: game.competition_id,
-      home_team_id: game.home_team_id,
-      away_team_id: game.away_team_id,
-      scheduled_date: game.scheduled_date,
-      venue: game.venue,
-      home_score: game.home_score,
-      away_score: game.away_score,
-      status: game.status,
-      round: game.round
-    }))
-  });
-
-  const { data: playersData, isLoading: playersLoading, refetch: refetchPlayers } = useFetch('players', {
-    ...cacheConfig.static,
-    select: (data) => data?.map(player => ({
-      id: player.id,
-      first_name: player.first_name,
-      last_name: player.last_name,
-      team_id: player.team_id,
-      jersey_number: player.jersey_number,
-      position: player.position,
-      status: player.status,
-      active: player.active
-    }))
-  });
-
-  const { data: newsData, isLoading: newsLoading, refetch: refetchNews } = useFetch('news', {
-    ...cacheConfig.dynamic,
-    select: (data) => data?.map(news => ({
-      id: news.id,
-      title: news.title,
-      content: news.content,
-      excerpt: news.excerpt,
-      featured_image_url: news.featured_image_url,
-      category: news.category,
-      published: news.published,
-      published_at: news.published_at,
-      status: news.status,
-      author: news.author,
-      featured: news.featured
-    }))
-  });
-
-  const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useFetch('events', cacheConfig.moderate);
-  const { data: refereesData, isLoading: refereesLoading, refetch: refetchReferees } = useFetch('referees', cacheConfig.static);
-  const { data: coachesData, isLoading: coachesLoading, refetch: refetchCoaches } = useFetch('coaches', cacheConfig.static);
-  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading, refetch: refetchRegionalAssociations } = useFetch('regional_associations', cacheConfig.static);
-  const { data: federationsData, isLoading: federationsLoading, refetch: refetchFederations } = useFetch('federations', cacheConfig.static);
-
-  // Arrays de dados processados com useMemo para evitar re-computação desnecessária
-  const teams: Team[] = useMemo(() => {
-    return safeArrayCast<Team>(teamsData, ['id', 'name', 'category']);
-  }, [teamsData]);
-
-  const clubs: Club[] = useMemo(() => {
-    return safeArrayCast<Club>(clubsData, ['id', 'name', 'island']);
-  }, [clubsData]);
-
-  const competitions: Competition[] = useMemo(() => {
-    return safeArrayCast<Competition>(competitionsData, ['id', 'name', 'type', 'season', 'status']);
-  }, [competitionsData]);
-
-  const games: Game[] = useMemo(() => {
-    return safeArrayCast<Game>(gamesData, ['id', 'scheduled_date']);
-  }, [gamesData]);
-
-  const players: Player[] = useMemo(() => {
-    return safeArrayCast<Player>(playersData, ['id', 'first_name', 'last_name']);
-  }, [playersData]);
-
-  const news: NewsItem[] = useMemo(() => {
-    return safeArrayCast<NewsItem>(newsData, ['id', 'title', 'content']);
-  }, [newsData]);
-
-  const events: Event[] = useMemo(() => {
-    return safeArrayCast<Event>(eventsData, ['id', 'title', 'event_date']);
-  }, [eventsData]);
-
-  const referees: Referee[] = useMemo(() => {
-    return safeArrayCast<Referee>(refereesData, ['id', 'first_name', 'last_name', 'level']);
-  }, [refereesData]);
-
-  const coaches: Coach[] = useMemo(() => {
-    return safeArrayCast<Coach>(coachesData, ['id', 'name', 'status']);
-  }, [coachesData]);
-
-  const regionalAssociations: RegionalAssociation[] = useMemo(() => {
-    return safeArrayCast<RegionalAssociation>(regionalAssociationsData, ['id', 'name', 'federation_id']);
-  }, [regionalAssociationsData]);
-
-  const federations: Federation[] = useMemo(() => {
-    return safeArrayCast<Federation>(federationsData, ['id', 'name']);
-  }, [federationsData]);
-
-  // Computed properties otimizadas com useMemo
+  // Computed properties otimizadas
   const publishedNews = useMemo(() => {
     return news
       .filter(item => item.published === true || item.status === 'published')
@@ -337,96 +155,10 @@ export const useBackendData = () => {
         if (!a.published_at || !b.published_at) return 0;
         return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
       })
-      .slice(0, 20); // Limitar a 20 notícias para performance
+      .slice(0, 10);
   }, [news]);
 
-  const activeEvents = useMemo(() => {
-    return events
-      .filter(event => event.status === 'active' || !event.status)
-      .slice(0, 10); // Limitar a 10 eventos para performance
-  }, [events]);
-
-  const recentGames = useMemo(() => {
-    return games
-      .filter(game => game.status === 'finalizado')
-      .sort((a, b) => new Date(b.scheduled_date).getTime() - new Date(a.scheduled_date).getTime())
-      .slice(0, 10); // Limitar a 10 jogos para performance
-  }, [games]);
-
-  const upcomingGames = useMemo(() => {
-    const now = new Date();
-    return games
-      .filter(game => {
-        const gameDate = new Date(game.scheduled_date);
-        return game.status === 'agendado' || gameDate > now;
-      })
-      .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
-      .slice(0, 10); // Limitar a 10 jogos para performance
-  }, [games]);
-
-  // Função para forçar atualização de dados específicos
-  const refreshData = {
-    teams: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams'] });
-      refetchTeams();
-    },
-    clubs: () => {
-      queryClient.invalidateQueries({ queryKey: ['clubs'] });
-      refetchClubs();
-    },
-    competitions: () => {
-      queryClient.invalidateQueries({ queryKey: ['championships'] });
-      refetchCompetitions();
-    },
-    games: () => {
-      queryClient.invalidateQueries({ queryKey: ['games'] });
-      refetchGames();
-    },
-    players: () => {
-      queryClient.invalidateQueries({ queryKey: ['players'] });
-      refetchPlayers();
-    },
-    news: () => {
-      queryClient.invalidateQueries({ queryKey: ['news'] });
-      refetchNews();
-    },
-    events: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-      refetchEvents();
-    },
-    referees: () => {
-      queryClient.invalidateQueries({ queryKey: ['referees'] });
-      refetchReferees();
-    },
-    coaches: () => {
-      queryClient.invalidateQueries({ queryKey: ['coaches'] });
-      refetchCoaches();
-    },
-    regionalAssociations: () => {
-      queryClient.invalidateQueries({ queryKey: ['regional_associations'] });
-      refetchRegionalAssociations();
-    },
-    federations: () => {
-      queryClient.invalidateQueries({ queryKey: ['federations'] });
-      refetchFederations();
-    },
-    all: () => {
-      queryClient.invalidateQueries();
-      refetchTeams();
-      refetchClubs();
-      refetchCompetitions();
-      refetchGames();
-      refetchPlayers();
-      refetchNews();
-      refetchEvents();
-      refetchReferees();
-      refetchCoaches();
-      refetchRegionalAssociations();
-      refetchFederations();
-    }
-  };
-
-  // Operações CRUD com invalidação automática
+  // Operações CRUD
   const operations = {
     teams: {
       create: useCreate('teams'),
@@ -472,16 +204,6 @@ export const useBackendData = () => {
       create: useCreate('coaches'),
       update: useUpdate('coaches'),
       delete: useDelete('coaches')
-    },
-    regionalAssociations: {
-      create: useCreate('regional_associations'),
-      update: useUpdate('regional_associations'),
-      delete: useDelete('regional_associations')
-    },
-    federations: {
-      create: useCreate('federations'),
-      update: useUpdate('federations'),
-      delete: useDelete('federations')
     }
   };
 
@@ -496,25 +218,14 @@ export const useBackendData = () => {
     events,
     referees,
     coaches,
-    regionalAssociations,
-    federations,
 
-    // Computed properties for backward compatibility
+    // Computed properties
     publishedNews,
-    activeEvents,
-    recentGames,
-    upcomingGames,
-
-    // Raw data for DataManagement component
     newsData,
     eventsData,
 
-    // Loading states - otimizado para mostrar loading apenas quando necessário
-    isLoading: (teamsLoading && !teams.length) || 
-               (clubsLoading && !clubs.length) || 
-               (newsLoading && !news.length),
-
-    // Individual loading states
+    // Loading states
+    isLoading: teamsLoading || clubsLoading || newsLoading,
     teamsLoading,
     clubsLoading,
     competitionsLoading,
@@ -524,128 +235,8 @@ export const useBackendData = () => {
     eventsLoading,
     refereesLoading,
     coachesLoading,
-    regionalAssociationsLoading,
-    federationsLoading,
 
     // CRUD operations
-    operations: {
-      teams: {
-        create: useCreate('teams'),
-        update: useUpdate('teams'),
-        delete: useDelete('teams')
-      },
-      clubs: {
-        create: useCreate('clubs'),
-        update: useUpdate('clubs'),
-        delete: useDelete('clubs')
-      },
-      competitions: {
-        create: useCreate('championships'),
-        update: useUpdate('championships'),
-        delete: useDelete('championships')
-      },
-      games: {
-        create: useCreate('games'),
-        update: useUpdate('games'),
-        delete: useDelete('games')
-      },
-      players: {
-        create: useCreate('players'),
-        update: useUpdate('players'),
-        delete: useDelete('players')
-      },
-      news: {
-        create: useCreate('news'),
-        update: useUpdate('news'),
-        delete: useDelete('news')
-      },
-      events: {
-        create: useCreate('events'),
-        update: useUpdate('events'),
-        delete: useDelete('events')
-      },
-      referees: {
-        create: useCreate('referees'),
-        update: useUpdate('referees'),
-        delete: useDelete('referees')
-      },
-      coaches: {
-        create: useCreate('coaches'),
-        update: useUpdate('coaches'),
-        delete: useDelete('coaches')
-      },
-      regionalAssociations: {
-        create: useCreate('regional_associations'),
-        update: useUpdate('regional_associations'),
-        delete: useDelete('regional_associations')
-      },
-      federations: {
-        create: useCreate('federations'),
-        update: useUpdate('federations'),
-        delete: useDelete('federations')
-      }
-    },
-
-    // Refresh functions
-    refreshData: {
-      teams: () => {
-        queryClient.invalidateQueries({ queryKey: ['teams'] });
-        refetchTeams();
-      },
-      clubs: () => {
-        queryClient.invalidateQueries({ queryKey: ['clubs'] });
-        refetchClubs();
-      },
-      competitions: () => {
-        queryClient.invalidateQueries({ queryKey: ['championships'] });
-        refetchCompetitions();
-      },
-      games: () => {
-        queryClient.invalidateQueries({ queryKey: ['games'] });
-        refetchGames();
-      },
-      players: () => {
-        queryClient.invalidateQueries({ queryKey: ['players'] });
-        refetchPlayers();
-      },
-      news: () => {
-        queryClient.invalidateQueries({ queryKey: ['news'] });
-        refetchNews();
-      },
-      events: () => {
-        queryClient.invalidateQueries({ queryKey: ['events'] });
-        refetchEvents();
-      },
-      referees: () => {
-        queryClient.invalidateQueries({ queryKey: ['referees'] });
-        refetchReferees();
-      },
-      coaches: () => {
-        queryClient.invalidateQueries({ queryKey: ['coaches'] });
-        refetchCoaches();
-      },
-      regionalAssociations: () => {
-        queryClient.invalidateQueries({ queryKey: ['regional_associations'] });
-        refetchRegionalAssociations();
-      },
-      federations: () => {
-        queryClient.invalidateQueries({ queryKey: ['federations'] });
-        refetchFederations();
-      },
-      all: () => {
-        queryClient.invalidateQueries();
-        refetchTeams();
-        refetchClubs();
-        refetchCompetitions();
-        refetchGames();
-        refetchPlayers();
-        refetchNews();
-        refetchEvents();
-        refetchReferees();
-        refetchCoaches();
-        refetchRegionalAssociations();
-        refetchFederations();
-      }
-    }
+    operations
   };
 };
