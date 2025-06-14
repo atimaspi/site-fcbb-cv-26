@@ -1,0 +1,91 @@
+
+@layer utilities {
+  /* Enhanced hover effects with microinteractions */
+  .hover-lift {
+    @apply transition-all duration-300 hover:transform hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105 active:scale-95;
+  }
+
+  /* Enhanced live indicator */
+  .live-indicator {
+    @apply relative;
+  }
+
+  .live-indicator::before {
+    content: '';
+    @apply absolute -left-2 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-red-500 rounded-full animate-pulse;
+  }
+
+  /* Enhanced interactive states for better UX */
+  .interactive-element {
+    @apply transition-all duration-200 hover:bg-opacity-90 active:transform active:scale-95 focus-visible-cv;
+  }
+
+  /* Enhanced button states */
+  .btn-loading {
+    @apply opacity-75 cursor-not-allowed pointer-events-none;
+  }
+
+  /* Enhanced responsive text utilities */
+  .text-responsive-xl {
+    @apply text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
+  }
+
+  .text-responsive-lg {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+
+  .text-responsive-base {
+    @apply text-base md:text-lg;
+  }
+
+  /* Enhanced professional shadows with better contrast */
+  .shadow-professional {
+    box-shadow: 0 4px 6px -1px rgba(0, 56, 147, 0.1), 0 2px 4px -1px rgba(0, 56, 147, 0.06);
+  }
+
+  .shadow-professional-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 56, 147, 0.1), 0 4px 6px -2px rgba(0, 56, 147, 0.05);
+  }
+
+  .shadow-professional-xl {
+    box-shadow: 0 20px 25px -5px rgba(0, 56, 147, 0.1), 0 10px 10px -5px rgba(0, 56, 147, 0.04);
+  }
+
+  /* Enhanced scroll animations */
+  .scroll-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease-out;
+  }
+
+  .scroll-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Enhanced glass morphism effects */
+  .glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Enhanced high contrast mode support */
+  @media (prefers-contrast: high) {
+    .text-high-contrast {
+      @apply text-black;
+    }
+    
+    .bg-high-contrast {
+      @apply bg-white;
+    }
+  }
+
+  /* Melhor contraste para acessibilidade */
+  .text-high-contrast {
+    @apply text-gray-900;
+  }
+}
