@@ -78,6 +78,7 @@ const PlayersManagementAdvanced = () => {
       setIsDialogOpen(false);
       resetForm();
     } catch (error: any) {
+      console.error('Erro ao salvar jogador:', error);
       toast({
         title: "Erro",
         description: `Erro ao salvar jogador: ${error.message || 'Erro desconhecido'}`,
@@ -112,6 +113,7 @@ const PlayersManagementAdvanced = () => {
           description: "Jogador eliminado com sucesso!"
         });
       } catch (error: any) {
+        console.error('Erro ao eliminar jogador:', error);
         toast({
           title: "Erro",
           description: `Erro ao eliminar jogador: ${error.message || 'Erro desconhecido'}`,
