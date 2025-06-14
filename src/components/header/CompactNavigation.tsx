@@ -83,14 +83,14 @@ const CompactNavigation = () => {
               {item.path ? (
                 <Link 
                   to={item.path}
-                  className="block px-6 py-3 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
+                  className="block px-8 py-4 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
                 >
                   {item.title}
                 </Link>
               ) : (
                 <div className="relative">
                   <button 
-                    className="flex items-center px-6 py-3 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
+                    className="flex items-center px-8 py-4 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
                     onMouseEnter={() => setActiveDropdown(item.title)}
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
@@ -108,7 +108,7 @@ const CompactNavigation = () => {
                           <Link 
                             key={subItem.name}
                             to={subItem.path}
-                            className="block px-4 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white transition-colors"
+                            className="block px-4 py-3 text-sm text-cv-dark hover:bg-cv-blue hover:text-white transition-colors"
                           >
                             {subItem.name}
                           </Link>
