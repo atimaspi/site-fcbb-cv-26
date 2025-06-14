@@ -10,11 +10,3 @@ export function safeArrayCast<T>(data: any): T[] {
   }
   return [];
 }
-
-// Cache configuration
-export const getCacheConfig = () => ({
-  staleTime: 2 * 60 * 1000, // 2 minutes
-  gcTime: 5 * 60 * 1000, // 5 minutes
-  retry: 1,
-  refetchOnWindowFocus: false,
-});

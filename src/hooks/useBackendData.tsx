@@ -1,7 +1,7 @@
 
 import { useApi } from '@/hooks/useApi';
 import { useMemo } from 'react';
-import { safeArrayCast, getCacheConfig } from '@/utils/dataUtils';
+import { safeArrayCast } from '@/utils/dataUtils';
 import { useComputedData } from '@/hooks/useComputedData';
 import { useBackendOperations } from '@/hooks/useBackendOperations';
 import type {
@@ -22,21 +22,17 @@ export const useBackendData = () => {
   const { useFetch } = useApi();
   const { operations } = useBackendOperations();
 
-  // Cache configuration
-  const cacheConfig = getCacheConfig();
-
-  // Fetch data with optimized configuration
-  const { data: teamsData, isLoading: teamsLoading } = useFetch('teams', cacheConfig);
-  const { data: clubsData, isLoading: clubsLoading } = useFetch('clubs', cacheConfig);
-  const { data: competitionsData, isLoading: competitionsLoading } = useFetch('championships', cacheConfig);
-  const { data: gamesData, isLoading: gamesLoading } = useFetch('games', cacheConfig);
-  const { data: playersData, isLoading: playersLoading } = useFetch('players', cacheConfig);
-  const { data: newsData, isLoading: newsLoading } = useFetch('news', cacheConfig);
-  const { data: eventsData, isLoading: eventsLoading } = useFetch('events', cacheConfig);
-  const { data: refereesData, isLoading: refereesLoading } = useFetch('referees', cacheConfig);
-  const { data: coachesData, isLoading: coachesLoading } = useFetch('coaches', cacheConfig);
-  const { data: federationsData, isLoading: federationsLoading } = useFetch('federations', cacheConfig);
-  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading } = useFetch('regional_associations', cacheConfig);
+  // Fetch data without problematic cache config
+  const { data: teamsData, isLoading: teamsLoading } = useFetch('teams');
+  const { data: clubsData, isLoading: clubsLoading } = useFetch('clubs');
+  const { data: competitionsData, isLoading: competitionsLoading } = useFetch('championships');
+  const { data: gamesData, isLoading: gamesLoading } = useFetch('games');
+  const { data: playersData, isLoading: playersLoading } = useFetch('players');
+  const { data: newsData, isLoading: newsLoading } = useFetch('news');
+  const { data: eventsData, isLoading: eventsLoading } = useFetch('events');
+  const { data: refereesData, isLoading: refereesLoading } = useFetch('referees');
+  const { data: federationsData, isLoading: federationsLoading } = useFetch('federations');
+  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading } = useFetch('regional_associations');
 
   // Process arrays with memoization
   const teams: Team[] = useMemo(() => safeArrayCast<Team>(teamsData), [teamsData]);
@@ -47,9 +43,12 @@ export const useBackendData = () => {
   const news: NewsItem[] = useMemo(() => safeArrayCast<NewsItem>(newsData), [newsData]);
   const events: Event[] = useMemo(() => safeArrayCast<Event>(eventsData), [eventsData]);
   const referees: Referee[] = useMemo(() => safeArrayCast<Referee>(refereesData), [refereesData]);
-  const coaches: Coach[] = useMemo(() => safeArrayCast<Coach>(coachesData), [coachesData]);
   const federations: Federation[] = useMemo(() => safeArrayCast<Federation>(federationsData), [federationsData]);
   const regionalAssociations: RegionalAssociation[] = useMemo(() => safeArrayCast<RegionalAssociation>(regionalAssociationsData), [regionalAssociationsData]);
+
+  // Handle coaches separately since the table doesn't exist
+  const coaches: Coach[] = useMemo(() => [], []);
+  const coachesLoading = false;
 
   // Get computed properties
   const { publishedNews, activeEvents, upcomingGames, recentGames } = useComputedData(news, events, games);

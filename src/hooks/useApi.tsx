@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -60,14 +61,16 @@ export const useApi = () => {
     if (error) throw error;
   };
 
-  // Hook for fetching data with shorter cache time for real-time updates
+  // Hook for fetching data - fixed to separate cache config from query filters
   const useFetch = (table: TableName, filters?: Record<string, any>) => {
     return useQuery({
       queryKey: [table, filters],
       queryFn: () => fetchData(table, filters),
-      staleTime: 30 * 1000, // 30 seconds - mais rápido para ver mudanças
+      staleTime: 30 * 1000, // 30 seconds
+      gcTime: 5 * 60 * 1000, // 5 minutes
       refetchInterval: 60 * 1000, // Refetch every minute
       refetchOnWindowFocus: true, // Refetch when user returns to tab
+      retry: 1,
     });
   };
 
