@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -68,7 +67,7 @@ const UserProfile = () => {
 
           if (createError) {
             console.error('Error creating profile:', createError);
-            // Create fallback profile
+            // Create fallback profile with proper typing
             const fallbackProfile: Profile = {
               id: user.id,
               full_name: user.user_metadata?.full_name || 'Utilizador',
@@ -82,24 +81,35 @@ const UserProfile = () => {
             setFullName(fallbackProfile.full_name || '');
             setError('Perfil criado localmente. Algumas funcionalidades podem estar limitadas.');
           } else {
-            setProfile(newProfile);
-            setFullName(newProfile.full_name || '');
+            // Cast the role to DetailedRole type
+            const typedProfile: Profile = {
+              ...newProfile,
+              role: newProfile.role as DetailedRole
+            };
+            setProfile(typedProfile);
+            setFullName(typedProfile.full_name || '');
           }
         } else {
           throw error;
         }
       } else {
-        setProfile(data);
-        setFullName(data.full_name || '');
+        // Cast the role to DetailedRole type for existing profiles
+        const typedProfile: Profile = {
+          ...data,
+          role: data.role as DetailedRole
+        };
+        setProfile(typedProfile);
+        setFullName(typedProfile.full_name || '');
       }
     } catch (error: any) {
       console.error('Error fetching profile:', error);
       
-      // Provide fallback profile data
+      // Provide fallback profile data with proper typing
+      const defaultRole: DetailedRole = user.email === 'admin@fcbb.cv' ? 'admin' : 'user';
       const fallbackProfile: Profile = {
         id: user.id,
         full_name: user.user_metadata?.full_name || 'Utilizador',
-        role: user.email === 'admin@fcbb.cv' ? 'admin' : 'user',
+        role: defaultRole,
         updated_at: new Date().toISOString(),
         avatar_url: null,
         club_id: null,
