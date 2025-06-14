@@ -1,29 +1,24 @@
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Users, PenLine, Trash2, Plus } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import PlayersHeader from './players/PlayersHeader';
+import PlayersTable from './players/PlayersTable';
+import PlayerForm from './players/PlayerForm';
 
 interface Player {
   id: string;
+  first_name: string;
+  last_name: string;
+  club: string;
+  position: string;
+  jersey_number: number;
+  age: number;
+  nationality: string;
+  status: string;
+}
+
+interface FormData {
   first_name: string;
   last_name: string;
   club: string;
@@ -39,7 +34,7 @@ const PlayersManagement = () => {
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<Player | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     first_name: '',
     last_name: '',
     club: '',
@@ -237,223 +232,31 @@ const PlayersManagement = () => {
     }
   };
 
+  const handleCloseDialog = () => {
+    setShowDialog(false);
+    setFormData({ first_name: '', last_name: '', club: '', position: 'Base', jersey_number: 0, age: 0, nationality: 'Cabo Verde', status: 'active' });
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold text-cv-blue">Gestão de Jogadores</h3>
-        <Button onClick={handleAdd} className="bg-cv-blue hover:bg-blue-700 flex items-center gap-2">
-          <Plus size={18} />
-          Adicionar Jogador
-        </Button>
-      </div>
+      <PlayersHeader onAddClick={handleAdd} />
+      
+      <PlayersTable
+        players={players}
+        loading={loading}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nome</TableHead>
-              <TableHead>Clube</TableHead>
-              <TableHead>Posição</TableHead>
-              <TableHead>Nº</TableHead>
-              <TableHead>Idade</TableHead>
-              <TableHead>Nacionalidade</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center">Carregando...</TableCell>
-              </TableRow>
-            ) : players.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center">Nenhum jogador encontrado</TableCell>
-              </TableRow>
-            ) : (
-              players.map((player) => (
-                <TableRow key={player.id}>
-                  <TableCell className="font-medium">{`${player.first_name} ${player.last_name}`}</TableCell>
-                  <TableCell>{player.club}</TableCell>
-                  <TableCell>{player.position}</TableCell>
-                  <TableCell>{player.jersey_number}</TableCell>
-                  <TableCell>{player.age}</TableCell>
-                  <TableCell>{player.nationality}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      player.status === 'Ativo' ? 'bg-green-100 text-green-800' : 
-                      player.status === 'Lesionado' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {player.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <button 
-                        onClick={() => handleEdit(player)}
-                        className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 p-1 rounded"
-                        title="Editar"
-                      >
-                        <PenLine size={16} />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(player.id)}
-                        className="text-red-600 hover:text-red-800 hover:bg-red-50 p-1 rounded"
-                        title="Eliminar"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>
-              {editingItem ? 'Editar Jogador' : 'Adicionar Novo Jogador'}
-            </DialogTitle>
-            <DialogDescription>
-              Preencha os campos abaixo para {editingItem ? 'atualizar' : 'registar'} o jogador.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="first_name" className="text-sm font-medium">
-                    Primeiro Nome
-                  </label>
-                  <Input
-                    id="first_name"
-                    value={formData.first_name}
-                    onChange={(e) => setFormData({...formData, first_name: e.target.value})}
-                    required
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <label htmlFor="last_name" className="text-sm font-medium">
-                    Último Nome
-                  </label>
-                  <Input
-                    id="last_name"
-                    value={formData.last_name}
-                    onChange={(e) => setFormData({...formData, last_name: e.target.value})}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="club" className="text-sm font-medium">
-                    Clube
-                  </label>
-                  <Input
-                    id="club"
-                    value={formData.club}
-                    onChange={(e) => setFormData({...formData, club: e.target.value})}
-                    required
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <label htmlFor="position" className="text-sm font-medium">
-                    Posição
-                  </label>
-                  <select
-                    id="position"
-                    value={formData.position}
-                    onChange={(e) => setFormData({...formData, position: e.target.value})}
-                    className="px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="Base">Base</option>
-                    <option value="Extremo">Extremo</option>
-                    <option value="Ala">Ala</option>
-                    <option value="Poste-Baixo">Poste-Baixo</option>
-                    <option value="Poste">Poste</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="jersey_number" className="text-sm font-medium">
-                    Número
-                  </label>
-                  <Input
-                    id="jersey_number"
-                    type="number"
-                    value={formData.jersey_number}
-                    onChange={(e) => setFormData({...formData, jersey_number: parseInt(e.target.value)})}
-                    min="0"
-                    max="99"
-                    required
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <label htmlFor="age" className="text-sm font-medium">
-                    Idade
-                  </label>
-                  <Input
-                    id="age"
-                    type="number"
-                    value={formData.age}
-                    onChange={(e) => setFormData({...formData, age: parseInt(e.target.value)})}
-                    min="16"
-                    max="50"
-                    required
-                  />
-                </div>
-                
-                <div className="grid gap-2">
-                  <label htmlFor="nationality" className="text-sm font-medium">
-                    Nacionalidade
-                  </label>
-                  <Input
-                    id="nationality"
-                    value={formData.nationality}
-                    onChange={(e) => setFormData({...formData, nationality: e.target.value})}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="grid gap-2">
-                <label htmlFor="status" className="text-sm font-medium">
-                  Estado
-                </label>
-                <select
-                  id="status"
-                  value={formData.status}
-                  onChange={(e) => setFormData({...formData, status: e.target.value})}
-                  className="px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="active">Ativo</option>
-                  <option value="injured">Lesionado</option>
-                  <option value="suspended">Suspenso</option>
-                  <option value="inactive">Inativo</option>
-                </select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowDialog(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit" className="bg-cv-blue" disabled={loading}>
-                {loading ? 'A processar...' : editingItem ? 'Atualizar' : 'Registar'} Jogador
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <PlayerForm
+        showDialog={showDialog}
+        editingItem={editingItem}
+        formData={formData}
+        loading={loading}
+        onClose={handleCloseDialog}
+        onSubmit={handleSubmit}
+        onFormDataChange={setFormData}
+      />
     </div>
   );
 };
