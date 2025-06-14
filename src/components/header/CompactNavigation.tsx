@@ -83,14 +83,14 @@ const CompactNavigation = () => {
               {item.path ? (
                 <Link 
                   to={item.path}
-                  className="block px-4 py-2 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
+                  className="block px-3 py-1.5 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
                 >
                   {item.title}
                 </Link>
               ) : (
                 <div className="relative">
                   <button 
-                    className="flex items-center px-4 py-2 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
+                    className="flex items-center px-3 py-1.5 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
                     onMouseEnter={() => setActiveDropdown(item.title)}
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
@@ -108,7 +108,7 @@ const CompactNavigation = () => {
                           <Link 
                             key={subItem.name}
                             to={subItem.path}
-                            className="block px-3 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white transition-colors"
+                            className="block px-3 py-1.5 text-sm text-cv-dark hover:bg-cv-blue hover:text-white transition-colors"
                           >
                             {subItem.name}
                           </Link>
@@ -124,26 +124,26 @@ const CompactNavigation = () => {
       </nav>
 
       {/* Mobile Menu Button */}
-      <div className="lg:hidden flex justify-end py-1">
+      <div className="lg:hidden flex justify-end py-0.5">
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2"
+          className="p-1"
           aria-label="Menu"
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t shadow-lg">
-          <div className="py-2">
+          <div className="py-1">
             {navItems.map((item) => (
               <div key={item.title}>
                 {item.path ? (
                   <Link 
                     to={item.path}
-                    className="block py-2 px-4 text-cv-dark hover:bg-gray-50"
+                    className="block py-1.5 px-4 text-cv-dark hover:bg-gray-50"
                     onClick={() => setMobileOpen(false)}
                   >
                     {item.title}
@@ -151,7 +151,7 @@ const CompactNavigation = () => {
                 ) : (
                   <div>
                     <button 
-                      className="w-full text-left py-2 px-4 text-cv-dark font-medium hover:bg-gray-50"
+                      className="w-full text-left py-1.5 px-4 text-cv-dark font-medium hover:bg-gray-50"
                       onClick={() => setActiveDropdown(activeDropdown === item.title ? null : item.title)}
                     >
                       <span className="flex items-center justify-between">
@@ -165,7 +165,7 @@ const CompactNavigation = () => {
                           <Link 
                             key={subItem.name}
                             to={subItem.path}
-                            className="block py-2 px-8 text-sm text-cv-dark hover:bg-gray-100"
+                            className="block py-1.5 px-8 text-sm text-cv-dark hover:bg-gray-100"
                             onClick={() => setMobileOpen(false)}
                           >
                             {subItem.name}
