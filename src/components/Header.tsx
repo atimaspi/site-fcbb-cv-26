@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown, Lock, Search } from 'lucide-react';
@@ -232,14 +231,14 @@ const Header = () => {
               <img 
                 src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
                 alt="Logótipo da Federação Cabo-verdiana de Basquetebol" 
-                className="h-16 w-auto mr-3"
-                width="64"
-                height="64"
+                className="h-12 w-auto mr-3"
+                width="48"
+                height="48"
                 loading="eager"
               />
               <div className="flex flex-col">
-                <h1 className="text-xl font-bold text-cv-blue">FCBB</h1>
-                <p className="text-sm text-cv-dark">Federação Cabo-verdiana de Basquetebol</p>
+                <h1 className="text-lg font-bold text-cv-blue">FCBB</h1>
+                <p className="text-xs text-cv-dark">Federação Cabo-verdiana de Basquetebol</p>
               </div>
             </Link>
           </div>
