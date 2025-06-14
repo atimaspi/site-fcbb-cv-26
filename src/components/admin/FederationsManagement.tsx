@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,14 +41,9 @@ const FederationsManagement = () => {
         const { data: directFetch, error: directError } = await supabase.from('federations').select('*');
         console.log('Direct federations fetch:', { directFetch, directError });
         
-        // Test 3: Check table existence
-        const { data: tables, error: tablesError } = await supabase.rpc('get_tables');
-        console.log('Available tables:', { tables, tablesError });
-        
         setDebugInfo({
           connectionTest: { testData, testError },
-          directFetch: { directFetch, directError },
-          tablesInfo: { tables, tablesError }
+          directFetch: { directFetch, directError }
         });
         
         console.log('===========================');

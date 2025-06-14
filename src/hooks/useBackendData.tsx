@@ -49,9 +49,9 @@ export const useBackendData = () => {
   if (federationsError) {
     console.error('Federations error details:', {
       message: federationsError.message,
-      code: federationsError.code,
-      details: federationsError.details,
-      hint: federationsError.hint
+      code: (federationsError as any).code,
+      details: (federationsError as any).details,
+      hint: (federationsError as any).hint
     });
   }
   console.log('==============================');
