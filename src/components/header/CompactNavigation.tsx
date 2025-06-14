@@ -6,10 +6,13 @@ import { Link } from 'react-router-dom';
 const navItems = [
   { title: 'Início', path: '/' },
   { 
-    title: 'Sobre', 
+    title: 'Sobre a FCBB', 
     items: [
+      { name: 'Missão e Visão', path: '/sobre/missao-visao' },
       { name: 'História', path: '/sobre/historia' },
       { name: 'Direção', path: '/sobre/direcao' },
+      { name: 'Órgãos Sociais', path: '/sobre/orgaos-sociais' },
+      { name: 'Estatutos', path: '/sobre/estatutos' },
       { name: 'Contactos', path: '/sobre/contactos' }
     ]
   },
@@ -18,22 +21,50 @@ const navItems = [
     items: [
       { name: 'Nacional Masculino', path: '/competicoes/nacional-masculino' },
       { name: 'Liga Nacional', path: '/competicoes/liga-nacional' },
-      { name: 'Classificações', path: '/competicoes/classificacoes' }
+      { name: 'Taça de Cabo Verde', path: '/competicoes/taca-cabo-verde' },
+      { name: 'Super Taça', path: '/competicoes/super-taca' },
+      { name: 'Competições Regionais', path: '/competicoes/competicoes-regionais' },
+      { name: 'Classificações', path: '/competicoes/classificacoes' },
+      { name: 'Calendário', path: '/competicoes/calendario' }
     ]
   },
   { 
-    title: 'Seleções', 
+    title: 'Seleções Nacionais', 
     items: [
       { name: 'Sénior Masculina', path: '/selecoes/senior-masculina' },
-      { name: 'Sénior Feminina', path: '/selecoes/senior-feminina' }
+      { name: 'Sénior Feminina', path: '/selecoes/senior-feminina' },
+      { name: 'Sub-18 Masculina', path: '/selecoes/sub-18-masculina' },
+      { name: 'Sub-18 Feminina', path: '/selecoes/sub-18-feminina' },
+      { name: 'Sub-16 Masculina', path: '/selecoes/sub-16-masculina' },
+      { name: 'Sub-16 Feminina', path: '/selecoes/sub-16-feminina' }
+    ]
+  },
+  { 
+    title: 'Clubes', 
+    items: [
+      { name: 'Direção de Clubes', path: '/clubes' },
+      { name: 'Transferências', path: '/transferencias' },
+      { name: 'Formação', path: '/formacao' },
+      { name: 'Arbitragem', path: '/arbitragem' }
+    ]
+  },
+  { 
+    title: 'Resultados & Estatísticas', 
+    items: [
+      { name: 'Resultados ao Vivo', path: '/resultados/ao-vivo' },
+      { name: 'Estatísticas', path: '/estatisticas' },
+      { name: 'Resultados', path: '/resultados' },
+      { name: 'FIBA LiveStats', path: '/resultados/fiba-livestats' }
     ]
   },
   { 
     title: 'Multimédia', 
     items: [
       { name: 'Notícias', path: '/noticias' },
-      { name: 'Galeria', path: '/galeria' },
-      { name: 'Vídeos', path: '/videos' }
+      { name: 'Galeria de Imagens', path: '/galeria' },
+      { name: 'Vídeos', path: '/videos' },
+      { name: 'Área de Imprensa', path: '/imprensa' },
+      { name: 'Transmissões', path: '/transmissoes' }
     ]
   }
 ];
@@ -48,39 +79,41 @@ const CompactNavigation = () => {
       <nav className="hidden lg:block border-t border-gray-200">
         <ul className="flex">
           {navItems.map((item) => (
-            <li key={item.title} className="relative group border-r border-gray-200 last:border-r-0">
+            <li key={item.title} className="relative group">
               {item.path ? (
                 <Link 
                   to={item.path}
-                  className="block px-3 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white"
+                  className="block px-6 py-3 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
                 >
                   {item.title}
                 </Link>
               ) : (
-                <div>
+                <div className="relative">
                   <button 
-                    className="flex items-center px-3 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white w-full"
+                    className="flex items-center px-6 py-3 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
                     onMouseEnter={() => setActiveDropdown(item.title)}
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
                     {item.title}
-                    <ChevronDown className="ml-1 w-3 h-3" />
+                    <ChevronDown className="ml-1 w-4 h-4" />
                   </button>
                   {activeDropdown === item.title && (
                     <div 
-                      className="absolute left-0 top-full w-48 bg-white shadow-lg border border-gray-200 z-50"
+                      className="absolute left-0 top-full w-64 bg-white shadow-xl border border-gray-200 z-50 rounded-md"
                       onMouseEnter={() => setActiveDropdown(item.title)}
                       onMouseLeave={() => setActiveDropdown(null)}
                     >
-                      {item.items?.map((subItem) => (
-                        <Link 
-                          key={subItem.name}
-                          to={subItem.path}
-                          className="block px-3 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white border-b border-gray-100 last:border-0"
-                        >
-                          {subItem.name}
-                        </Link>
-                      ))}
+                      <div className="py-2">
+                        {item.items?.map((subItem) => (
+                          <Link 
+                            key={subItem.name}
+                            to={subItem.path}
+                            className="block px-4 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white transition-colors"
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -97,20 +130,20 @@ const CompactNavigation = () => {
           className="p-2"
           aria-label="Menu"
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="lg:hidden bg-white border-t">
+        <div className="lg:hidden bg-white border-t shadow-lg">
           <div className="py-2">
             {navItems.map((item) => (
               <div key={item.title}>
                 {item.path ? (
                   <Link 
                     to={item.path}
-                    className="block py-2 px-4 text-cv-dark"
+                    className="block py-3 px-4 text-cv-dark hover:bg-gray-50"
                     onClick={() => setMobileOpen(false)}
                   >
                     {item.title}
@@ -118,10 +151,13 @@ const CompactNavigation = () => {
                 ) : (
                   <div>
                     <button 
-                      className="w-full text-left py-2 px-4 text-cv-dark font-medium"
+                      className="w-full text-left py-3 px-4 text-cv-dark font-medium hover:bg-gray-50"
                       onClick={() => setActiveDropdown(activeDropdown === item.title ? null : item.title)}
                     >
-                      {item.title}
+                      <span className="flex items-center justify-between">
+                        {item.title}
+                        <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === item.title ? 'rotate-180' : ''}`} />
+                      </span>
                     </button>
                     {activeDropdown === item.title && (
                       <div className="bg-gray-50">
@@ -129,7 +165,7 @@ const CompactNavigation = () => {
                           <Link 
                             key={subItem.name}
                             to={subItem.path}
-                            className="block py-2 px-8 text-sm text-cv-dark"
+                            className="block py-2 px-8 text-sm text-cv-dark hover:bg-gray-100"
                             onClick={() => setMobileOpen(false)}
                           >
                             {subItem.name}
