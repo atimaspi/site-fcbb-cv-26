@@ -31,6 +31,7 @@ const DataManagement = () => {
     eventsData,
     referees,
     coaches,
+    operations,
     isLoading
   } = useBackendData();
 
