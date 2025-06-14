@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon, Clock, MapPin, Trophy, Filter, Download, Share2, Bell } from 'lucide-react';
-import { format, addDays, startOfMonth, endOfMonth, isSameDay } from 'date-fns';
+import { format, addDays, startOfMonth, endOfMonth, isSameDay, isValid } from 'date-fns';
 import { pt } from 'date-fns/locale';
 
 const CalendarioPage = () => {
@@ -105,7 +105,7 @@ const CalendarioPage = () => {
   const exportCalendar = () => {
     const calendarData = filteredJogos.map(jogo => ({
       title: `${jogo.equipaCasa} vs ${jogo.equipaFora}`,
-      date: format(jogo.data, 'yyyy-MM-dd'),
+      date: isValid(jogo.data) ? format(jogo.data, 'yyyy-MM-dd') : '',
       time: jogo.hora,
       location: `${jogo.pavilhao}, ${jogo.cidade}`,
       competition: jogo.competicao
@@ -121,22 +121,34 @@ const CalendarioPage = () => {
   };
 
   const shareGame = (jogo: any) => {
+    const formattedDate = isValid(jogo.data) ? format(jogo.data, 'dd/MM/yyyy') : 'Data inválida';
+    
     if (navigator.share) {
       navigator.share({
         title: `${jogo.equipaCasa} vs ${jogo.equipaFora}`,
-        text: `${jogo.competicao} - ${format(jogo.data, 'dd/MM/yyyy')} às ${jogo.hora}`,
+        text: `${jogo.competicao} - ${formattedDate} às ${jogo.hora}`,
         url: window.location.href
       });
     } else {
       navigator.clipboard.writeText(
-        `${jogo.equipaCasa} vs ${jogo.equipaFora} - ${format(jogo.data, 'dd/MM/yyyy')} às ${jogo.hora}`
+        `${jogo.equipaCasa} vs ${jogo.equipaFora} - ${formattedDate} às ${jogo.hora}`
       );
       alert('Link copiado para a área de transferência!');
     }
   };
 
   const getDaysWithGames = () => {
-    return jogosCalendario.map(jogo => jogo.data);
+    return jogosCalendario
+      .map(jogo => jogo.data)
+      .filter(date => isValid(date));
+  };
+
+  const safeFormat = (date: Date, formatString: string) => {
+    if (!isValid(date)) {
+      console.warn('Invalid date passed to format function:', date);
+      return 'Data inválida';
+    }
+    return format(date, formatString, { locale: pt });
   };
 
   return (
@@ -254,7 +266,7 @@ const CalendarioPage = () => {
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                         <div className="flex items-center">
                           <CalendarIcon className="w-4 h-4 mr-1" />
-                          {format(jogo.data, 'dd/MM/yyyy', { locale: pt })}
+                          {safeFormat(jogo.data, 'dd/MM/yyyy')}
                         </div>
                         <div className="flex items-center">
                           <Clock className="w-4 h-4 mr-1" />
@@ -323,11 +335,11 @@ const CalendarioPage = () => {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-4">
-                      Jogos em {format(selectedDate, 'dd/MM/yyyy', { locale: pt })}
+                      Jogos em {safeFormat(selectedDate, 'dd/MM/yyyy')}
                     </h3>
                     <div className="space-y-3">
                       {filteredJogos
-                        .filter(jogo => isSameDay(jogo.data, selectedDate))
+                        .filter(jogo => isValid(jogo.data) && isSameDay(jogo.data, selectedDate))
                         .map(jogo => (
                           <Card key={jogo.id} className="p-4">
                             <div className="flex justify-between items-center">
@@ -341,7 +353,7 @@ const CalendarioPage = () => {
                             </div>
                           </Card>
                         ))}
-                      {filteredJogos.filter(jogo => isSameDay(jogo.data, selectedDate)).length === 0 && (
+                      {filteredJogos.filter(jogo => isValid(jogo.data) && isSameDay(jogo.data, selectedDate)).length === 0 && (
                         <p className="text-gray-500">Nenhum jogo agendado para esta data.</p>
                       )}
                     </div>
@@ -357,12 +369,12 @@ const CalendarioPage = () => {
                 <div className="space-y-4">
                   {Array.from({ length: 7 }, (_, i) => {
                     const currentDate = addDays(selectedDate, i);
-                    const dayGames = filteredJogos.filter(jogo => isSameDay(jogo.data, currentDate));
+                    const dayGames = filteredJogos.filter(jogo => isValid(jogo.data) && isSameDay(jogo.data, currentDate));
                     
                     return (
                       <div key={i} className="border-l-4 border-cv-blue pl-4">
                         <h4 className="font-semibold text-lg">
-                          {format(currentDate, 'EEEE, dd/MM', { locale: pt })}
+                          {safeFormat(currentDate, 'EEEE, dd/MM')}
                         </h4>
                         {dayGames.length > 0 ? (
                           <div className="space-y-2 mt-2">
