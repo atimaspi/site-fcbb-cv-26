@@ -7,15 +7,9 @@ import { Calendar, User, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import PageLayout from './PageLayout';
-import { useEffect } from 'react';
 
 const NoticiasPage = () => {
-  const { publishedNews, newsLoading, refreshData } = useBackendData();
-
-  // Forçar atualização quando a página é carregada
-  useEffect(() => {
-    refreshData.news();
-  }, []);
+  const { publishedNews, newsLoading } = useBackendData();
 
   if (newsLoading) {
     return (
@@ -56,6 +50,7 @@ const NoticiasPage = () => {
                   src={noticia.featured_image_url} 
                   alt={noticia.title}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
                 />
               </div>
             )}
@@ -64,10 +59,12 @@ const NoticiasPage = () => {
                 <Badge variant="secondary" className="bg-cv-blue text-white">
                   {noticia.category}
                 </Badge>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Calendar className="w-4 h-4 mr-1" />
-                  {format(new Date(noticia.published_at), 'dd MMM, yyyy', { locale: ptBR })}
-                </div>
+                {noticia.published_at && (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Calendar className="w-4 h-4 mr-1" />
+                    {format(new Date(noticia.published_at), 'dd MMM, yyyy', { locale: ptBR })}
+                  </div>
+                )}
               </div>
               
               <h3 className="text-lg font-semibold mb-3 text-gray-900 line-clamp-2">

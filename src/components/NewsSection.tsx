@@ -5,19 +5,9 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { useEffect } from 'react';
 
 const NewsSection = () => {
-  const { publishedNews, newsLoading, refreshData } = useBackendData();
-
-  // Forçar atualização quando o componente é montado
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refreshData.news();
-    }, 30000); // Atualizar a cada 30 segundos
-
-    return () => clearInterval(interval);
-  }, [refreshData]);
+  const { publishedNews, newsLoading } = useBackendData();
 
   // Pegar apenas as 4 notícias mais recentes
   const recentNews = publishedNews.slice(0, 4);
@@ -89,6 +79,7 @@ const NewsSection = () => {
                   src={item.featured_image_url || "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format"} 
                   alt={item.title} 
                   className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
                 />
               </div>
               <div className="p-4">
