@@ -51,25 +51,23 @@ export const usePermissions = () => {
   const { user, isAdmin } = useAuth();
   const [userRole, setUserRole] = useState<UserRole>('user');
   const [isLoading, setIsLoading] = useState(false);
-  const [hasAttempted, setHasAttempted] = useState(false);
 
   const fetchUserRole = useCallback(async () => {
-    if (!user || isLoading || hasAttempted) {
+    if (!user || isLoading) {
       return;
     }
 
     setIsLoading(true);
     
     try {
-      // First check if user email is admin (fast check)
+      // Quick check by email first
       if (user.email === 'admin@fcbb.cv') {
-        console.log('Usuário identificado como admin pelo email');
+        console.log('Admin role detected by email');
         setUserRole('admin');
-        setHasAttempted(true);
         return;
       }
 
-      // Try to fetch role from database
+      // Try to fetch from database with error handling
       const { data, error } = await supabase
         .from('profiles')
         .select('role')
@@ -77,16 +75,20 @@ export const usePermissions = () => {
         .single();
 
       if (!error && data && data.role) {
-        console.log('Role do usuário obtida da base de dados:', data.role);
+        console.log('Role from database:', data.role);
         setUserRole(data.role as UserRole);
       } else {
-        console.log('Erro ao obter role ou perfil não encontrado:', error);
-        setUserRole('user');
+        console.log('Using fallback role determination');
+        // Fallback logic
+        if (user.email === 'admin@fcbb.cv' || isAdmin) {
+          setUserRole('admin');
+        } else {
+          setUserRole('user');
+        }
       }
     } catch (error: any) {
-      console.log('Erro ao verificar role, usando fallbacks:', error.message);
-      
-      // Fallback strategies
+      console.error('Error fetching user role:', error);
+      // Fallback logic
       if (user.email === 'admin@fcbb.cv' || isAdmin) {
         setUserRole('admin');
       } else {
@@ -94,33 +96,20 @@ export const usePermissions = () => {
       }
     } finally {
       setIsLoading(false);
-      setHasAttempted(true);
     }
-  }, [user, isAdmin, isLoading, hasAttempted]);
+  }, [user, isAdmin, isLoading]);
 
   useEffect(() => {
-    if (user && !hasAttempted) {
-      // Add a small delay to prevent rapid repeated calls
-      const timeout = setTimeout(() => {
-        fetchUserRole();
-      }, 100);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [user, fetchUserRole, hasAttempted]);
-
-  // Reset when user changes
-  useEffect(() => {
-    setHasAttempted(false);
-    setIsLoading(false);
-    if (!user) {
+    if (user) {
+      fetchUserRole();
+    } else {
       setUserRole('user');
     }
-  }, [user?.id]);
+  }, [user, fetchUserRole]);
 
   const getUserRole = (): UserRole => {
     // Use multiple fallback strategies
-    if (user?.email === 'admin@fcbb.cv' || isAdmin || userRole === 'admin') {
+    if (user?.email === 'admin@fcbb.cv' || isAdmin) {
       return 'admin';
     }
     return userRole;
@@ -130,7 +119,7 @@ export const usePermissions = () => {
     if (!user) return false;
     
     const currentRole = getUserRole();
-    console.log('Verificando permissão:', { resource, action, currentRole, userEmail: user.email });
+    console.log('Checking permission:', { resource, action, currentRole, userEmail: user.email });
     
     const permissions = ROLE_PERMISSIONS[currentRole] || [];
     
@@ -138,7 +127,7 @@ export const usePermissions = () => {
       permission => permission.resource === resource && permission.action === action
     );
     
-    console.log('Permissão concedida:', hasAccess);
+    console.log('Permission granted:', hasAccess);
     return hasAccess;
   };
 
@@ -156,7 +145,7 @@ export const usePermissions = () => {
 
   const canAccessAdminArea = (): boolean => {
     const canAccess = hasPermission('dashboard', 'view');
-    console.log('Pode aceder à área admin:', canAccess);
+    console.log('Can access admin area:', canAccess);
     return canAccess;
   };
 

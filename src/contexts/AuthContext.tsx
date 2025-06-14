@@ -31,7 +31,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Configurar listener de mudanças de autenticação
+    // Get initial session
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error getting initial session:', error);
+        } else {
+          setSession(session);
+          setUser(session?.user ?? null);
+          if (session?.user) {
+            await checkAdminStatus(session.user);
+          }
+        }
+      } catch (error) {
+        console.error('Error in getInitialSession:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getInitialSession();
+
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
@@ -39,170 +61,174 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Aguardar um pouco para garantir que o perfil foi criado
-          setTimeout(() => {
-            checkAdminStatus(session.user.id);
-          }, 1000);
+          await checkAdminStatus(session.user);
         } else {
           setIsAdmin(false);
         }
-        setLoading(false);
+        
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          setLoading(false);
+        }
       }
     );
-
-    // Verificar sessão existente
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        setTimeout(() => {
-          checkAdminStatus(session.user.id);
-        }, 1000);
-      }
-      setLoading(false);
-    });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkAdminStatus = async (userId: string) => {
+  const checkAdminStatus = async (user: User) => {
     try {
-      console.log('Verificando status de admin para:', userId);
-      
-      // Tentar múltiplas vezes em caso de delay na criação do perfil
-      let attempts = 0;
-      const maxAttempts = 5;
-      
-      while (attempts < maxAttempts) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', userId)
-          .single();
-
-        if (!error && data) {
-          console.log('Role do usuário:', data.role);
-          setIsAdmin(data.role === 'admin');
-          return;
-        } else if (attempts === maxAttempts - 1) {
-          console.log('Erro ao verificar role após várias tentativas:', error);
-          setIsAdmin(false);
-          return;
-        }
-        
-        attempts++;
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      // Quick check by email first
+      if (user.email === 'admin@fcbb.cv') {
+        console.log('Admin detected by email');
+        setIsAdmin(true);
+        return;
       }
+
+      // Try to fetch from profiles table with retry
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (retryCount < maxRetries) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+          if (!error && data) {
+            console.log('Role from database:', data.role);
+            setIsAdmin(data.role === 'admin');
+            return;
+          } else if (error.code === 'PGRST116') {
+            // Profile doesn't exist, create it
+            const role = user.email === 'admin@fcbb.cv' ? 'admin' : 'user';
+            
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert({
+                id: user.id,
+                full_name: user.user_metadata?.full_name || 'Utilizador',
+                role: role
+              });
+
+            if (!insertError) {
+              setIsAdmin(role === 'admin');
+              return;
+            }
+          }
+          
+          retryCount++;
+          if (retryCount < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        } catch (retryError) {
+          console.error('Retry error:', retryError);
+          retryCount++;
+          if (retryCount < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+      }
+
+      // Fallback to email check
+      console.log('Falling back to email check for admin status');
+      setIsAdmin(user.email === 'admin@fcbb.cv');
+      
     } catch (error) {
-      console.log('Erro ao verificar status de admin:', error);
-      setIsAdmin(false);
+      console.error('Error checking admin status:', error);
+      // Fallback to email check
+      setIsAdmin(user.email === 'admin@fcbb.cv');
     }
   };
 
   const createAdminUser = async (email: string, password: string, fullName: string) => {
-    console.log('Criando usuário admin:', email);
+    console.log('Creating admin user:', email);
     
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName
-          },
-          emailRedirectTo: redirectUrl
+          }
         }
       });
       
       if (error) {
-        console.log('Erro no registro:', error);
+        console.error('Error creating admin user:', error);
         return { error };
       }
 
-      if (data.user) {
-        console.log('Usuário criado, promovendo a admin:', data.user.id);
-        
-        // Aguardar um pouco para o trigger criar o perfil
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Promover o usuário a admin
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({ role: 'admin' })
-          .eq('id', data.user.id);
-        
-        if (profileError) {
-          console.log('Erro ao promover usuário a admin:', profileError);
-          return { error: profileError };
-        } else {
-          console.log('Usuário promovido a admin com sucesso');
-        }
-      }
-      
+      console.log('Admin user created successfully');
       return { error: null };
     } catch (err) {
-      console.log('Erro geral na criação:', err);
+      console.error('Exception creating admin user:', err);
       return { error: err };
     }
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    // Verificar se o usuário atual é admin
     if (!isAdmin) {
       return { error: { message: 'Apenas administradores podem registrar novos usuários' } };
     }
 
-    console.log('Admin criando novo usuário:', email);
+    console.log('Admin creating new user:', email);
     
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName
-          },
-          emailRedirectTo: redirectUrl
+          }
         }
       });
       
       if (error) {
-        console.log('Erro ao criar usuário:', error);
+        console.error('Error creating user:', error);
       } else {
-        console.log('Usuário criado com sucesso');
+        console.log('User created successfully');
       }
       
       return { error };
     } catch (err) {
-      console.log('Erro geral no signUp:', err);
+      console.error('Exception in signUp:', err);
       return { error: err };
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    console.log('Tentando fazer login:', email);
+    console.log('Attempting sign in:', email);
     
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    
-    if (error) {
-      console.log('Erro no login:', error);
-    } else {
-      console.log('Login realizado com sucesso');
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (error) {
+        console.error('Sign in error:', error);
+      } else {
+        console.log('Sign in successful');
+      }
+      
+      return { error };
+    } catch (err) {
+      console.error('Exception in signIn:', err);
+      return { error: err };
     }
-    
-    return { error };
   };
 
   const signOut = async () => {
-    console.log('Fazendo logout');
-    await supabase.auth.signOut();
+    console.log('Signing out');
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const value = {

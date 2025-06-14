@@ -36,19 +36,78 @@ const UserProfile = () => {
   }, [user]);
 
   const fetchProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user?.id)
-        .single();
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
 
-      if (error) throw error;
+    try {
+      setError('');
       
-      setProfile(data);
-      setFullName(data.full_name || '');
+      // Try to fetch profile with retry logic
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (retryCount < maxRetries) {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (error) {
+            if (error.code === 'PGRST116') {
+              // Profile doesn't exist, create it
+              const { data: newProfile, error: createError } = await supabase
+                .from('profiles')
+                .insert({
+                  id: user.id,
+                  full_name: user.user_metadata?.full_name || 'Utilizador',
+                  role: user.email === 'admin@fcbb.cv' ? 'admin' : 'user'
+                })
+                .select()
+                .single();
+
+              if (createError) throw createError;
+              
+              setProfile(newProfile);
+              setFullName(newProfile.full_name || '');
+              break;
+            } else {
+              throw error;
+            }
+          } else {
+            setProfile(data);
+            setFullName(data.full_name || '');
+            break;
+          }
+        } catch (retryError: any) {
+          retryCount++;
+          if (retryCount >= maxRetries) {
+            throw retryError;
+          }
+          // Wait before retry
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
     } catch (error: any) {
-      setError('Erro ao carregar perfil: ' + error.message);
+      console.error('Error fetching profile:', error);
+      
+      // Provide fallback profile data
+      const fallbackProfile = {
+        id: user.id,
+        full_name: user.user_metadata?.full_name || 'Utilizador',
+        role: user.email === 'admin@fcbb.cv' ? 'admin' : 'user',
+        updated_at: new Date().toISOString(),
+        avatar_url: null,
+        club_id: null,
+        regional_association_id: null
+      };
+      
+      setProfile(fallbackProfile);
+      setFullName(fallbackProfile.full_name || '');
+      setError('Algumas informações do perfil podem não estar atualizadas.');
     } finally {
       setLoading(false);
     }
@@ -56,6 +115,8 @@ const UserProfile = () => {
 
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.id) return;
+    
     setUpdating(true);
     setError('');
     setSuccess('');
@@ -63,18 +124,21 @@ const UserProfile = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ 
+        .upsert({ 
+          id: user.id,
           full_name: fullName,
           updated_at: new Date().toISOString()
-        })
-        .eq('id', user?.id);
+        }, {
+          onConflict: 'id'
+        });
 
       if (error) throw error;
       
       setSuccess('Perfil atualizado com sucesso!');
-      fetchProfile();
+      await fetchProfile();
     } catch (error: any) {
-      setError('Erro ao atualizar perfil: ' + error.message);
+      console.error('Error updating profile:', error);
+      setError('Erro ao atualizar perfil. Tente novamente mais tarde.');
     } finally {
       setUpdating(false);
     }
