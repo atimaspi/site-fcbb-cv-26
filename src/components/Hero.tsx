@@ -1,8 +1,9 @@
 
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, memo, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play, Calendar, Trophy, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 
 const Hero = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -10,7 +11,7 @@ const Hero = memo(() => {
   const slides = useMemo(() => [
     {
       id: 1,
-      image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1920&h=1080&q=80",
+      image: "https://images.unsplash.com/photo-1546519638-68e109498ffc",
       title: "Seleção Nacional conquista histórica vitória no AfroBasket",
       subtitle: "Cabo Verde marca presença no cenário internacional",
       description: "A nossa seleção nacional masculina alcança novo patamar competitivo com performance exemplar no AfroBasket 2024.",
@@ -19,7 +20,7 @@ const Hero = memo(() => {
     },
     {
       id: 2,
-      image: "https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?auto=format&fit=crop&w=1920&h=1080&q=80",
+      image: "https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4",
       title: "Liga Nacional 2024/25 arranca em grande",
       subtitle: "12 equipas disputam o título nacional",
       description: "A nova época da Liga Nacional promete ser emocionante com clubes renovados e jovens talentos em destaque.",
@@ -28,7 +29,7 @@ const Hero = memo(() => {
     },
     {
       id: 3,
-      image: "https://images.unsplash.com/photo-1552847661-dddc6d9e71ba?auto=format&fit=crop&w=1920&h=1080&q=80",
+      image: "https://images.unsplash.com/photo-1552847661-dddc6d9e71ba",
       title: "Desenvolvimento do Basquetebol Feminino",
       subtitle: "Programa especial de formação",
       description: "FCBB lança programa inovador para promover e desenvolver o basquetebol feminino em todas as ilhas.",
@@ -43,20 +44,22 @@ const Hero = memo(() => {
     { icon: Calendar, label: "Jogos por Época", value: "180+" }
   ], []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 6000);
-    return () => clearInterval(timer);
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
   }, [slides.length]);
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  }, [slides.length]);
+
+  const goToSlide = useCallback((index: number) => {
+    setCurrentSlide(index);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 6000);
+    return () => clearInterval(timer);
+  }, [nextSlide]);
 
   return (
     <section className="relative">
@@ -71,12 +74,15 @@ const Hero = memo(() => {
             }`}
           >
             <div className="relative h-full">
-              <img
-                src={slide.image}
+              <OptimizedImage
+                src={`${slide.image}?auto=format&fit=crop&w=1920&h=1080&q=75`}
                 alt={slide.title}
                 className="w-full h-full object-cover"
-                loading={index === 0 ? 'eager' : 'lazy'}
-                decoding="async"
+                width={1920}
+                height={1080}
+                priority={index === 0}
+                sizes="100vw"
+                quality={75}
               />
               <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               
@@ -129,7 +135,7 @@ const Hero = memo(() => {
           {slides.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentSlide(index)}
+              onClick={() => goToSlide(index)}
               className={`w-3 h-3 rounded-full transition-all ${
                 index === currentSlide ? 'bg-white' : 'bg-white bg-opacity-50'
               }`}

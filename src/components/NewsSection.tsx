@@ -20,28 +20,28 @@ const NewsSection = memo(() => {
       id: "1",
       title: "ABC vence a SuperTaça de Cabo Verde 2025",
       published_at: "2025-03-23T00:00:00Z",
-      featured_image_url: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format",
+      featured_image_url: "https://images.unsplash.com/photo-1546519638-68e109498ffc",
       category: "Competições"
     },
     {
       id: "2",
       title: "Seleção Nacional convoca 20 jogadores para o AfroBasket",
       published_at: "2025-03-20T00:00:00Z",
-      featured_image_url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2069&auto=format",
+      featured_image_url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23",
       category: "Seleções"
     },
     {
       id: "3",
       title: "Final Four da Liga Nacional em São Vicente",
       published_at: "2025-03-15T00:00:00Z",
-      featured_image_url: "https://images.unsplash.com/photo-1504450758481-7338eba7524a?q=80&w=2069&auto=format",
+      featured_image_url: "https://images.unsplash.com/photo-1504450758481-7338eba7524a",
       category: "Competições"
     },
     {
       id: "4",
       title: "Workshop para treinadores na Praia",
       published_at: "2025-03-10T00:00:00Z",
-      featured_image_url: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=1964&auto=format",
+      featured_image_url: "https://images.unsplash.com/photo-1519501025264-65ba15a82390",
       category: "Formação"
     }
   ], []);
@@ -76,15 +76,18 @@ const NewsSection = memo(() => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {newsToShow.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+          {newsToShow.map((item, index) => (
+            <article key={item.id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
               <div className="h-48 overflow-hidden">
                 <OptimizedImage
-                  src={item.featured_image_url || "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=2090&auto=format"}
+                  src={`${item.featured_image_url || "https://images.unsplash.com/photo-1546519638-68e109498ffc"}?auto=format&fit=crop&w=400&h=200&q=80`}
                   alt={item.title}
                   className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
                   width={400}
                   height={200}
+                  priority={index === 0}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  quality={80}
                 />
               </div>
               <div className="p-4">
@@ -93,12 +96,12 @@ const NewsSection = memo(() => {
                 </Badge>
                 <h3 className="font-bold text-lg mb-2 line-clamp-2">{item.title}</h3>
                 {item.published_at && (
-                  <p className="text-gray-600 text-sm">
+                  <time className="text-gray-600 text-sm" dateTime={item.published_at}>
                     {format(new Date(item.published_at), 'dd MMM, yyyy', { locale: ptBR })}
-                  </p>
+                  </time>
                 )}
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>

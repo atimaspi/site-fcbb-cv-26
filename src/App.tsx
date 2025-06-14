@@ -8,59 +8,93 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/ui/smooth-transition";
 import ResponsiveContainer from "@/components/ui/responsive-container";
+import CriticalCSS from "@/components/CriticalCSS";
+import { Suspense, lazy } from "react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-// Page imports
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import NoticiasPage from "./pages/NoticiasPage";
-import GaleriaPage from "./pages/GaleriaPage";
-import ContactoPage from "./pages/ContactoPage";
-import AreaReservadaPage from "./pages/AreaReservadaPage";
-import VideosPage from "./pages/VideosPage";
-import ImprensaPage from "./pages/ImprensaPage";
-import CalendarioPage from "./pages/competitions/CalendarioPage";
-import TransferenciasPage from "./pages/TransferenciasPage";
-import FibaLiveStatsPage from "./pages/FibaLiveStatsPage";
-import ResultadosAoVivoPage from "./pages/ResultadosAoVivoPage";
+// Lazy load all pages for better performance
+const Index = lazy(() => import("./pages/Index"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const NoticiasPage = lazy(() => import("./pages/NoticiasPage"));
+const GaleriaPage = lazy(() => import("./pages/GaleriaPage"));
+const ContactoPage = lazy(() => import("./pages/ContactoPage"));
+const AreaReservadaPage = lazy(() => import("./pages/AreaReservadaPage"));
+const VideosPage = lazy(() => import("./pages/VideosPage"));
+const ImprensaPage = lazy(() => import("./pages/ImprensaPage"));
+const CalendarioPage = lazy(() => import("./pages/competitions/CalendarioPage"));
+const TransferenciasPage = lazy(() => import("./pages/TransferenciasPage"));
+const FibaLiveStatsPage = lazy(() => import("./pages/FibaLiveStatsPage"));
+const ResultadosAoVivoPage = lazy(() => import("./pages/ResultadosAoVivoPage"));
 
-// New main pages to fix 404 issues
-import SobreFCBBPage from "./pages/SobreFCBBPage";
-import CompeticoesPage from "./pages/CompeticoesPage";
-import SelecoesPage from "./pages/SelecoesPage";
-import ClubesCompletePage from "./pages/ClubesCompletePage";
-import MultimediaPage from "./pages/MultimediaPage";
+// Main pages
+const SobreFCBBPage = lazy(() => import("./pages/SobreFCBBPage"));
+const CompeticoesPage = lazy(() => import("./pages/CompeticoesPage"));
+const SelecoesPage = lazy(() => import("./pages/SelecoesPage"));
+const ClubesCompletePage = lazy(() => import("./pages/ClubesCompletePage"));
+const MultimediaPage = lazy(() => import("./pages/MultimediaPage"));
 
 // Federation pages
-import MissaoVisaoPage from "./pages/federation/MissaoVisaoPage";
-import DirecaoPage from "./pages/federation/DirecaoPage";
-import HistoriaPage from "./pages/federation/HistoriaPage";
-import OrgaosSociaisPage from "./pages/federation/OrgaosSociaisPage";
-import EstatutosPage from "./pages/federation/EstatutosPage";
-import ContactosPage from "./pages/federation/ContactosPage";
+const MissaoVisaoPage = lazy(() => import("./pages/federation/MissaoVisaoPage"));
+const DirecaoPage = lazy(() => import("./pages/federation/DirecaoPage"));
+const HistoriaPage = lazy(() => import("./pages/federation/HistoriaPage"));
+const OrgaosSociaisPage = lazy(() => import("./pages/federation/OrgaosSociaisPage"));
+const EstatutosPage = lazy(() => import("./pages/federation/EstatutosPage"));
+const ContactosPage = lazy(() => import("./pages/federation/ContactosPage"));
 
 // Competitions pages
-import LigaNacionalPage from "./pages/competitions/LigaNacionalPage";
-import TacaPage from "./pages/competitions/TacaPage";
-import SuperTacaPage from "./pages/competitions/SuperTacaPage";
-import CompeticoesRegionaisPage from "./pages/competitions/CompeticoesRegionaisPage";
-import NacionalMasculinoPage from "./pages/competitions/NacionalMasculinoPage";
+const LigaNacionalPage = lazy(() => import("./pages/competitions/LigaNacionalPage"));
+const TacaPage = lazy(() => import("./pages/competitions/TacaPage"));
+const SuperTacaPage = lazy(() => import("./pages/competitions/SuperTacaPage"));
+const CompeticoesRegionaisPage = lazy(() => import("./pages/competitions/CompeticoesRegionaisPage"));
+const NacionalMasculinoPage = lazy(() => import("./pages/competitions/NacionalMasculinoPage"));
 
 // Teams pages
-import SelecaoMasculinaPage from "./pages/teams/SelecaoMasculinaPage";
-import SelecaoFemininaPage from "./pages/teams/SelecaoFemininaPage";
-import SelecoesJovensPage from "./pages/teams/SelecoesJovensPage";
+const SelecaoMasculinaPage = lazy(() => import("./pages/teams/SelecaoMasculinaPage"));
+const SelecaoFemininaPage = lazy(() => import("./pages/teams/SelecaoFemininaPage"));
+const SelecoesJovensPage = lazy(() => import("./pages/teams/SelecoesJovensPage"));
 
-// New feature pages
-import ClassificacoesPage from "./pages/ClassificacoesPage";
-import EstatisticasPage from "./pages/EstatisticasPage";
-import ResultadosPage from "./pages/ResultadosPage";
-import ArbitragemPage from "./pages/ArbitragemPage";
-import ClubesPage from "./pages/ClubesPage";
-import FormacaoPage from "./pages/FormacaoPage";
-import EventosPage from "./pages/EventosPage";
-import TransmissoesPage from "./pages/TransmissoesPage";
+// Feature pages
+const ClassificacoesPage = lazy(() => import("./pages/ClassificacoesPage"));
+const EstatisticasPage = lazy(() => import("./pages/EstatisticasPage"));
+const ResultadosPage = lazy(() => import("./pages/ResultadosPage"));
+const ArbitragemPage = lazy(() => import("./pages/ArbitragemPage"));
+const ClubesPage = lazy(() => import("./pages/ClubesPage"));
+const FormacaoPage = lazy(() => import("./pages/FormacaoPage"));
+const EventosPage = lazy(() => import("./pages/EventosPage"));
+const TransmissoesPage = lazy(() => import("./pages/TransmissoesPage"));
 
-const queryClient = new QueryClient();
+// Otimizar QueryClient para melhor performance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      gcTime: 10 * 60 * 1000, // 10 minutos
+      retry: (failureCount, error) => {
+        // Não fazer retry em erros 4xx
+        if (error && typeof error === 'object' && 'status' in error) {
+          const status = (error as any).status;
+          if (status >= 400 && status < 500) return false;
+        }
+        return failureCount < 2;
+      },
+      refetchOnWindowFocus: false, // Evitar refetches desnecessários
+    },
+  },
+});
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <LoadingSpinner size="lg" />
+  </div>
+);
+
+// Wrapper para Suspense com PageTransition
+const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<LoadingFallback />}>
+    <PageTransition>{children}</PageTransition>
+  </Suspense>
+);
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -68,102 +102,105 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/" element={<SuspenseWrapper><Index /></SuspenseWrapper>} />
         
-        {/* Main navigation routes - Fixing 404 issues */}
-        <Route path="/sobre" element={<PageTransition><SobreFCBBPage /></PageTransition>} />
-        <Route path="/competicoes" element={<PageTransition><CompeticoesPage /></PageTransition>} />
-        <Route path="/selecoes" element={<PageTransition><SelecoesPage /></PageTransition>} />
-        <Route path="/clubes" element={<PageTransition><ClubesCompletePage /></PageTransition>} />
-        <Route path="/multimedia" element={<PageTransition><MultimediaPage /></PageTransition>} />
+        {/* Main navigation routes */}
+        <Route path="/sobre" element={<SuspenseWrapper><SobreFCBBPage /></SuspenseWrapper>} />
+        <Route path="/competicoes" element={<SuspenseWrapper><CompeticoesPage /></SuspenseWrapper>} />
+        <Route path="/selecoes" element={<SuspenseWrapper><SelecoesPage /></SuspenseWrapper>} />
+        <Route path="/clubes" element={<SuspenseWrapper><ClubesCompletePage /></SuspenseWrapper>} />
+        <Route path="/multimedia" element={<SuspenseWrapper><MultimediaPage /></SuspenseWrapper>} />
         
-        {/* Federation routes - Both /federacao and /sobre paths */}
-        <Route path="/federacao/historia" element={<PageTransition><HistoriaPage /></PageTransition>} />
-        <Route path="/federacao/missao-visao" element={<PageTransition><MissaoVisaoPage /></PageTransition>} />
-        <Route path="/federacao/direcao" element={<PageTransition><DirecaoPage /></PageTransition>} />
-        <Route path="/federacao/orgaos-sociais" element={<PageTransition><OrgaosSociaisPage /></PageTransition>} />
-        <Route path="/federacao/estatutos" element={<PageTransition><EstatutosPage /></PageTransition>} />
-        <Route path="/federacao/contactos" element={<PageTransition><ContactosPage /></PageTransition>} />
+        {/* Federation routes */}
+        <Route path="/federacao/historia" element={<SuspenseWrapper><HistoriaPage /></SuspenseWrapper>} />
+        <Route path="/federacao/missao-visao" element={<SuspenseWrapper><MissaoVisaoPage /></SuspenseWrapper>} />
+        <Route path="/federacao/direcao" element={<SuspenseWrapper><DirecaoPage /></SuspenseWrapper>} />
+        <Route path="/federacao/orgaos-sociais" element={<SuspenseWrapper><OrgaosSociaisPage /></SuspenseWrapper>} />
+        <Route path="/federacao/estatutos" element={<SuspenseWrapper><EstatutosPage /></SuspenseWrapper>} />
+        <Route path="/federacao/contactos" element={<SuspenseWrapper><ContactosPage /></SuspenseWrapper>} />
         
-        {/* Sobre a FCBB routes (alternative paths) */}
-        <Route path="/sobre/historia" element={<PageTransition><HistoriaPage /></PageTransition>} />
-        <Route path="/sobre/missao-visao" element={<PageTransition><MissaoVisaoPage /></PageTransition>} />
-        <Route path="/sobre/direcao" element={<PageTransition><DirecaoPage /></PageTransition>} />
-        <Route path="/sobre/orgaos-sociais" element={<PageTransition><OrgaosSociaisPage /></PageTransition>} />
-        <Route path="/sobre/estatutos" element={<PageTransition><EstatutosPage /></PageTransition>} />
-        <Route path="/sobre/contactos" element={<PageTransition><ContactosPage /></PageTransition>} />
+        {/* Sobre a FCBB routes */}
+        <Route path="/sobre/historia" element={<SuspenseWrapper><HistoriaPage /></SuspenseWrapper>} />
+        <Route path="/sobre/missao-visao" element={<SuspenseWrapper><MissaoVisaoPage /></SuspenseWrapper>} />
+        <Route path="/sobre/direcao" element={<SuspenseWrapper><DirecaoPage /></SuspenseWrapper>} />
+        <Route path="/sobre/orgaos-sociais" element={<SuspenseWrapper><OrgaosSociaisPage /></SuspenseWrapper>} />
+        <Route path="/sobre/estatutos" element={<SuspenseWrapper><EstatutosPage /></SuspenseWrapper>} />
+        <Route path="/sobre/contactos" element={<SuspenseWrapper><ContactosPage /></SuspenseWrapper>} />
         
-        {/* Competitions routes - All paths covered */}
-        <Route path="/competicoes/liga-nacional" element={<PageTransition><LigaNacionalPage /></PageTransition>} />
-        <Route path="/competicoes/nacional-masculino" element={<PageTransition><NacionalMasculinoPage /></PageTransition>} />
-        <Route path="/competicoes/taca-de-cabo-verde" element={<PageTransition><TacaPage /></PageTransition>} />
-        <Route path="/competicoes/taca-cabo-verde" element={<PageTransition><TacaPage /></PageTransition>} />
-        <Route path="/competicoes/super-taca" element={<PageTransition><SuperTacaPage /></PageTransition>} />
-        <Route path="/competicoes/competicoes-regionais" element={<PageTransition><CompeticoesRegionaisPage /></PageTransition>} />
-        <Route path="/competicoes/calendario" element={<PageTransition><CalendarioPage /></PageTransition>} />
-        <Route path="/competicoes/classificacoes" element={<PageTransition><ClassificacoesPage /></PageTransition>} />
-        <Route path="/competicoes/resultados" element={<PageTransition><ResultadosPage /></PageTransition>} />
+        {/* Competitions routes */}
+        <Route path="/competicoes/liga-nacional" element={<SuspenseWrapper><LigaNacionalPage /></SuspenseWrapper>} />
+        <Route path="/competicoes/nacional-masculino" element={<SuspenseWrapper><NacionalMasculinoPage /></SuspenseWrapper>} />
+        <Route path="/competicoes/taca-de-cabo-verde" element={<SuspenseWrapper><TacaPage /></SuspenseWrapper>} />
+        <Route path="/competicoes/taca-cabo-verde" element={<SuspenseWrapper><TacaPage /></SuspenseWrapper>} />
+        <Route path="/competicoes/super-taca" element={<SuspenseWrapper><SuperTacaPage /></SuspenseWrapper>} />
+        <Route path="/competicoes/competicoes-regionais" element={<SuspenseWrapper><CompeticoesRegionaisPage /></SuspenseWrapper>} />
+        <Route path="/competicoes/calendario" element={<SuspenseWrapper><CalendarioPage /></SuspenseWrapper>} />
+        <Route path="/competicoes/classificacoes" element={<SuspenseWrapper><ClassificacoesPage /></SuspenseWrapper>} />
+        <Route path="/competicoes/resultados" element={<SuspenseWrapper><ResultadosPage /></SuspenseWrapper>} />
         
-        {/* Teams routes - All variations covered */}
-        <Route path="/selecoes/masculina" element={<PageTransition><SelecaoMasculinaPage /></PageTransition>} />
-        <Route path="/selecoes/senior-masculina" element={<PageTransition><SelecaoMasculinaPage /></PageTransition>} />
-        <Route path="/selecoes/feminina" element={<PageTransition><SelecaoFemininaPage /></PageTransition>} />
-        <Route path="/selecoes/senior-feminina" element={<PageTransition><SelecaoFemininaPage /></PageTransition>} />
-        <Route path="/selecoes/jovens" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
-        <Route path="/selecoes/sub-18-masculina" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
-        <Route path="/selecoes/sub-18-feminina" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
-        <Route path="/selecoes/sub-16-masculina" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
-        <Route path="/selecoes/sub-16-feminina" element={<PageTransition><SelecoesJovensPage /></PageTransition>} />
+        {/* Teams routes */}
+        <Route path="/selecoes/masculina" element={<SuspenseWrapper><SelecaoMasculinaPage /></SuspenseWrapper>} />
+        <Route path="/selecoes/senior-masculina" element={<SuspenseWrapper><SelecaoMasculinaPage /></SuspenseWrapper>} />
+        <Route path="/selecoes/feminina" element={<SuspenseWrapper><SelecaoFemininaPage /></SuspenseWrapper>} />
+        <Route path="/selecoes/senior-feminina" element={<SuspenseWrapper><SelecaoFemininaPage /></SuspenseWrapper>} />
+        <Route path="/selecoes/jovens" element={<SuspenseWrapper><SelecoesJovensPage /></SuspenseWrapper>} />
+        <Route path="/selecoes/sub-18-masculina" element={<SuspenseWrapper><SelecoesJovensPage /></SuspenseWrapper>} />
+        <Route path="/selecoes/sub-18-feminina" element={<SuspenseWrapper><SelecoesJovensPage /></SuspenseWrapper>} />
+        <Route path="/selecoes/sub-16-masculina" element={<SuspenseWrapper><SelecoesJovensPage /></SuspenseWrapper>} />
+        <Route path="/selecoes/sub-16-feminina" element={<SuspenseWrapper><SelecoesJovensPage /></SuspenseWrapper>} />
         
         {/* Additional feature routes */}
-        <Route path="/estatisticas" element={<PageTransition><EstatisticasPage /></PageTransition>} />
-        <Route path="/arbitragem" element={<PageTransition><ArbitragemPage /></PageTransition>} />
-        <Route path="/clubes-old" element={<PageTransition><ClubesPage /></PageTransition>} />
-        <Route path="/formacao" element={<PageTransition><FormacaoPage /></PageTransition>} />
-        <Route path="/eventos" element={<PageTransition><EventosPage /></PageTransition>} />
-        <Route path="/transmissoes" element={<PageTransition><TransmissoesPage /></PageTransition>} />
-        <Route path="/transferencias" element={<PageTransition><TransferenciasPage /></PageTransition>} />
+        <Route path="/estatisticas" element={<SuspenseWrapper><EstatisticasPage /></SuspenseWrapper>} />
+        <Route path="/arbitragem" element={<SuspenseWrapper><ArbitragemPage /></SuspenseWrapper>} />
+        <Route path="/clubes-old" element={<SuspenseWrapper><ClubesPage /></SuspenseWrapper>} />
+        <Route path="/formacao" element={<SuspenseWrapper><FormacaoPage /></SuspenseWrapper>} />
+        <Route path="/eventos" element={<SuspenseWrapper><EventosPage /></SuspenseWrapper>} />
+        <Route path="/transmissoes" element={<SuspenseWrapper><TransmissoesPage /></SuspenseWrapper>} />
+        <Route path="/transferencias" element={<SuspenseWrapper><TransferenciasPage /></SuspenseWrapper>} />
         
-        {/* Results and live data routes - All paths covered */}
-        <Route path="/resultados" element={<PageTransition><ResultadosPage /></PageTransition>} />
-        <Route path="/resultados/ao-vivo" element={<PageTransition><ResultadosAoVivoPage /></PageTransition>} />
-        <Route path="/resultados/fiba-livestats" element={<PageTransition><FibaLiveStatsPage /></PageTransition>} />
-        <Route path="/resultados/liga-nacional" element={<PageTransition><ResultadosPage /></PageTransition>} />
-        <Route path="/resultados/taca-cabo-verde" element={<PageTransition><ResultadosPage /></PageTransition>} />
+        {/* Results and live data routes */}
+        <Route path="/resultados" element={<SuspenseWrapper><ResultadosPage /></SuspenseWrapper>} />
+        <Route path="/resultados/ao-vivo" element={<SuspenseWrapper><ResultadosAoVivoPage /></SuspenseWrapper>} />
+        <Route path="/resultados/fiba-livestats" element={<SuspenseWrapper><FibaLiveStatsPage /></SuspenseWrapper>} />
+        <Route path="/resultados/liga-nacional" element={<SuspenseWrapper><ResultadosPage /></SuspenseWrapper>} />
+        <Route path="/resultados/taca-cabo-verde" element={<SuspenseWrapper><ResultadosPage /></SuspenseWrapper>} />
         
         {/* Multimedia routes */}
-        <Route path="/videos" element={<PageTransition><VideosPage /></PageTransition>} />
-        <Route path="/imprensa" element={<PageTransition><ImprensaPage /></PageTransition>} />
-        <Route path="/media/videos" element={<PageTransition><VideosPage /></PageTransition>} />
-        <Route path="/media/imprensa" element={<PageTransition><ImprensaPage /></PageTransition>} />
+        <Route path="/videos" element={<SuspenseWrapper><VideosPage /></SuspenseWrapper>} />
+        <Route path="/imprensa" element={<SuspenseWrapper><ImprensaPage /></SuspenseWrapper>} />
+        <Route path="/media/videos" element={<SuspenseWrapper><VideosPage /></SuspenseWrapper>} />
+        <Route path="/media/imprensa" element={<SuspenseWrapper><ImprensaPage /></SuspenseWrapper>} />
         
         {/* Main routes */}
-        <Route path="/noticias" element={<PageTransition><NoticiasPage /></PageTransition>} />
-        <Route path="/galeria" element={<PageTransition><GaleriaPage /></PageTransition>} />
-        <Route path="/area-reservada" element={<PageTransition><AreaReservadaPage /></PageTransition>} />
-        <Route path="/contacto" element={<PageTransition><ContactoPage /></PageTransition>} />
+        <Route path="/noticias" element={<SuspenseWrapper><NoticiasPage /></SuspenseWrapper>} />
+        <Route path="/galeria" element={<SuspenseWrapper><GaleriaPage /></SuspenseWrapper>} />
+        <Route path="/area-reservada" element={<SuspenseWrapper><AreaReservadaPage /></SuspenseWrapper>} />
+        <Route path="/contacto" element={<SuspenseWrapper><ContactoPage /></SuspenseWrapper>} />
         
         {/* Catch-all route */}
-        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        <Route path="*" element={<SuspenseWrapper><NotFound /></SuspenseWrapper>} />
       </Routes>
     </AnimatePresence>
   );
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <ResponsiveContainer maxWidth="full" padding="none">
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AnimatedRoutes />
-          </BrowserRouter>
-        </ResponsiveContainer>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+  <>
+    <CriticalCSS />
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <ResponsiveContainer maxWidth="full" padding="none">
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AnimatedRoutes />
+            </BrowserRouter>
+          </ResponsiveContainer>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </>
 );
 
 export default App;

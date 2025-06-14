@@ -1,4 +1,3 @@
-
 import { useApi } from '@/hooks/useApi';
 import { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -175,51 +174,115 @@ export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
   const queryClient = useQueryClient();
 
-  // Fetch dados das tabelas principais - com staleTime para reduzir re-fetches
+  // Otimizar configurações de cache para melhor performance
+  const cacheConfig = useMemo(() => ({
+    // Cache mais agressivo para dados que mudam raramente
+    static: {
+      staleTime: 15 * 60 * 1000, // 15 minutos
+      gcTime: 30 * 60 * 1000, // 30 minutos
+    },
+    // Cache moderado para dados que mudam ocasionalmente
+    moderate: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      gcTime: 10 * 60 * 1000, // 10 minutos
+    },
+    // Cache dinâmico para dados que mudam frequentemente
+    dynamic: {
+      staleTime: 2 * 60 * 1000, // 2 minutos
+      gcTime: 5 * 60 * 1000, // 5 minutos
+    }
+  }), []);
+
+  // Fetch dados das tabelas principais - otimizado para performance
   const { data: teamsData, isLoading: teamsLoading, error: teamsError, refetch: refetchTeams } = useFetch('teams', {
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos
+    ...cacheConfig.moderate,
+    select: (data) => data?.map(team => ({
+      id: team.id,
+      name: team.name,
+      category: team.category,
+      club_id: team.club_id,
+      division: team.division
+    }))
   });
+
   const { data: clubsData, isLoading: clubsLoading, refetch: refetchClubs } = useFetch('clubs', {
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    ...cacheConfig.static,
+    select: (data) => data?.map(club => ({
+      id: club.id,
+      name: club.name,
+      island: club.island,
+      founded_year: club.founded_year,
+      logo_url: club.logo_url,
+      status: club.status,
+      active: club.active
+    }))
   });
+
   const { data: competitionsData, isLoading: competitionsLoading, refetch: refetchCompetitions } = useFetch('championships', {
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    ...cacheConfig.moderate,
+    select: (data) => data?.map(comp => ({
+      id: comp.id,
+      name: comp.name,
+      type: comp.type,
+      season: comp.season,
+      status: comp.status,
+      start_date: comp.start_date,
+      end_date: comp.end_date
+    }))
   });
+
   const { data: gamesData, isLoading: gamesLoading, refetch: refetchGames } = useFetch('games', {
-    staleTime: 2 * 60 * 1000, // 2 minutos para jogos
-    gcTime: 5 * 60 * 1000,
+    ...cacheConfig.dynamic,
+    select: (data) => data?.map(game => ({
+      id: game.id,
+      competition_id: game.competition_id,
+      home_team_id: game.home_team_id,
+      away_team_id: game.away_team_id,
+      scheduled_date: game.scheduled_date,
+      venue: game.venue,
+      home_score: game.home_score,
+      away_score: game.away_score,
+      status: game.status,
+      round: game.round
+    }))
   });
+
   const { data: playersData, isLoading: playersLoading, refetch: refetchPlayers } = useFetch('players', {
-    staleTime: 10 * 60 * 1000, // 10 minutos
-    gcTime: 20 * 60 * 1000,
+    ...cacheConfig.static,
+    select: (data) => data?.map(player => ({
+      id: player.id,
+      first_name: player.first_name,
+      last_name: player.last_name,
+      team_id: player.team_id,
+      jersey_number: player.jersey_number,
+      position: player.position,
+      status: player.status,
+      active: player.active
+    }))
   });
+
   const { data: newsData, isLoading: newsLoading, refetch: refetchNews } = useFetch('news', {
-    staleTime: 3 * 60 * 1000, // 3 minutos para notícias
-    gcTime: 10 * 60 * 1000,
+    ...cacheConfig.dynamic,
+    select: (data) => data?.map(news => ({
+      id: news.id,
+      title: news.title,
+      content: news.content,
+      excerpt: news.excerpt,
+      featured_image_url: news.featured_image_url,
+      category: news.category,
+      published: news.published,
+      published_at: news.published_at,
+      status: news.status,
+      author: news.author,
+      featured: news.featured
+    }))
   });
-  const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useFetch('events', {
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
-  const { data: refereesData, isLoading: refereesLoading, refetch: refetchReferees } = useFetch('referees', {
-    staleTime: 10 * 60 * 1000,
-    gcTime: 20 * 60 * 1000,
-  });
-  const { data: coachesData, isLoading: coachesLoading, refetch: refetchCoaches } = useFetch('coaches', {
-    staleTime: 10 * 60 * 1000,
-    gcTime: 20 * 60 * 1000,
-  });
-  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading, refetch: refetchRegionalAssociations } = useFetch('regional_associations', {
-    staleTime: 15 * 60 * 1000, // 15 minutos
-    gcTime: 30 * 60 * 1000,
-  });
-  const { data: federationsData, isLoading: federationsLoading, refetch: refetchFederations } = useFetch('federations', {
-    staleTime: 15 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-  });
+
+  const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useFetch('events', cacheConfig.moderate);
+  const { data: refereesData, isLoading: refereesLoading, refetch: refetchReferees } = useFetch('referees', cacheConfig.static);
+  const { data: coachesData, isLoading: coachesLoading, refetch: refetchCoaches } = useFetch('coaches', cacheConfig.static);
+  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading, refetch: refetchRegionalAssociations } = useFetch('regional_associations', cacheConfig.static);
+  const { data: federationsData, isLoading: federationsLoading, refetch: refetchFederations } = useFetch('federations', cacheConfig.static);
 
   // Arrays de dados processados com useMemo para evitar re-computação desnecessária
   const teams: Team[] = useMemo(() => {
@@ -266,32 +329,39 @@ export const useBackendData = () => {
     return safeArrayCast<Federation>(federationsData, ['id', 'name']);
   }, [federationsData]);
 
-  // Computed properties for backward compatibility - otimizadas com useMemo
+  // Computed properties otimizadas com useMemo
   const publishedNews = useMemo(() => {
     return news
       .filter(item => item.published === true || item.status === 'published')
       .sort((a, b) => {
         if (!a.published_at || !b.published_at) return 0;
         return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
-      });
+      })
+      .slice(0, 20); // Limitar a 20 notícias para performance
   }, [news]);
 
   const activeEvents = useMemo(() => {
-    return events.filter(event => event.status === 'active' || !event.status);
+    return events
+      .filter(event => event.status === 'active' || !event.status)
+      .slice(0, 10); // Limitar a 10 eventos para performance
   }, [events]);
 
   const recentGames = useMemo(() => {
     return games
       .filter(game => game.status === 'finalizado')
       .sort((a, b) => new Date(b.scheduled_date).getTime() - new Date(a.scheduled_date).getTime())
-      .slice(0, 5);
+      .slice(0, 10); // Limitar a 10 jogos para performance
   }, [games]);
 
   const upcomingGames = useMemo(() => {
+    const now = new Date();
     return games
-      .filter(game => game.status === 'agendado' || new Date(game.scheduled_date) > new Date())
+      .filter(game => {
+        const gameDate = new Date(game.scheduled_date);
+        return game.status === 'agendado' || gameDate > now;
+      })
       .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
-      .slice(0, 5);
+      .slice(0, 10); // Limitar a 10 jogos para performance
   }, [games]);
 
   // Função para forçar atualização de dados específicos
@@ -439,10 +509,10 @@ export const useBackendData = () => {
     newsData,
     eventsData,
 
-    // Loading states
-    isLoading: teamsLoading || clubsLoading || competitionsLoading || gamesLoading || 
-               playersLoading || newsLoading || eventsLoading || refereesLoading ||
-               coachesLoading || regionalAssociationsLoading || federationsLoading,
+    // Loading states - otimizado para mostrar loading apenas quando necessário
+    isLoading: (teamsLoading && !teams.length) || 
+               (clubsLoading && !clubs.length) || 
+               (newsLoading && !news.length),
 
     // Individual loading states
     teamsLoading,
