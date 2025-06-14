@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,6 @@ const ClubsManagement = () => {
   const [editingClub, setEditingClub] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
-    abbreviation: '',
     city: '',
     island: '',
     founded_year: '',
@@ -97,7 +95,6 @@ const ClubsManagement = () => {
     setEditingClub(club);
     setFormData({
       name: club.name || '',
-      abbreviation: club.abbreviation || '',
       city: club.city || '',
       island: club.island || '',
       founded_year: club.founded_year?.toString() || '',
@@ -136,7 +133,6 @@ const ClubsManagement = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      abbreviation: '',
       city: '',
       island: '',
       founded_year: '',
@@ -200,19 +196,6 @@ const ClubsManagement = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="abbreviation">Abreviação</Label>
-                  <Input
-                    id="abbreviation"
-                    value={formData.abbreviation}
-                    onChange={(e) => handleInputChange('abbreviation', e.target.value)}
-                    maxLength={10}
-                    placeholder="Ex: SCP"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
                   <Label htmlFor="city">Cidade *</Label>
                   <Input
                     id="city"
@@ -222,6 +205,9 @@ const ClubsManagement = () => {
                     placeholder="Ex: Praia"
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="island">Ilha *</Label>
                   <Select value={formData.island} onValueChange={(value) => handleInputChange('island', value)}>
@@ -235,9 +221,6 @@ const ClubsManagement = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="founded_year">Ano de Fundação</Label>
                   <Input
@@ -250,6 +233,9 @@ const ClubsManagement = () => {
                     placeholder="Ex: 1985"
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="status">Status</Label>
                   <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
@@ -263,9 +249,6 @@ const ClubsManagement = () => {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -276,6 +259,9 @@ const ClubsManagement = () => {
                     placeholder="clube@email.com"
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="phone">Telefone</Label>
                   <Input
@@ -285,17 +271,16 @@ const ClubsManagement = () => {
                     placeholder="Ex: +238 123 45 67"
                   />
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="website">Website</Label>
-                <Input
-                  id="website"
-                  type="url"
-                  value={formData.website}
-                  onChange={(e) => handleInputChange('website', e.target.value)}
-                  placeholder="https://www.clubeexemplo.cv"
-                />
+                <div>
+                  <Label htmlFor="website">Website</Label>
+                  <Input
+                    id="website"
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => handleInputChange('website', e.target.value)}
+                    placeholder="https://www.clubeexemplo.cv"
+                  />
+                </div>
               </div>
 
               <div>
@@ -422,7 +407,6 @@ const ClubsManagement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Abreviação</TableHead>
                 <TableHead>Cidade/Ilha</TableHead>
                 <TableHead>Fundação</TableHead>
                 <TableHead>Status</TableHead>
@@ -433,7 +417,6 @@ const ClubsManagement = () => {
               {teams.map((club: any) => (
                 <TableRow key={club.id}>
                   <TableCell className="font-medium">{club.name}</TableCell>
-                  <TableCell>{club.abbreviation || '—'}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-1">
                       <MapPin className="h-3 w-3 text-gray-400" />
