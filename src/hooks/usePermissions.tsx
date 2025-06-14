@@ -2,6 +2,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { DetailedRole } from '@/components/auth/RoleSelector';
 
 export type UserRole = 'admin' | 'user' | 'moderator' | 'editor';
 
@@ -10,7 +11,7 @@ export interface Permission {
   action: string;
 }
 
-const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
+const DETAILED_ROLE_PERMISSIONS: Record<DetailedRole, Permission[]> = {
   admin: [
     { resource: 'news', action: 'create' },
     { resource: 'news', action: 'edit' },
@@ -37,6 +38,36 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     { resource: 'dashboard', action: 'view' },
   ],
   moderator: [
+    { resource: 'news', action: 'edit' },
+    { resource: 'news', action: 'view' },
+    { resource: 'events', action: 'edit' },
+    { resource: 'events', action: 'view' },
+    { resource: 'dashboard', action: 'view' },
+  ],
+  treinador: [
+    { resource: 'news', action: 'view' },
+    { resource: 'events', action: 'view' },
+    { resource: 'dashboard', action: 'view' },
+    { resource: 'teams', action: 'edit' },
+    { resource: 'players', action: 'edit' },
+  ],
+  arbitro: [
+    { resource: 'news', action: 'view' },
+    { resource: 'events', action: 'view' },
+    { resource: 'dashboard', action: 'view' },
+    { resource: 'games', action: 'edit' },
+    { resource: 'referees', action: 'view' },
+  ],
+  dirigente: [
+    { resource: 'news', action: 'view' },
+    { resource: 'events', action: 'view' },
+    { resource: 'dashboard', action: 'view' },
+    { resource: 'clubs', action: 'edit' },
+    { resource: 'teams', action: 'view' },
+  ],
+  jornalista: [
+    { resource: 'news', action: 'create' },
+    { resource: 'news', action: 'edit' },
     { resource: 'news', action: 'view' },
     { resource: 'events', action: 'view' },
     { resource: 'dashboard', action: 'view' },
@@ -49,7 +80,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 
 export const usePermissions = () => {
   const { user, isAdmin } = useAuth();
-  const [userRole, setUserRole] = useState<UserRole>('user');
+  const [userRole, setUserRole] = useState<DetailedRole>('user');
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchUserRole = useCallback(async () => {
@@ -76,7 +107,7 @@ export const usePermissions = () => {
 
       if (!error && data && data.role) {
         console.log('Role from database:', data.role);
-        setUserRole(data.role as UserRole);
+        setUserRole(data.role as DetailedRole);
       } else {
         console.log('Using fallback role determination');
         // Fallback logic
@@ -107,7 +138,7 @@ export const usePermissions = () => {
     }
   }, [user, fetchUserRole]);
 
-  const getUserRole = (): UserRole => {
+  const getUserRole = (): DetailedRole => {
     // Use multiple fallback strategies
     if (user?.email === 'admin@fcbb.cv' || isAdmin) {
       return 'admin';
@@ -121,7 +152,7 @@ export const usePermissions = () => {
     const currentRole = getUserRole();
     console.log('Checking permission:', { resource, action, currentRole, userEmail: user.email });
     
-    const permissions = ROLE_PERMISSIONS[currentRole] || [];
+    const permissions = DETAILED_ROLE_PERMISSIONS[currentRole] || [];
     
     const hasAccess = permissions.some(
       permission => permission.resource === resource && permission.action === action

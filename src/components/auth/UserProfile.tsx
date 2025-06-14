@@ -9,11 +9,12 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { User, LogOut } from 'lucide-react';
+import { ROLE_LABELS, DetailedRole } from './RoleSelector';
 
 interface Profile {
   id: string;
   full_name: string | null;
-  role: string;
+  role: DetailedRole;
   updated_at: string | null;
   avatar_url: string | null;
   club_id: string | null;
@@ -44,58 +45,58 @@ const UserProfile = () => {
     try {
       setError('');
       
-      // Try to fetch profile with retry logic
-      let retryCount = 0;
-      const maxRetries = 3;
-      
-      while (retryCount < maxRetries) {
-        try {
-          const { data, error } = await supabase
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // Profile doesn't exist, create it
+          const defaultRole: DetailedRole = user.email === 'admin@fcbb.cv' ? 'admin' : 'user';
+          
+          const { data: newProfile, error: createError } = await supabase
             .from('profiles')
-            .select('*')
-            .eq('id', user.id)
+            .insert({
+              id: user.id,
+              full_name: user.user_metadata?.full_name || 'Utilizador',
+              role: defaultRole
+            })
+            .select()
             .single();
 
-          if (error) {
-            if (error.code === 'PGRST116') {
-              // Profile doesn't exist, create it
-              const { data: newProfile, error: createError } = await supabase
-                .from('profiles')
-                .insert({
-                  id: user.id,
-                  full_name: user.user_metadata?.full_name || 'Utilizador',
-                  role: user.email === 'admin@fcbb.cv' ? 'admin' : 'user'
-                })
-                .select()
-                .single();
-
-              if (createError) throw createError;
-              
-              setProfile(newProfile);
-              setFullName(newProfile.full_name || '');
-              break;
-            } else {
-              throw error;
-            }
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            // Create fallback profile
+            const fallbackProfile: Profile = {
+              id: user.id,
+              full_name: user.user_metadata?.full_name || 'Utilizador',
+              role: defaultRole,
+              updated_at: new Date().toISOString(),
+              avatar_url: null,
+              club_id: null,
+              regional_association_id: null
+            };
+            setProfile(fallbackProfile);
+            setFullName(fallbackProfile.full_name || '');
+            setError('Perfil criado localmente. Algumas funcionalidades podem estar limitadas.');
           } else {
-            setProfile(data);
-            setFullName(data.full_name || '');
-            break;
+            setProfile(newProfile);
+            setFullName(newProfile.full_name || '');
           }
-        } catch (retryError: any) {
-          retryCount++;
-          if (retryCount >= maxRetries) {
-            throw retryError;
-          }
-          // Wait before retry
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        } else {
+          throw error;
         }
+      } else {
+        setProfile(data);
+        setFullName(data.full_name || '');
       }
     } catch (error: any) {
       console.error('Error fetching profile:', error);
       
       // Provide fallback profile data
-      const fallbackProfile = {
+      const fallbackProfile: Profile = {
         id: user.id,
         full_name: user.user_metadata?.full_name || 'Utilizador',
         role: user.email === 'admin@fcbb.cv' ? 'admin' : 'user',
@@ -107,7 +108,7 @@ const UserProfile = () => {
       
       setProfile(fallbackProfile);
       setFullName(fallbackProfile.full_name || '');
-      setError('Algumas informações do perfil podem não estar atualizadas.');
+      setError('Operando em modo offline. Conecte-se à internet para sincronizar dados.');
     } finally {
       setLoading(false);
     }
@@ -127,7 +128,7 @@ const UserProfile = () => {
         .upsert({ 
           id: user.id,
           full_name: fullName,
-          role: profile.role, // Include the current role
+          role: profile.role,
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'id'
@@ -139,7 +140,7 @@ const UserProfile = () => {
       await fetchProfile();
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      setError('Erro ao atualizar perfil. Tente novamente mais tarde.');
+      setError('Erro ao atualizar perfil. Verifique sua conexão.');
     } finally {
       setUpdating(false);
     }
@@ -170,7 +171,9 @@ const UserProfile = () => {
             </div>
             <div>
               <Label className="text-sm font-medium text-gray-500">Função</Label>
-              <p className="mt-1 text-sm text-gray-900 capitalize">{profile?.role}</p>
+              <p className="mt-1 text-sm text-gray-900">
+                {profile?.role ? ROLE_LABELS[profile.role] : 'Utilizador'}
+              </p>
             </div>
           </div>
 
