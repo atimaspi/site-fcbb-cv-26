@@ -2,14 +2,13 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Plus, Edit, Trash2, Building, Globe, Calendar } from 'lucide-react';
+import { Plus, Building } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import FederationForm from './federations/FederationForm';
+import FederationsTable from './federations/FederationsTable';
 
 const FederationsManagement = () => {
   const { federations, federationsLoading, operations } = useBackendData();
@@ -156,108 +155,13 @@ const FederationsManagement = () => {
                 Preencha as informações da federação
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Nome da Federação *</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    required
-                    placeholder="Ex: Federação Caboverdiana de Basquetebol"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="acronym">Acrónimo</Label>
-                  <Input
-                    id="acronym"
-                    value={formData.acronym}
-                    onChange={(e) => handleInputChange('acronym', e.target.value)}
-                    placeholder="Ex: FCBB"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="contact_email">Email de Contacto</Label>
-                  <Input
-                    id="contact_email"
-                    type="email"
-                    value={formData.contact_email}
-                    onChange={(e) => handleInputChange('contact_email', e.target.value)}
-                    placeholder="federacao@exemplo.com"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="contact_phone">Telefone de Contacto</Label>
-                  <Input
-                    id="contact_phone"
-                    value={formData.contact_phone}
-                    onChange={(e) => handleInputChange('contact_phone', e.target.value)}
-                    placeholder="+238 123 456 789"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    id="website"
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => handleInputChange('website', e.target.value)}
-                    placeholder="https://federacao.exemplo.com"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="foundation_date">Data de Fundação</Label>
-                  <Input
-                    id="foundation_date"
-                    type="date"
-                    value={formData.foundation_date}
-                    onChange={(e) => handleInputChange('foundation_date', e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="address">Endereço</Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    placeholder="Endereço da sede"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="logo_url">URL do Logo</Label>
-                  <Input
-                    id="logo_url"
-                    type="url"
-                    value={formData.logo_url}
-                    onChange={(e) => handleInputChange('logo_url', e.target.value)}
-                    placeholder="https://exemplo.com/logo.png"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-4">
-                <Button type="submit" className="flex-1 bg-cv-blue hover:bg-blue-700">
-                  {editingFederation ? 'Atualizar' : 'Criar'} Federação
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </form>
+            <FederationForm
+              formData={formData}
+              isEditing={!!editingFederation}
+              onInputChange={handleInputChange}
+              onSubmit={handleSubmit}
+              onCancel={() => setIsDialogOpen(false)}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -270,67 +174,11 @@ const FederationsManagement = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Acrónimo</TableHead>
-                <TableHead>Contacto</TableHead>
-                <TableHead>Website</TableHead>
-                <TableHead>Fundação</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {federations.map((federation: any) => (
-                <TableRow key={federation.id}>
-                  <TableCell className="font-medium">{federation.name}</TableCell>
-                  <TableCell>{federation.acronym || '—'}</TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      {federation.contact_email && <div>{federation.contact_email}</div>}
-                      {federation.contact_phone && <div>{federation.contact_phone}</div>}
-                      {!federation.contact_email && !federation.contact_phone && '—'}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {federation.website ? (
-                      <a href={federation.website} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:underline">
-                        <Globe className="h-3 w-3 mr-1" />
-                        Website
-                      </a>
-                    ) : '—'}
-                  </TableCell>
-                  <TableCell>
-                    {federation.foundation_date ? (
-                      <div className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1 text-gray-400" />
-                        {new Date(federation.foundation_date).toLocaleDateString('pt-PT')}
-                      </div>
-                    ) : '—'}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleEdit(federation)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleDelete(federation.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <FederationsTable
+            federations={federations}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </CardContent>
       </Card>
     </div>
