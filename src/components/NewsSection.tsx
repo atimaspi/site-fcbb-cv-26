@@ -5,9 +5,19 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useEffect } from 'react';
 
 const NewsSection = () => {
-  const { publishedNews, newsLoading } = useBackendData();
+  const { publishedNews, newsLoading, refreshData } = useBackendData();
+
+  // Forçar atualização quando o componente é montado
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshData.news();
+    }, 30000); // Atualizar a cada 30 segundos
+
+    return () => clearInterval(interval);
+  }, [refreshData]);
 
   // Pegar apenas as 4 notícias mais recentes
   const recentNews = publishedNews.slice(0, 4);
@@ -67,7 +77,7 @@ const NewsSection = () => {
         <div className="flex justify-between items-center mb-6">
           <h2 className="section-title">Últimas Notícias</h2>
           <a href="/noticias" className="flex items-center text-cv-blue hover:text-blue-700">
-            Ver todas <ArrowRight className="ml-1 w-4 h-4" />
+            Ver todas <ArrowRight className="ml-1 w-4 w-4" />
           </a>
         </div>
         

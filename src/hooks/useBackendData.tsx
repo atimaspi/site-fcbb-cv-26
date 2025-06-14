@@ -1,6 +1,6 @@
-
 import { useApi } from '@/hooks/useApi';
 import { useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface Team {
   id: string;
@@ -125,16 +125,17 @@ function safeArrayCast<T>(data: any, requiredFields: string[]): T[] {
 
 export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
+  const queryClient = useQueryClient();
 
-  // Fetch dados com cache otimizado
-  const { data: teamsData, isLoading: teamsLoading, error: teamsError } = useFetch('teams');
-  const { data: competitionsData, isLoading: competitionsLoading } = useFetch('competitions');
-  const { data: gamesData, isLoading: gamesLoading } = useFetch('games');
-  const { data: playersData, isLoading: playersLoading } = useFetch('players');
-  const { data: newsData, isLoading: newsLoading } = useFetch('news');
-  const { data: eventsData, isLoading: eventsLoading } = useFetch('events');
-  const { data: refereesData, isLoading: refereesLoading } = useFetch('referees');
-  const { data: coachesData, isLoading: coachesLoading } = useFetch('coaches');
+  // Fetch dados com cache otimizado - reduzir stale time para refletir mudanças mais rapidamente
+  const { data: teamsData, isLoading: teamsLoading, error: teamsError, refetch: refetchTeams } = useFetch('teams');
+  const { data: competitionsData, isLoading: competitionsLoading, refetch: refetchCompetitions } = useFetch('competitions');
+  const { data: gamesData, isLoading: gamesLoading, refetch: refetchGames } = useFetch('games');
+  const { data: playersData, isLoading: playersLoading, refetch: refetchPlayers } = useFetch('players');
+  const { data: newsData, isLoading: newsLoading, refetch: refetchNews } = useFetch('news');
+  const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useFetch('events');
+  const { data: refereesData, isLoading: refereesLoading, refetch: refetchReferees } = useFetch('referees');
+  const { data: coachesData, isLoading: coachesLoading, refetch: refetchCoaches } = useFetch('coaches');
 
   // Arrays de dados processados
   const teams: Team[] = useMemo(() => {
@@ -186,7 +187,7 @@ export const useBackendData = () => {
 
   const publishedNews = useMemo(() => {
     return news
-      .filter(newsItem => newsItem.status === 'publicado')
+      .filter(newsItem => newsItem.status === 'publicado' || newsItem.status === 'published')
       .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
   }, [news]);
 
@@ -196,7 +197,38 @@ export const useBackendData = () => {
       .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
   }, [events]);
 
-  // Operações CRUD
+  // Função para forçar atualização de dados específicos
+  const refreshData = {
+    news: () => {
+      queryClient.invalidateQueries({ queryKey: ['news'] });
+      refetchNews();
+    },
+    events: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      refetchEvents();
+    },
+    teams: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      refetchTeams();
+    },
+    games: () => {
+      queryClient.invalidateQueries({ queryKey: ['games'] });
+      refetchGames();
+    },
+    all: () => {
+      queryClient.invalidateQueries();
+      refetchNews();
+      refetchEvents();
+      refetchTeams();
+      refetchGames();
+      refetchCompetitions();
+      refetchPlayers();
+      refetchReferees();
+      refetchCoaches();
+    }
+  };
+
+  // Operações CRUD com invalidação automática
   const operations = {
     teams: {
       create: useCreate('teams'),
@@ -272,6 +304,9 @@ export const useBackendData = () => {
     coachesLoading,
 
     // CRUD operations
-    operations
+    operations,
+
+    // Refresh functions
+    refreshData
   };
 };

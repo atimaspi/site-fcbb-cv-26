@@ -7,9 +7,15 @@ import { Calendar, User, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import PageLayout from './PageLayout';
+import { useEffect } from 'react';
 
 const NoticiasPage = () => {
-  const { publishedNews, newsLoading } = useBackendData();
+  const { publishedNews, newsLoading, refreshData } = useBackendData();
+
+  // Forçar atualização quando a página é carregada
+  useEffect(() => {
+    refreshData.news();
+  }, []);
 
   if (newsLoading) {
     return (
