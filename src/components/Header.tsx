@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
@@ -74,7 +73,7 @@ const Header = () => {
   }, [location.pathname]);
 
   return (
-    <header ref={headerRef} className="bg-white shadow-md relative z-50" role="banner">
+    <header ref={headerRef} className="bg-white shadow-sm relative z-50" role="banner">
       {/* Skip navigation link for screen readers */}
       <a 
         href="#main-content" 
@@ -96,14 +95,14 @@ const Header = () => {
         />
 
         {/* Mobile menu button */}
-        <div className="lg:hidden flex justify-end py-3">
+        <div className="lg:hidden flex justify-end py-2">
           <AccessibleButton
             variant="ghost"
             size="sm"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             ariaLabel={mobileMenuOpen ? "Fechar menu de navegação" : "Abrir menu de navegação"}
-            icon={mobileMenuOpen ? <X /> : <Menu />}
-            className="p-2"
+            icon={mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            className="p-1"
           />
         </div>
       </div>
