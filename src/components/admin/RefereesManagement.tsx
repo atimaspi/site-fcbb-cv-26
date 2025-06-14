@@ -10,14 +10,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Shield, Phone, Mail, MapPin } from 'lucide-react';
+import { Plus, Edit, Trash2, Shield, Phone, Mail, MapPin, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const RefereesManagement = () => {
   const { referees, refereesLoading, operations } = useBackendData();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReferee, setEditingReferee] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     license_number: '',
@@ -35,30 +37,73 @@ const RefereesManagement = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const validateForm = () => {
+    if (!formData.name?.trim()) {
+      toast({
+        title: "Erro de Validação",
+        description: "Nome é obrigatório.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    
+    if (!formData.category) {
+      toast({
+        title: "Erro de Validação",
+        description: "Categoria é obrigatória.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    
+    if (!formData.island) {
+      toast({
+        title: "Erro de Validação",
+        description: "Ilha é obrigatória.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast({
+        title: "Erro de Validação",
+        description: "Email deve ter um formato válido.",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.category || !formData.island) {
-      toast({
-        title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios.",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    
     try {
+      const dataToSubmit = {
+        ...formData,
+        name: formData.name.trim(),
+        license_number: formData.license_number?.trim() || null,
+        phone: formData.phone?.trim() || null,
+        email: formData.email?.trim() || null,
+      };
+
       if (editingReferee) {
         await operations.referees.update.mutateAsync({ 
           id: editingReferee.id, 
-          data: formData 
+          data: dataToSubmit 
         });
         toast({
           title: "Sucesso",
           description: "Árbitro atualizado com sucesso!"
         });
       } else {
-        await operations.referees.create.mutateAsync(formData);
+        await operations.referees.create.mutateAsync(dataToSubmit);
         toast({
           title: "Sucesso", 
           description: "Árbitro criado com sucesso!"
@@ -68,11 +113,14 @@ const RefereesManagement = () => {
       setIsDialogOpen(false);
       resetForm();
     } catch (error: any) {
+      console.error('Erro ao salvar árbitro:', error);
       toast({
         title: "Erro",
         description: `Erro ao salvar árbitro: ${error.message || 'Erro desconhecido'}`,
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -90,8 +138,8 @@ const RefereesManagement = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (refereeId: string) => {
-    if (confirm('Tem certeza que deseja eliminar este árbitro?')) {
+  const handleDelete = async (refereeId: string, refereeName: string) => {
+    if (confirm(`Tem certeza que deseja eliminar o árbitro "${refereeName}"?`)) {
       try {
         await operations.referees.delete.mutateAsync(refereeId);
         toast({
@@ -99,6 +147,7 @@ const RefereesManagement = () => {
           description: "Árbitro eliminado com sucesso!"
         });
       } catch (error: any) {
+        console.error('Erro ao eliminar árbitro:', error);
         toast({
           title: "Erro",
           description: `Erro ao eliminar árbitro: ${error.message || 'Erro desconhecido'}`,
@@ -165,6 +214,7 @@ const RefereesManagement = () => {
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   required
                   placeholder="Ex: João Silva Santos"
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -176,11 +226,16 @@ const RefereesManagement = () => {
                     value={formData.license_number}
                     onChange={(e) => handleInputChange('license_number', e.target.value)}
                     placeholder="Ex: ARB2024001"
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
                   <Label htmlFor="category">Categoria *</Label>
-                  <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                  <Select 
+                    value={formData.category} 
+                    onValueChange={(value) => handleInputChange('category', value)}
+                    disabled={isSubmitting}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecionar categoria" />
                     </SelectTrigger>
@@ -201,6 +256,7 @@ const RefereesManagement = () => {
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     placeholder="Ex: +238 123 45 67"
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -211,6 +267,7 @@ const RefereesManagement = () => {
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="arbitro@email.com"
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -218,7 +275,11 @@ const RefereesManagement = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="island">Ilha *</Label>
-                  <Select value={formData.island} onValueChange={(value) => handleInputChange('island', value)}>
+                  <Select 
+                    value={formData.island} 
+                    onValueChange={(value) => handleInputChange('island', value)}
+                    disabled={isSubmitting}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecionar ilha" />
                     </SelectTrigger>
@@ -231,7 +292,11 @@ const RefereesManagement = () => {
                 </div>
                 <div>
                   <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                  <Select 
+                    value={formData.status} 
+                    onValueChange={(value) => handleInputChange('status', value)}
+                    disabled={isSubmitting}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -245,13 +310,25 @@ const RefereesManagement = () => {
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button type="submit" className="flex-1 bg-cv-blue hover:bg-blue-700">
-                  {editingReferee ? 'Atualizar' : 'Criar'} Árbitro
+                <Button 
+                  type="submit" 
+                  className="flex-1 bg-cv-blue hover:bg-blue-700"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      Salvando...
+                    </>
+                  ) : (
+                    `${editingReferee ? 'Atualizar' : 'Criar'} Árbitro`
+                  )}
                 </Button>
                 <Button 
                   type="button" 
                   variant="outline" 
                   onClick={() => setIsDialogOpen(false)}
+                  disabled={isSubmitting}
                 >
                   Cancelar
                 </Button>
@@ -323,75 +400,84 @@ const RefereesManagement = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Licença</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Contacto</TableHead>
-                <TableHead>Ilha</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {referees.map((referee: any) => (
-                <TableRow key={referee.id}>
-                  <TableCell className="font-medium">{referee.name}</TableCell>
-                  <TableCell>{referee.license_number || '—'}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{referee.category}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      {referee.phone && (
-                        <div className="flex items-center space-x-1 text-sm">
-                          <Phone className="h-3 w-3 text-gray-400" />
-                          <span>{referee.phone}</span>
-                        </div>
-                      )}
-                      {referee.email && (
-                        <div className="flex items-center space-x-1 text-sm">
-                          <Mail className="h-3 w-3 text-gray-400" />
-                          <span>{referee.email}</span>
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-1">
-                      <MapPin className="h-3 w-3 text-gray-400" />
-                      <span>{referee.island}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={referee.status === 'ativo' ? 'default' : 'secondary'}>
-                      {referee.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleEdit(referee)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleDelete(referee.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          {referees.length === 0 ? (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Nenhum árbitro registado. Clique em "Novo Árbitro" para adicionar o primeiro.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Licença</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead>Contacto</TableHead>
+                  <TableHead>Ilha</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {referees.map((referee: any) => (
+                  <TableRow key={referee.id}>
+                    <TableCell className="font-medium">{referee.name}</TableCell>
+                    <TableCell>{referee.license_number || '—'}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{referee.category}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        {referee.phone && (
+                          <div className="flex items-center space-x-1 text-sm">
+                            <Phone className="h-3 w-3 text-gray-400" />
+                            <span>{referee.phone}</span>
+                          </div>
+                        )}
+                        {referee.email && (
+                          <div className="flex items-center space-x-1 text-sm">
+                            <Mail className="h-3 w-3 text-gray-400" />
+                            <span className="truncate">{referee.email}</span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-1">
+                        <MapPin className="h-3 w-3 text-gray-400" />
+                        <span>{referee.island}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={referee.status === 'ativo' ? 'default' : 'secondary'}>
+                        {referee.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEdit(referee)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDelete(referee.id, referee.name)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

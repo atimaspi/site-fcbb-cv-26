@@ -100,25 +100,23 @@ export interface Coach {
   status: string;
 }
 
-// Improved type guards
+// Funções de validação melhoradas
 const isValidArray = (data: any): data is any[] => {
   return Array.isArray(data);
 };
 
 const hasValidStructure = (data: any, requiredFields: string[]): boolean => {
   if (!Array.isArray(data)) return false;
-  if (data.length === 0) return true; // Empty arrays are valid
+  if (data.length === 0) return true;
   
-  // Check if first item has required fields and is not an error object
   const firstItem = data[0];
   if (!firstItem || typeof firstItem !== 'object') return false;
-  if (firstItem.error === true) return false; // Supabase error object
+  if (firstItem.error === true) return false;
   
   return requiredFields.every(field => field in firstItem);
 };
 
 function safeArrayCast<T>(data: any, requiredFields: string[]): T[] {
-  console.log('safeArrayCast called with:', { data, requiredFields });
   if (isValidArray(data) && hasValidStructure(data, requiredFields)) {
     return data as T[];
   }
@@ -128,7 +126,7 @@ function safeArrayCast<T>(data: any, requiredFields: string[]): T[] {
 export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
 
-  // Data fetching with detailed logging
+  // Fetch dados com cache otimizado
   const { data: teamsData, isLoading: teamsLoading, error: teamsError } = useFetch('teams');
   const { data: competitionsData, isLoading: competitionsLoading } = useFetch('competitions');
   const { data: gamesData, isLoading: gamesLoading } = useFetch('games');
@@ -138,16 +136,9 @@ export const useBackendData = () => {
   const { data: refereesData, isLoading: refereesLoading } = useFetch('referees');
   const { data: coachesData, isLoading: coachesLoading } = useFetch('coaches');
 
-  // Log data for debugging
-  console.log('Teams data:', { teamsData, teamsError, teamsLoading });
-  console.log('Competitions data:', { competitionsData, competitionsLoading });
-  console.log('Games data:', { gamesData, gamesLoading });
-
-  // Safe data arrays with proper type checking
+  // Arrays de dados processados
   const teams: Team[] = useMemo(() => {
-    const result = safeArrayCast<Team>(teamsData, ['id', 'name', 'city', 'island', 'status']);
-    console.log('Teams processed:', result);
-    return result;
+    return safeArrayCast<Team>(teamsData, ['id', 'name', 'city', 'island', 'status']);
   }, [teamsData]);
 
   const competitions: Competition[] = useMemo(() => {
@@ -178,42 +169,34 @@ export const useBackendData = () => {
     return safeArrayCast<Coach>(coachesData, ['id', 'name', 'status']);
   }, [coachesData]);
 
-  // Computed data with proper type safety
+  // Dados computados
   const recentGames = useMemo(() => {
-    if (!games || games.length === 0) return [];
-    
     return games
-      .filter((game: Game) => game && game.status === 'finalizado')
-      .sort((a: Game, b: Game) => new Date(b.game_date).getTime() - new Date(a.game_date).getTime())
+      .filter(game => game.status === 'finalizado')
+      .sort((a, b) => new Date(b.game_date).getTime() - new Date(a.game_date).getTime())
       .slice(0, 10);
   }, [games]);
 
   const upcomingGames = useMemo(() => {
-    if (!games || games.length === 0) return [];
-    
     return games
-      .filter((game: Game) => game && game.status === 'agendado')
-      .sort((a: Game, b: Game) => new Date(a.game_date).getTime() - new Date(b.game_date).getTime())
+      .filter(game => game.status === 'agendado')
+      .sort((a, b) => new Date(a.game_date).getTime() - new Date(b.game_date).getTime())
       .slice(0, 10);
   }, [games]);
 
   const publishedNews = useMemo(() => {
-    if (!news || news.length === 0) return [];
-    
     return news
-      .filter((newsItem: NewsItem) => newsItem && newsItem.status === 'publicado')
-      .sort((a: NewsItem, b: NewsItem) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
+      .filter(newsItem => newsItem.status === 'publicado')
+      .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
   }, [news]);
 
   const activeEvents = useMemo(() => {
-    if (!events || events.length === 0) return [];
-    
     return events
-      .filter((event: Event) => event && event.status === 'ativo')
-      .sort((a: Event, b: Event) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
+      .filter(event => event.status === 'ativo')
+      .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
   }, [events]);
 
-  // CRUD operations with better error handling
+  // Operações CRUD
   const operations = {
     teams: {
       create: useCreate('teams'),
@@ -258,7 +241,7 @@ export const useBackendData = () => {
   };
 
   return {
-    // Data arrays (now properly typed)
+    // Data arrays
     teams,
     competitions,
     games,
@@ -278,7 +261,7 @@ export const useBackendData = () => {
     isLoading: teamsLoading || competitionsLoading || gamesLoading || playersLoading || 
                newsLoading || eventsLoading || refereesLoading || coachesLoading,
 
-    // Individual loading states for better UX
+    // Individual loading states
     teamsLoading,
     competitionsLoading,
     gamesLoading,

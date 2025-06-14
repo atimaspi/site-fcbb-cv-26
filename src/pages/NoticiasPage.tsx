@@ -1,55 +1,99 @@
 
+import { useBackendData } from '@/hooks/useBackendData';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, User, Eye } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import PageLayout from './PageLayout';
 
 const NoticiasPage = () => {
+  const { publishedNews, newsLoading } = useBackendData();
+
+  if (newsLoading) {
+    return (
+      <PageLayout title="Notícias">
+        <div className="flex items-center justify-center h-64">
+          <LoadingSpinner size="lg" />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (publishedNews.length === 0) {
+    return (
+      <PageLayout title="Notícias">
+        <div className="text-center py-12">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Nenhuma notícia disponível
+          </h3>
+          <p className="text-gray-600">
+            As notícias publicadas aparecerão aqui em breve.
+          </p>
+        </div>
+      </PageLayout>
+    );
+  }
+
   return (
-    <PageLayout title="Notícias">
+    <PageLayout 
+      title="Notícias" 
+      description="Acompanhe as últimas novidades do basquetebol cabo-verdiano"
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {/* This would typically be dynamically generated from a database */}
-        <div className="bg-white rounded-lg overflow-hidden shadow-md">
-          <img 
-            src="https://via.placeholder.com/400x200" 
-            alt="Notícia" 
-            className="w-full h-48 object-cover" 
-          />
-          <div className="p-4">
-            <span className="text-sm text-gray-500">05 Mai, 2025</span>
-            <h3 className="text-lg font-semibold mt-2">Cabo Verde defronta Angola no AfroBasket 2025</h3>
-            <p className="mt-2 text-sm text-gray-600">A seleção cabo-verdiana de basquetebol vai defrontar Angola na fase de qualificação para o AfroBasket 2025.</p>
-            <a href="#" className="mt-3 inline-block text-cv-blue font-medium">Ler mais</a>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg overflow-hidden shadow-md">
-          <img 
-            src="https://via.placeholder.com/400x200" 
-            alt="Notícia" 
-            className="w-full h-48 object-cover" 
-          />
-          <div className="p-4">
-            <span className="text-sm text-gray-500">28 Abr, 2025</span>
-            <h3 className="text-lg font-semibold mt-2">Liga Nacional inicia no próximo mês</h3>
-            <p className="mt-2 text-sm text-gray-600">A Liga Nacional de Basquetebol iniciará no próximo mês com 12 equipas em competição.</p>
-            <a href="#" className="mt-3 inline-block text-cv-blue font-medium">Ler mais</a>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg overflow-hidden shadow-md">
-          <img 
-            src="https://via.placeholder.com/400x200" 
-            alt="Notícia" 
-            className="w-full h-48 object-cover" 
-          />
-          <div className="p-4">
-            <span className="text-sm text-gray-500">20 Abr, 2025</span>
-            <h3 className="text-lg font-semibold mt-2">Workshop para treinadores em São Vicente</h3>
-            <p className="mt-2 text-sm text-gray-600">A FCBB organizou um workshop para treinadores em São Vicente com participação internacional.</p>
-            <a href="#" className="mt-3 inline-block text-cv-blue font-medium">Ler mais</a>
-          </div>
-        </div>
-        
-        {/* Add more news items as needed */}
+        {publishedNews.map((noticia) => (
+          <Card key={noticia.id} className="hover:shadow-lg transition-shadow">
+            {noticia.featured_image_url && (
+              <div className="aspect-video overflow-hidden rounded-t-lg">
+                <img 
+                  src={noticia.featured_image_url} 
+                  alt={noticia.title}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            )}
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Badge variant="secondary" className="bg-cv-blue text-white">
+                  {noticia.category}
+                </Badge>
+                <div className="flex items-center text-sm text-gray-500">
+                  <Calendar className="w-4 h-4 mr-1" />
+                  {format(new Date(noticia.published_at), 'dd MMM, yyyy', { locale: ptBR })}
+                </div>
+              </div>
+              
+              <h3 className="text-lg font-semibold mb-3 text-gray-900 line-clamp-2">
+                {noticia.title}
+              </h3>
+              
+              {noticia.excerpt && (
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  {noticia.excerpt}
+                </p>
+              )}
+              
+              <div className="flex items-center justify-between">
+                <button className="text-cv-blue font-medium hover:text-blue-700 transition-colors">
+                  Ler mais
+                </button>
+                <div className="flex items-center text-gray-400">
+                  <Eye className="w-4 h-4" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+
+      {publishedNews.length > 9 && (
+        <div className="text-center mt-8">
+          <button className="bg-cv-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            Ver mais notícias
+          </button>
+        </div>
+      )}
     </PageLayout>
   );
 };
