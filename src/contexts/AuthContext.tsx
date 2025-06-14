@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,67 +76,84 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAdminStatus = async (user: User) => {
     try {
-      // Quick check by email first
+      // Primary check by email - most reliable
       if (user.email === 'admin@fcbb.cv') {
-        console.log('Admin detected by email');
+        console.log('Admin detected by email - setting admin status');
         setIsAdmin(true);
         return;
       }
 
-      // Try to fetch from profiles table with retry
-      let retryCount = 0;
-      const maxRetries = 3;
+      // Try to fetch from profiles table with aggressive error handling
+      let attempts = 0;
+      const maxAttempts = 2;
       
-      while (retryCount < maxRetries) {
+      while (attempts < maxAttempts) {
         try {
+          console.log(`Attempting to fetch profile, attempt ${attempts + 1}`);
+          
           const { data, error } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', user.id)
-            .single();
+            .maybeSingle(); // Use maybeSingle to avoid errors if no rows
 
-          if (!error && data) {
+          if (!error && data && data.role) {
             console.log('Role from database:', data.role);
             setIsAdmin(data.role === 'admin');
             return;
-          } else if (error.code === 'PGRST116') {
-            // Profile doesn't exist, create it
-            const role = user.email === 'admin@fcbb.cv' ? 'admin' : 'user';
+          } else if (error) {
+            console.warn('Profile fetch error:', error);
             
-            const { error: insertError } = await supabase
-              .from('profiles')
-              .insert({
-                id: user.id,
-                full_name: user.user_metadata?.full_name || 'Utilizador',
-                role: role
-              });
+            if (error.code === 'PGRST116' || error.message?.includes('no rows')) {
+              // Profile doesn't exist, try to create it
+              console.log('Profile not found, attempting to create...');
+              
+              const role = user.email === 'admin@fcbb.cv' ? 'admin' : 'user';
+              
+              try {
+                const { error: insertError } = await supabase
+                  .from('profiles')
+                  .insert({
+                    id: user.id,
+                    full_name: user.user_metadata?.full_name || 'Utilizador',
+                    role: role
+                  });
 
-            if (!insertError) {
-              setIsAdmin(role === 'admin');
-              return;
+                if (!insertError) {
+                  console.log('Profile created successfully');
+                  setIsAdmin(role === 'admin');
+                  return;
+                } else {
+                  console.warn('Profile creation failed:', insertError);
+                }
+              } catch (insertError) {
+                console.warn('Exception during profile creation:', insertError);
+              }
             }
           }
           
-          retryCount++;
-          if (retryCount < maxRetries) {
+          attempts++;
+          if (attempts < maxAttempts) {
+            console.log('Waiting before retry...');
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
-        } catch (retryError) {
-          console.error('Retry error:', retryError);
-          retryCount++;
-          if (retryCount < maxRetries) {
+          
+        } catch (attemptError) {
+          console.error('Attempt error:', attemptError);
+          attempts++;
+          if (attempts < maxAttempts) {
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
         }
       }
 
-      // Fallback to email check
-      console.log('Falling back to email check for admin status');
+      // Ultimate fallback - check email again
+      console.log('All attempts failed, using email fallback');
       setIsAdmin(user.email === 'admin@fcbb.cv');
       
     } catch (error) {
-      console.error('Error checking admin status:', error);
-      // Fallback to email check
+      console.error('Critical error in checkAdminStatus:', error);
+      // Final fallback
       setIsAdmin(user.email === 'admin@fcbb.cv');
     }
   };
