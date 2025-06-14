@@ -26,11 +26,18 @@ const FederationsManagement = () => {
     foundation_date: ''
   });
 
-  // Log para debug
+  // Log detalhado para debug
   useEffect(() => {
+    console.log('=== DEBUG FEDERATIONS ===');
     console.log('Federations data:', federations);
     console.log('Federations loading:', federationsLoading);
     console.log('Total federations:', federations?.length || 0);
+    console.log('Federations type:', typeof federations);
+    console.log('Is array?', Array.isArray(federations));
+    if (federations && federations.length > 0) {
+      console.log('First federation:', federations[0]);
+    }
+    console.log('=========================');
   }, [federations, federationsLoading]);
 
   const handleInputChange = (field: string, value: string) => {
@@ -50,17 +57,21 @@ const FederationsManagement = () => {
     }
 
     try {
+      console.log('Creating federation with data:', formData);
+      
       if (editingFederation) {
-        await operations.federations.update.mutateAsync({ 
+        const result = await operations.federations.update.mutateAsync({ 
           id: editingFederation.id, 
           data: formData 
         });
+        console.log('Update result:', result);
         toast({
           title: "Sucesso",
           description: "Federação atualizada com sucesso!"
         });
       } else {
-        await operations.federations.create.mutateAsync(formData);
+        const result = await operations.federations.create.mutateAsync(formData);
+        console.log('Create result:', result);
         toast({
           title: "Sucesso", 
           description: "Federação criada com sucesso!"
@@ -69,8 +80,14 @@ const FederationsManagement = () => {
       
       setIsDialogOpen(false);
       resetForm();
+      
+      // Force refresh após criar/editar
+      console.log('Forcing data refresh...');
+      window.location.reload();
+      
     } catch (error: any) {
       console.error('Error saving federation:', error);
+      console.error('Error details:', error.message, error.code, error.details);
       toast({
         title: "Erro",
         description: `Erro ao salvar federação: ${error.message || 'Erro desconhecido'}`,

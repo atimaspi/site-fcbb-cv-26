@@ -31,8 +31,13 @@ export const useBackendData = () => {
   const { data: newsData, isLoading: newsLoading } = useFetch('news');
   const { data: eventsData, isLoading: eventsLoading } = useFetch('events');
   const { data: refereesData, isLoading: refereesLoading } = useFetch('referees');
-  const { data: federationsData, isLoading: federationsLoading } = useFetch('federations');
+  const { data: federationsData, isLoading: federationsLoading, error: federationsError } = useFetch('federations');
   const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading } = useFetch('regional_associations');
+
+  // Debug federations especificamente
+  console.log('useBackendData - federationsData raw:', federationsData);
+  console.log('useBackendData - federationsLoading:', federationsLoading);
+  console.log('useBackendData - federationsError:', federationsError);
 
   // Process arrays with memoization
   const teams: Team[] = useMemo(() => safeArrayCast<Team>(teamsData), [teamsData]);
@@ -43,7 +48,11 @@ export const useBackendData = () => {
   const news: NewsItem[] = useMemo(() => safeArrayCast<NewsItem>(newsData), [newsData]);
   const events: Event[] = useMemo(() => safeArrayCast<Event>(eventsData), [eventsData]);
   const referees: Referee[] = useMemo(() => safeArrayCast<Referee>(refereesData), [refereesData]);
-  const federations: Federation[] = useMemo(() => safeArrayCast<Federation>(federationsData), [federationsData]);
+  const federations: Federation[] = useMemo(() => {
+    const result = safeArrayCast<Federation>(federationsData);
+    console.log('useBackendData - processed federations:', result);
+    return result;
+  }, [federationsData]);
   const regionalAssociations: RegionalAssociation[] = useMemo(() => safeArrayCast<RegionalAssociation>(regionalAssociationsData), [regionalAssociationsData]);
 
   // Handle coaches separately since the table doesn't exist
@@ -88,6 +97,9 @@ export const useBackendData = () => {
     coachesLoading,
     federationsLoading,
     regionalAssociationsLoading,
+
+    // Errors for debug
+    federationsError,
 
     // CRUD operations
     operations
