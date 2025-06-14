@@ -175,20 +175,53 @@ export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
   const queryClient = useQueryClient();
 
-  // Fetch dados das tabelas principais
-  const { data: teamsData, isLoading: teamsLoading, error: teamsError, refetch: refetchTeams } = useFetch('teams');
-  const { data: clubsData, isLoading: clubsLoading, refetch: refetchClubs } = useFetch('clubs');
-  const { data: competitionsData, isLoading: competitionsLoading, refetch: refetchCompetitions } = useFetch('championships');
-  const { data: gamesData, isLoading: gamesLoading, refetch: refetchGames } = useFetch('games');
-  const { data: playersData, isLoading: playersLoading, refetch: refetchPlayers } = useFetch('players');
-  const { data: newsData, isLoading: newsLoading, refetch: refetchNews } = useFetch('news');
-  const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useFetch('events');
-  const { data: refereesData, isLoading: refereesLoading, refetch: refetchReferees } = useFetch('referees');
-  const { data: coachesData, isLoading: coachesLoading, refetch: refetchCoaches } = useFetch('coaches');
-  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading, refetch: refetchRegionalAssociations } = useFetch('regional_associations');
-  const { data: federationsData, isLoading: federationsLoading, refetch: refetchFederations } = useFetch('federations');
+  // Fetch dados das tabelas principais - com staleTime para reduzir re-fetches
+  const { data: teamsData, isLoading: teamsLoading, error: teamsError, refetch: refetchTeams } = useFetch('teams', {
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos
+  });
+  const { data: clubsData, isLoading: clubsLoading, refetch: refetchClubs } = useFetch('clubs', {
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+  const { data: competitionsData, isLoading: competitionsLoading, refetch: refetchCompetitions } = useFetch('championships', {
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+  const { data: gamesData, isLoading: gamesLoading, refetch: refetchGames } = useFetch('games', {
+    staleTime: 2 * 60 * 1000, // 2 minutos para jogos
+    gcTime: 5 * 60 * 1000,
+  });
+  const { data: playersData, isLoading: playersLoading, refetch: refetchPlayers } = useFetch('players', {
+    staleTime: 10 * 60 * 1000, // 10 minutos
+    gcTime: 20 * 60 * 1000,
+  });
+  const { data: newsData, isLoading: newsLoading, refetch: refetchNews } = useFetch('news', {
+    staleTime: 3 * 60 * 1000, // 3 minutos para notícias
+    gcTime: 10 * 60 * 1000,
+  });
+  const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useFetch('events', {
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+  const { data: refereesData, isLoading: refereesLoading, refetch: refetchReferees } = useFetch('referees', {
+    staleTime: 10 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
+  });
+  const { data: coachesData, isLoading: coachesLoading, refetch: refetchCoaches } = useFetch('coaches', {
+    staleTime: 10 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
+  });
+  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading, refetch: refetchRegionalAssociations } = useFetch('regional_associations', {
+    staleTime: 15 * 60 * 1000, // 15 minutos
+    gcTime: 30 * 60 * 1000,
+  });
+  const { data: federationsData, isLoading: federationsLoading, refetch: refetchFederations } = useFetch('federations', {
+    staleTime: 15 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  });
 
-  // Arrays de dados processados
+  // Arrays de dados processados com useMemo para evitar re-computação desnecessária
   const teams: Team[] = useMemo(() => {
     return safeArrayCast<Team>(teamsData, ['id', 'name', 'category']);
   }, [teamsData]);
@@ -233,9 +266,14 @@ export const useBackendData = () => {
     return safeArrayCast<Federation>(federationsData, ['id', 'name']);
   }, [federationsData]);
 
-  // Computed properties for backward compatibility
+  // Computed properties for backward compatibility - otimizadas com useMemo
   const publishedNews = useMemo(() => {
-    return news.filter(item => item.published === true || item.status === 'published');
+    return news
+      .filter(item => item.published === true || item.status === 'published')
+      .sort((a, b) => {
+        if (!a.published_at || !b.published_at) return 0;
+        return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
+      });
   }, [news]);
 
   const activeEvents = useMemo(() => {
@@ -420,9 +458,124 @@ export const useBackendData = () => {
     federationsLoading,
 
     // CRUD operations
-    operations,
+    operations: {
+      teams: {
+        create: useCreate('teams'),
+        update: useUpdate('teams'),
+        delete: useDelete('teams')
+      },
+      clubs: {
+        create: useCreate('clubs'),
+        update: useUpdate('clubs'),
+        delete: useDelete('clubs')
+      },
+      competitions: {
+        create: useCreate('championships'),
+        update: useUpdate('championships'),
+        delete: useDelete('championships')
+      },
+      games: {
+        create: useCreate('games'),
+        update: useUpdate('games'),
+        delete: useDelete('games')
+      },
+      players: {
+        create: useCreate('players'),
+        update: useUpdate('players'),
+        delete: useDelete('players')
+      },
+      news: {
+        create: useCreate('news'),
+        update: useUpdate('news'),
+        delete: useDelete('news')
+      },
+      events: {
+        create: useCreate('events'),
+        update: useUpdate('events'),
+        delete: useDelete('events')
+      },
+      referees: {
+        create: useCreate('referees'),
+        update: useUpdate('referees'),
+        delete: useDelete('referees')
+      },
+      coaches: {
+        create: useCreate('coaches'),
+        update: useUpdate('coaches'),
+        delete: useDelete('coaches')
+      },
+      regionalAssociations: {
+        create: useCreate('regional_associations'),
+        update: useUpdate('regional_associations'),
+        delete: useDelete('regional_associations')
+      },
+      federations: {
+        create: useCreate('federations'),
+        update: useUpdate('federations'),
+        delete: useDelete('federations')
+      }
+    },
 
     // Refresh functions
-    refreshData
+    refreshData: {
+      teams: () => {
+        queryClient.invalidateQueries({ queryKey: ['teams'] });
+        refetchTeams();
+      },
+      clubs: () => {
+        queryClient.invalidateQueries({ queryKey: ['clubs'] });
+        refetchClubs();
+      },
+      competitions: () => {
+        queryClient.invalidateQueries({ queryKey: ['championships'] });
+        refetchCompetitions();
+      },
+      games: () => {
+        queryClient.invalidateQueries({ queryKey: ['games'] });
+        refetchGames();
+      },
+      players: () => {
+        queryClient.invalidateQueries({ queryKey: ['players'] });
+        refetchPlayers();
+      },
+      news: () => {
+        queryClient.invalidateQueries({ queryKey: ['news'] });
+        refetchNews();
+      },
+      events: () => {
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        refetchEvents();
+      },
+      referees: () => {
+        queryClient.invalidateQueries({ queryKey: ['referees'] });
+        refetchReferees();
+      },
+      coaches: () => {
+        queryClient.invalidateQueries({ queryKey: ['coaches'] });
+        refetchCoaches();
+      },
+      regionalAssociations: () => {
+        queryClient.invalidateQueries({ queryKey: ['regional_associations'] });
+        refetchRegionalAssociations();
+      },
+      federations: () => {
+        queryClient.invalidateQueries({ queryKey: ['federations'] });
+        refetchFederations();
+      },
+      all: () => {
+        queryClient.invalidateQueries();
+        refetchTeams();
+        refetchClubs();
+        refetchCompetitions();
+        refetchGames();
+        refetchPlayers();
+        refetchNews();
+        refetchEvents();
+        refetchReferees();
+        refetchCoaches();
+        refetchRegionalAssociations();
+        refetchFederations();
+      }
+    }
   };
 };

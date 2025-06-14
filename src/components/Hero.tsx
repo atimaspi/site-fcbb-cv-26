@@ -1,13 +1,13 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play, Calendar, Trophy, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const Hero = () => {
+const Hero = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = [
+  const slides = useMemo(() => [
     {
       id: 1,
       image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1920&h=1080&q=80",
@@ -35,13 +35,13 @@ const Hero = () => {
       cta: "Saber Mais",
       link: "/selecoes/senior-feminina"
     }
-  ];
+  ], []);
 
-  const quickStats = [
+  const quickStats = useMemo(() => [
     { icon: Trophy, label: "Clubes Licenciados", value: "24" },
     { icon: Users, label: "Atletas Federados", value: "1,250+" },
     { icon: Calendar, label: "Jogos por Época", value: "180+" }
-  ];
+  ], []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -75,6 +75,8 @@ const Hero = () => {
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
               />
               <div className="absolute inset-0 bg-black bg-opacity-50"></div>
               
@@ -110,12 +112,14 @@ const Hero = () => {
         <button
           onClick={prevSlide}
           className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
+          aria-label="Slide anterior"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
         <button
           onClick={nextSlide}
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
+          aria-label="Próximo slide"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
@@ -129,6 +133,7 @@ const Hero = () => {
               className={`w-3 h-3 rounded-full transition-all ${
                 index === currentSlide ? 'bg-white' : 'bg-white bg-opacity-50'
               }`}
+              aria-label={`Ir para slide ${index + 1}`}
             />
           ))}
         </div>
@@ -170,6 +175,8 @@ const Hero = () => {
       </div>
     </section>
   );
-};
+});
+
+Hero.displayName = 'Hero';
 
 export default Hero;

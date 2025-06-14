@@ -8,16 +8,16 @@ import PartnersSection from '@/components/PartnersSection';
 import Footer from '@/components/Footer';
 import LiveResultsWidget from '@/components/LiveResultsWidget';
 import FeaturedVideos from '@/components/FeaturedVideos';
-import UpcomingGames from '@/components/UpcomingGames';
 import SEO from '@/components/SEO';
 import ResponsiveContainer from '@/components/ui/responsive-container';
 import SmoothTransition from '@/components/ui/smooth-transition';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Trophy, Users, TrendingUp, Clock } from 'lucide-react';
+import { memo, useMemo } from 'react';
 
-const Index = () => {
-  const liveGames = [
+const Index = memo(() => {
+  const liveGames = useMemo(() => [
     {
       id: 1,
       homeTeam: "CD Travadores",
@@ -38,9 +38,9 @@ const Index = () => {
       time: "05:12",
       status: "live"
     }
-  ];
+  ], []);
 
-  const upcomingGames = [
+  const upcomingGames = useMemo(() => [
     {
       id: 1,
       homeTeam: "Barreirense",
@@ -59,9 +59,9 @@ const Index = () => {
       venue: "Pavilhão Municipal",
       competition: "Liga Nacional"
     }
-  ];
+  ], []);
 
-  const recentResults = [
+  const recentResults = useMemo(() => [
     {
       id: 1,
       homeTeam: "Unitec Assomada",
@@ -80,14 +80,14 @@ const Index = () => {
       date: "2025-06-07",
       competition: "Liga Nacional"
     }
-  ];
+  ], []);
 
-  const quickStats = [
+  const quickStats = useMemo(() => [
     { label: "Clubes Afiliados", value: "156", icon: <Users className="w-6 h-6" /> },
     { label: "Atletas Registados", value: "2,847", icon: <TrendingUp className="w-6 h-6" /> },
     { label: "Competições Ativas", value: "8", icon: <Trophy className="w-6 h-6" /> },
     { label: "Ilhas Representadas", value: "10", icon: <MapPin className="w-6 h-6" /> }
-  ];
+  ], []);
 
   return (
     <>
@@ -256,6 +256,8 @@ const Index = () => {
       </div>
     </>
   );
-};
+});
+
+Index.displayName = 'Index';
 
 export default Index;
