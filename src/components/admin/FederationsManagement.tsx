@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -25,6 +25,13 @@ const FederationsManagement = () => {
     logo_url: '',
     foundation_date: ''
   });
+
+  // Log para debug
+  useEffect(() => {
+    console.log('Federations data:', federations);
+    console.log('Federations loading:', federationsLoading);
+    console.log('Total federations:', federations?.length || 0);
+  }, [federations, federationsLoading]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -124,6 +131,7 @@ const FederationsManagement = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" />
+        <span className="ml-2">Carregando federações...</span>
       </div>
     );
   }
@@ -168,17 +176,38 @@ const FederationsManagement = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Federações ({federations.length})</CardTitle>
+          <CardTitle>Federações ({federations?.length || 0})</CardTitle>
           <CardDescription>
             Lista de federações de basquetebol
+            {federations?.length === 0 && !federationsLoading && (
+              <span className="text-yellow-600 block mt-1">
+                Nenhuma federação encontrada. Verifique a conexão com a base de dados.
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <FederationsTable
-            federations={federations}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          {federations?.length > 0 ? (
+            <FederationsTable
+              federations={federations}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ) : (
+            <div className="text-center py-8">
+              <Building className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                Nenhuma federação encontrada
+              </h3>
+              <p className="text-gray-500 mb-4">
+                Comece criando a primeira federação
+              </p>
+              <Button onClick={() => setIsDialogOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Criar Primeira Federação
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
