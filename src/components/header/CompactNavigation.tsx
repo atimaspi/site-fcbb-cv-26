@@ -83,32 +83,32 @@ const CompactNavigation = () => {
               {item.path ? (
                 <Link 
                   to={item.path}
-                  className="block px-6 py-3 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
+                  className="block px-4 py-2 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
                 >
                   {item.title}
                 </Link>
               ) : (
                 <div className="relative">
                   <button 
-                    className="flex items-center px-6 py-3 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
+                    className="flex items-center px-4 py-2 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
                     onMouseEnter={() => setActiveDropdown(item.title)}
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
                     {item.title}
-                    <ChevronDown className="ml-1 w-4 h-4" />
+                    <ChevronDown className="ml-1 w-3 h-3" />
                   </button>
                   {activeDropdown === item.title && (
                     <div 
-                      className="absolute left-0 top-full w-64 bg-white shadow-xl border border-gray-200 z-50 rounded-md"
+                      className="absolute left-0 top-full w-56 bg-white shadow-xl border border-gray-200 z-50 rounded-md"
                       onMouseEnter={() => setActiveDropdown(item.title)}
                       onMouseLeave={() => setActiveDropdown(null)}
                     >
-                      <div className="py-2">
+                      <div className="py-1">
                         {item.items?.map((subItem) => (
                           <Link 
                             key={subItem.name}
                             to={subItem.path}
-                            className="block px-4 py-2.5 text-sm text-cv-dark hover:bg-cv-blue hover:text-white transition-colors"
+                            className="block px-3 py-2 text-sm text-cv-dark hover:bg-cv-blue hover:text-white transition-colors"
                           >
                             {subItem.name}
                           </Link>
@@ -124,13 +124,13 @@ const CompactNavigation = () => {
       </nav>
 
       {/* Mobile Menu Button */}
-      <div className="lg:hidden flex justify-end py-2">
+      <div className="lg:hidden flex justify-end py-1">
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="p-2"
           aria-label="Menu"
         >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
@@ -143,7 +143,7 @@ const CompactNavigation = () => {
                 {item.path ? (
                   <Link 
                     to={item.path}
-                    className="block py-3 px-4 text-cv-dark hover:bg-gray-50"
+                    className="block py-2 px-4 text-cv-dark hover:bg-gray-50"
                     onClick={() => setMobileOpen(false)}
                   >
                     {item.title}
@@ -151,7 +151,7 @@ const CompactNavigation = () => {
                 ) : (
                   <div>
                     <button 
-                      className="w-full text-left py-3 px-4 text-cv-dark font-medium hover:bg-gray-50"
+                      className="w-full text-left py-2 px-4 text-cv-dark font-medium hover:bg-gray-50"
                       onClick={() => setActiveDropdown(activeDropdown === item.title ? null : item.title)}
                     >
                       <span className="flex items-center justify-between">
