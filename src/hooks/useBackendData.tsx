@@ -20,6 +20,14 @@ export interface Club {
   city?: string;
   status?: string;
   active?: boolean;
+  founded_year?: number;
+  logo_url?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  address?: string;
+  website?: string;
+  description?: string;
+  regional_association_id?: string;
 }
 
 export interface Competition {
@@ -102,6 +110,30 @@ export interface Coach {
   status: string;
 }
 
+export interface Federation {
+  id: string;
+  name: string;
+  acronym?: string;
+  address?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  website?: string;
+  logo_url?: string;
+  foundation_date?: string;
+}
+
+export interface RegionalAssociation {
+  id: string;
+  name: string;
+  island?: string;
+  acronym?: string;
+  address?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  logo_url?: string;
+  federation_id?: string;
+}
+
 // Funções de validação simplificadas
 const isValidArray = (data: any): data is any[] => {
   return Array.isArray(data) && data.length >= 0;
@@ -135,6 +167,8 @@ export const useBackendData = () => {
   const { data: eventsData, isLoading: eventsLoading } = useFetch('events', cacheConfig);
   const { data: refereesData, isLoading: refereesLoading } = useFetch('referees', cacheConfig);
   const { data: coachesData, isLoading: coachesLoading } = useFetch('coaches', cacheConfig);
+  const { data: federationsData, isLoading: federationsLoading } = useFetch('federations', cacheConfig);
+  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading } = useFetch('regional_associations', cacheConfig);
 
   // Arrays processados com memoização
   const teams: Team[] = useMemo(() => safeArrayCast<Team>(teamsData), [teamsData]);
@@ -146,6 +180,8 @@ export const useBackendData = () => {
   const events: Event[] = useMemo(() => safeArrayCast<Event>(eventsData), [eventsData]);
   const referees: Referee[] = useMemo(() => safeArrayCast<Referee>(refereesData), [refereesData]);
   const coaches: Coach[] = useMemo(() => safeArrayCast<Coach>(coachesData), [coachesData]);
+  const federations: Federation[] = useMemo(() => safeArrayCast<Federation>(federationsData), [federationsData]);
+  const regionalAssociations: RegionalAssociation[] = useMemo(() => safeArrayCast<RegionalAssociation>(regionalAssociationsData), [regionalAssociationsData]);
 
   // Computed properties otimizadas
   const publishedNews = useMemo(() => {
@@ -157,6 +193,25 @@ export const useBackendData = () => {
       })
       .slice(0, 10);
   }, [news]);
+
+  const activeEvents = useMemo(() => {
+    return events.filter(event => event.status === 'ativo' || event.status === 'active');
+  }, [events]);
+
+  const upcomingGames = useMemo(() => {
+    const now = new Date();
+    return games
+      .filter(game => new Date(game.scheduled_date) > now)
+      .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
+      .slice(0, 10);
+  }, [games]);
+
+  const recentGames = useMemo(() => {
+    return games
+      .filter(game => game.status === 'finalizado')
+      .sort((a, b) => new Date(b.scheduled_date).getTime() - new Date(a.scheduled_date).getTime())
+      .slice(0, 10);
+  }, [games]);
 
   // Operações CRUD
   const operations = {
@@ -204,6 +259,16 @@ export const useBackendData = () => {
       create: useCreate('coaches'),
       update: useUpdate('coaches'),
       delete: useDelete('coaches')
+    },
+    federations: {
+      create: useCreate('federations'),
+      update: useUpdate('federations'),
+      delete: useDelete('federations')
+    },
+    regionalAssociations: {
+      create: useCreate('regional_associations'),
+      update: useUpdate('regional_associations'),
+      delete: useDelete('regional_associations')
     }
   };
 
@@ -218,9 +283,14 @@ export const useBackendData = () => {
     events,
     referees,
     coaches,
+    federations,
+    regionalAssociations,
 
     // Computed properties
     publishedNews,
+    activeEvents,
+    upcomingGames,
+    recentGames,
     newsData,
     eventsData,
 
@@ -235,6 +305,8 @@ export const useBackendData = () => {
     eventsLoading,
     refereesLoading,
     coachesLoading,
+    federationsLoading,
+    regionalAssociationsLoading,
 
     // CRUD operations
     operations
