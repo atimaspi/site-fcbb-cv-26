@@ -43,17 +43,33 @@ export const useBackendData = () => {
     newsData: fetchingData.newsData,
     eventsData: fetchingData.eventsData,
 
-    // Loading states
-    isLoading: fetchingData.teamsLoading || fetchingData.clubsLoading || fetchingData.newsLoading || fetchingData.federationsLoading,
-    ...Object.fromEntries(
-      Object.entries(fetchingData).filter(([key]) => key.endsWith('Loading'))
-    ),
+    // Loading states - individual loading states
+    teamsLoading: fetchingData.teamsLoading,
+    clubsLoading: fetchingData.clubsLoading,
+    competitionsLoading: fetchingData.competitionsLoading,
+    gamesLoading: fetchingData.gamesLoading,
+    playersLoading: fetchingData.playersLoading,
+    newsLoading: fetchingData.newsLoading,
+    eventsLoading: fetchingData.eventsLoading,
+    refereesLoading: fetchingData.refereesLoading,
+    federationsLoading: fetchingData.federationsLoading,
+    regionalAssociationsLoading: fetchingData.regionalAssociationsLoading,
     coachesLoading: false,
 
-    // All errors for debugging
-    ...Object.fromEntries(
-      Object.entries(fetchingData).filter(([key]) => key.endsWith('Error'))
-    ),
+    // General loading state
+    isLoading: fetchingData.teamsLoading || fetchingData.clubsLoading || fetchingData.newsLoading || fetchingData.federationsLoading,
+
+    // Error states - individual error states
+    teamsError: fetchingData.teamsError,
+    clubsError: fetchingData.clubsError,
+    competitionsError: fetchingData.competitionsError,
+    gamesError: fetchingData.gamesError,
+    playersError: fetchingData.playersError,
+    newsError: fetchingData.newsError,
+    eventsError: fetchingData.eventsError,
+    refereesError: fetchingData.refereesError,
+    federationsError: fetchingData.federationsError,
+    regionalAssociationsError: fetchingData.regionalAssociationsError,
 
     // CRUD operations
     operations
