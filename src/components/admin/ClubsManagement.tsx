@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
@@ -23,13 +23,7 @@ const ClubsManagement = () => {
     city: '',
     island: '',
     founded_year: '',
-    website: '',
-    email: '',
-    phone: '',
-    address: '',
-    president_name: '',
-    coach_name: '',
-    home_venue: '',
+    logo_url: '',
     status: 'ativo'
   });
 
@@ -98,13 +92,7 @@ const ClubsManagement = () => {
       city: club.city || '',
       island: club.island || '',
       founded_year: club.founded_year?.toString() || '',
-      website: club.website || '',
-      email: club.email || '',
-      phone: club.phone || '',
-      address: club.address || '',
-      president_name: club.president_name || '',
-      coach_name: club.coach_name || '',
-      home_venue: club.home_venue || '',
+      logo_url: club.logo_url || '',
       status: club.status || 'ativo'
     });
     setIsDialogOpen(true);
@@ -136,13 +124,7 @@ const ClubsManagement = () => {
       city: '',
       island: '',
       founded_year: '',
-      website: '',
-      email: '',
-      phone: '',
-      address: '',
-      president_name: '',
-      coach_name: '',
-      home_venue: '',
+      logo_url: '',
       status: 'ativo'
     });
     setEditingClub(null);
@@ -174,7 +156,7 @@ const ClubsManagement = () => {
               Novo Clube
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingClub ? 'Editar Clube' : 'Novo Clube'}
@@ -250,78 +232,15 @@ const ClubsManagement = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="logo_url">URL do Logo</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="clube@email.com"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="phone">Telefone</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="Ex: +238 123 45 67"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="website">Website</Label>
-                  <Input
-                    id="website"
+                    id="logo_url"
                     type="url"
-                    value={formData.website}
-                    onChange={(e) => handleInputChange('website', e.target.value)}
-                    placeholder="https://www.clubeexemplo.cv"
+                    value={formData.logo_url}
+                    onChange={(e) => handleInputChange('logo_url', e.target.value)}
+                    placeholder="https://exemplo.com/logo.png"
                   />
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="address">Morada</Label>
-                <Textarea
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  placeholder="Endereço completo do clube..."
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="president_name">Presidente</Label>
-                  <Input
-                    id="president_name"
-                    value={formData.president_name}
-                    onChange={(e) => handleInputChange('president_name', e.target.value)}
-                    placeholder="Nome do presidente"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="coach_name">Treinador Principal</Label>
-                  <Input
-                    id="coach_name"
-                    value={formData.coach_name}
-                    onChange={(e) => handleInputChange('coach_name', e.target.value)}
-                    placeholder="Nome do treinador"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="home_venue">Pavilhão Principal</Label>
-                <Input
-                  id="home_venue"
-                  value={formData.home_venue}
-                  onChange={(e) => handleInputChange('home_venue', e.target.value)}
-                  placeholder="Nome do pavilhão onde joga"
-                />
               </div>
 
               <div className="flex gap-2 pt-4">
