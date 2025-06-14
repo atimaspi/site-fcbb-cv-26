@@ -1,3 +1,4 @@
+
 import { useApi } from '@/hooks/useApi';
 import { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -5,19 +6,26 @@ import { useQueryClient } from '@tanstack/react-query';
 export interface Team {
   id: string;
   name: string;
-  abbreviation?: string;
-  city: string;
+  category: string;
+  club_id?: string;
+  division?: string;
+  created_at?: string;
+}
+
+export interface Club {
+  id: string;
+  name: string;
   island: string;
   founded_year?: number;
   logo_url?: string;
-  website?: string;
-  email?: string;
-  phone?: string;
+  contact_email?: string;
+  contact_phone?: string;
   address?: string;
-  president_name?: string;
-  coach_name?: string;
-  home_venue?: string;
-  status: string;
+  website?: string;
+  description?: string;
+  status?: string;
+  active?: boolean;
+  regional_association_id?: string;
 }
 
 export interface Competition {
@@ -29,31 +37,36 @@ export interface Competition {
   start_date?: string;
   end_date?: string;
   description?: string;
-  regulations_url?: string;
+  federation_id?: string;
+  regional_association_id?: string;
 }
 
 export interface Game {
   id: string;
-  competition_id: string;
-  home_team_id: string;
-  away_team_id: string;
-  game_date: string;
+  competition_id?: string;
+  home_team_id?: string;
+  away_team_id?: string;
+  scheduled_date: string;
   venue?: string;
-  home_score: number;
-  away_score: number;
-  status: string;
+  home_score?: number;
+  away_score?: number;
+  status?: string;
+  round?: string;
 }
 
 export interface Player {
   id: string;
-  team_id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
+  team_id?: string;
   jersey_number?: number;
   position?: string;
   height_cm?: number;
   weight_kg?: number;
   birth_date?: string;
-  nationality: string;
+  nationality?: string;
+  status?: string;
+  active?: boolean;
 }
 
 export interface NewsItem {
@@ -61,10 +74,15 @@ export interface NewsItem {
   title: string;
   content: string;
   excerpt?: string;
-  featured_image_url?: string;
-  category: string;
-  published_at: string;
-  status: string;
+  image_url?: string;
+  category?: string;
+  published?: boolean;
+  status?: string;
+  author?: string;
+  author_id?: string;
+  featured?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Event {
@@ -74,19 +92,22 @@ export interface Event {
   event_date: string;
   end_date?: string;
   location?: string;
-  event_type: string;
-  status: string;
+  type?: string;
+  organizer?: string;
+  created_at?: string;
 }
 
 export interface Referee {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   license_number?: string;
-  category: string;
+  level: string;
   phone?: string;
   email?: string;
-  island: string;
-  status: string;
+  island?: string;
+  active?: boolean;
+  certified_date?: string;
 }
 
 export interface Coach {
@@ -98,6 +119,30 @@ export interface Coach {
   email?: string;
   experience_years?: number;
   status: string;
+}
+
+export interface RegionalAssociation {
+  id: string;
+  name: string;
+  island?: string;
+  acronym?: string;
+  address?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  logo_url?: string;
+  federation_id: string;
+}
+
+export interface Federation {
+  id: string;
+  name: string;
+  acronym?: string;
+  address?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  website?: string;
+  logo_url?: string;
+  foundation_date?: string;
 }
 
 // Funções de validação melhoradas
@@ -127,78 +172,81 @@ export const useBackendData = () => {
   const { useFetch, useCreate, useUpdate, useDelete } = useApi();
   const queryClient = useQueryClient();
 
-  // Fetch dados com cache otimizado - reduzir stale time para refletir mudanças mais rapidamente
+  // Fetch dados das tabelas principais
   const { data: teamsData, isLoading: teamsLoading, error: teamsError, refetch: refetchTeams } = useFetch('teams');
-  const { data: competitionsData, isLoading: competitionsLoading, refetch: refetchCompetitions } = useFetch('competitions');
+  const { data: clubsData, isLoading: clubsLoading, refetch: refetchClubs } = useFetch('clubs');
+  const { data: competitionsData, isLoading: competitionsLoading, refetch: refetchCompetitions } = useFetch('championships');
   const { data: gamesData, isLoading: gamesLoading, refetch: refetchGames } = useFetch('games');
   const { data: playersData, isLoading: playersLoading, refetch: refetchPlayers } = useFetch('players');
   const { data: newsData, isLoading: newsLoading, refetch: refetchNews } = useFetch('news');
   const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useFetch('events');
   const { data: refereesData, isLoading: refereesLoading, refetch: refetchReferees } = useFetch('referees');
-  const { data: coachesData, isLoading: coachesLoading, refetch: refetchCoaches } = useFetch('coaches');
+  const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading, refetch: refetchRegionalAssociations } = useFetch('regional_associations');
+  const { data: federationsData, isLoading: federationsLoading, refetch: refetchFederations } = useFetch('federations');
 
   // Arrays de dados processados
   const teams: Team[] = useMemo(() => {
-    return safeArrayCast<Team>(teamsData, ['id', 'name', 'city', 'island', 'status']);
+    return safeArrayCast<Team>(teamsData, ['id', 'name', 'category']);
   }, [teamsData]);
+
+  const clubs: Club[] = useMemo(() => {
+    return safeArrayCast<Club>(clubsData, ['id', 'name', 'island']);
+  }, [clubsData]);
 
   const competitions: Competition[] = useMemo(() => {
     return safeArrayCast<Competition>(competitionsData, ['id', 'name', 'type', 'season', 'status']);
   }, [competitionsData]);
 
   const games: Game[] = useMemo(() => {
-    return safeArrayCast<Game>(gamesData, ['id', 'competition_id', 'home_team_id', 'away_team_id', 'status']);
+    return safeArrayCast<Game>(gamesData, ['id', 'scheduled_date']);
   }, [gamesData]);
 
   const players: Player[] = useMemo(() => {
-    return safeArrayCast<Player>(playersData, ['id', 'team_id', 'name', 'nationality']);
+    return safeArrayCast<Player>(playersData, ['id', 'first_name', 'last_name']);
   }, [playersData]);
 
   const news: NewsItem[] = useMemo(() => {
-    return safeArrayCast<NewsItem>(newsData, ['id', 'title', 'content', 'category', 'published_at', 'status']);
+    return safeArrayCast<NewsItem>(newsData, ['id', 'title', 'content']);
   }, [newsData]);
 
   const events: Event[] = useMemo(() => {
-    return safeArrayCast<Event>(eventsData, ['id', 'title', 'event_date', 'event_type', 'status']);
+    return safeArrayCast<Event>(eventsData, ['id', 'title', 'event_date']);
   }, [eventsData]);
 
   const referees: Referee[] = useMemo(() => {
-    return safeArrayCast<Referee>(refereesData, ['id', 'name', 'category', 'island', 'status']);
+    return safeArrayCast<Referee>(refereesData, ['id', 'first_name', 'last_name', 'level']);
   }, [refereesData]);
 
-  const coaches: Coach[] = useMemo(() => {
-    return safeArrayCast<Coach>(coachesData, ['id', 'name', 'status']);
-  }, [coachesData]);
+  const regionalAssociations: RegionalAssociation[] = useMemo(() => {
+    return safeArrayCast<RegionalAssociation>(regionalAssociationsData, ['id', 'name', 'federation_id']);
+  }, [regionalAssociationsData]);
 
-  // Dados computados
-  const recentGames = useMemo(() => {
-    return games
-      .filter(game => game.status === 'finalizado')
-      .sort((a, b) => new Date(b.game_date).getTime() - new Date(a.game_date).getTime())
-      .slice(0, 10);
-  }, [games]);
-
-  const upcomingGames = useMemo(() => {
-    return games
-      .filter(game => game.status === 'agendado')
-      .sort((a, b) => new Date(a.game_date).getTime() - new Date(b.game_date).getTime())
-      .slice(0, 10);
-  }, [games]);
-
-  const publishedNews = useMemo(() => {
-    return news
-      .filter(newsItem => newsItem.status === 'publicado' || newsItem.status === 'published')
-      .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
-  }, [news]);
-
-  const activeEvents = useMemo(() => {
-    return events
-      .filter(event => event.status === 'ativo')
-      .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
-  }, [events]);
+  const federations: Federation[] = useMemo(() => {
+    return safeArrayCast<Federation>(federationsData, ['id', 'name']);
+  }, [federationsData]);
 
   // Função para forçar atualização de dados específicos
   const refreshData = {
+    teams: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      refetchTeams();
+    },
+    clubs: () => {
+      queryClient.invalidateQueries({ queryKey: ['clubs'] });
+      refetchClubs();
+    },
+    competitions: () => {
+      queryClient.invalidateQueries({ queryKey: ['championships'] });
+      refetchCompetitions();
+    },
+    games: () => {
+      queryClient.invalidateQueries({ queryKey: ['games'] });
+      refetchGames();
+    },
+    players: () => {
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+      refetchPlayers();
+    },
     news: () => {
       queryClient.invalidateQueries({ queryKey: ['news'] });
       refetchNews();
@@ -207,24 +255,30 @@ export const useBackendData = () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       refetchEvents();
     },
-    teams: () => {
-      queryClient.invalidateQueries({ queryKey: ['teams'] });
-      refetchTeams();
+    referees: () => {
+      queryClient.invalidateQueries({ queryKey: ['referees'] });
+      refetchReferees();
     },
-    games: () => {
-      queryClient.invalidateQueries({ queryKey: ['games'] });
-      refetchGames();
+    regionalAssociations: () => {
+      queryClient.invalidateQueries({ queryKey: ['regional_associations'] });
+      refetchRegionalAssociations();
+    },
+    federations: () => {
+      queryClient.invalidateQueries({ queryKey: ['federations'] });
+      refetchFederations();
     },
     all: () => {
       queryClient.invalidateQueries();
+      refetchTeams();
+      refetchClubs();
+      refetchCompetitions();
+      refetchGames();
+      refetchPlayers();
       refetchNews();
       refetchEvents();
-      refetchTeams();
-      refetchGames();
-      refetchCompetitions();
-      refetchPlayers();
       refetchReferees();
-      refetchCoaches();
+      refetchRegionalAssociations();
+      refetchFederations();
     }
   };
 
@@ -235,10 +289,15 @@ export const useBackendData = () => {
       update: useUpdate('teams'),
       delete: useDelete('teams')
     },
+    clubs: {
+      create: useCreate('clubs'),
+      update: useUpdate('clubs'),
+      delete: useDelete('clubs')
+    },
     competitions: {
-      create: useCreate('competitions'),
-      update: useUpdate('competitions'),
-      delete: useDelete('competitions')
+      create: useCreate('championships'),
+      update: useUpdate('championships'),
+      delete: useDelete('championships')
     },
     games: {
       create: useCreate('games'),
@@ -265,43 +324,47 @@ export const useBackendData = () => {
       update: useUpdate('referees'),
       delete: useDelete('referees')
     },
-    coaches: {
-      create: useCreate('coaches'),
-      update: useUpdate('coaches'),
-      delete: useDelete('coaches')
+    regionalAssociations: {
+      create: useCreate('regional_associations'),
+      update: useUpdate('regional_associations'),
+      delete: useDelete('regional_associations')
+    },
+    federations: {
+      create: useCreate('federations'),
+      update: useUpdate('federations'),
+      delete: useDelete('federations')
     }
   };
 
   return {
     // Data arrays
     teams,
+    clubs,
     competitions,
     games,
     players,
-    newsData: news,
-    eventsData: events,
+    news,
+    events,
     referees,
-    coaches,
-
-    // Computed data
-    recentGames,
-    upcomingGames,
-    publishedNews,
-    activeEvents,
+    regionalAssociations,
+    federations,
 
     // Loading states
-    isLoading: teamsLoading || competitionsLoading || gamesLoading || playersLoading || 
-               newsLoading || eventsLoading || refereesLoading || coachesLoading,
+    isLoading: teamsLoading || clubsLoading || competitionsLoading || gamesLoading || 
+               playersLoading || newsLoading || eventsLoading || refereesLoading ||
+               regionalAssociationsLoading || federationsLoading,
 
     // Individual loading states
     teamsLoading,
+    clubsLoading,
     competitionsLoading,
     gamesLoading,
     playersLoading,
     newsLoading,
     eventsLoading,
     refereesLoading,
-    coachesLoading,
+    regionalAssociationsLoading,
+    federationsLoading,
 
     // CRUD operations
     operations,

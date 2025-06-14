@@ -14,17 +14,22 @@ import { Plus, Edit, Trash2, Users, MapPin, Calendar, User } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast';
 
 const ClubsManagement = () => {
-  const { teams, teamsLoading, operations } = useBackendData();
+  const { clubs, clubsLoading, operations, regionalAssociations } = useBackendData();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClub, setEditingClub] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
-    city: '',
     island: '',
     founded_year: '',
     logo_url: '',
-    status: 'ativo'
+    contact_email: '',
+    contact_phone: '',
+    address: '',
+    website: '',
+    description: '',
+    status: 'ativo',
+    regional_association_id: ''
   });
 
   const islands = ['Santiago', 'São Vicente', 'Santo Antão', 'Fogo', 'Maio', 'Sal', 'Boa Vista', 'Brava', 'São Nicolau'];
@@ -36,26 +41,24 @@ const ClubsManagement = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.city || !formData.island) {
+    if (!formData.name || !formData.island) {
       toast({
         title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios.",
+        description: "Por favor, preencha os campos obrigatórios.",
         variant: "destructive"
       });
       return;
     }
 
-    console.log('Submitting club data:', formData);
-    
     try {
       const clubData = {
         ...formData,
-        founded_year: formData.founded_year ? parseInt(formData.founded_year) : null
+        founded_year: formData.founded_year ? parseInt(formData.founded_year) : null,
+        active: true
       };
 
       if (editingClub) {
-        console.log('Updating club:', editingClub.id, clubData);
-        await operations.teams.update.mutateAsync({ 
+        await operations.clubs.update.mutateAsync({ 
           id: editingClub.id, 
           data: clubData 
         });
@@ -64,8 +67,7 @@ const ClubsManagement = () => {
           description: "Clube atualizado com sucesso!"
         });
       } else {
-        console.log('Creating new club:', clubData);
-        await operations.teams.create.mutateAsync(clubData);
+        await operations.clubs.create.mutateAsync(clubData);
         toast({
           title: "Sucesso", 
           description: "Clube criado com sucesso!"
@@ -85,15 +87,19 @@ const ClubsManagement = () => {
   };
 
   const handleEdit = (club: any) => {
-    console.log('Editing club:', club);
     setEditingClub(club);
     setFormData({
       name: club.name || '',
-      city: club.city || '',
       island: club.island || '',
       founded_year: club.founded_year?.toString() || '',
       logo_url: club.logo_url || '',
-      status: club.status || 'ativo'
+      contact_email: club.contact_email || '',
+      contact_phone: club.contact_phone || '',
+      address: club.address || '',
+      website: club.website || '',
+      description: club.description || '',
+      status: club.status || 'ativo',
+      regional_association_id: club.regional_association_id || ''
     });
     setIsDialogOpen(true);
   };
@@ -101,8 +107,7 @@ const ClubsManagement = () => {
   const handleDelete = async (clubId: string) => {
     if (confirm('Tem certeza que deseja eliminar este clube?')) {
       try {
-        console.log('Deleting club:', clubId);
-        await operations.teams.delete.mutateAsync(clubId);
+        await operations.clubs.delete.mutateAsync(clubId);
         toast({
           title: "Sucesso",
           description: "Clube eliminado com sucesso!"
@@ -121,16 +126,21 @@ const ClubsManagement = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      city: '',
       island: '',
       founded_year: '',
       logo_url: '',
-      status: 'ativo'
+      contact_email: '',
+      contact_phone: '',
+      address: '',
+      website: '',
+      description: '',
+      status: 'ativo',
+      regional_association_id: ''
     });
     setEditingClub(null);
   };
 
-  if (teamsLoading) {
+  if (clubsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" />
@@ -146,7 +156,7 @@ const ClubsManagement = () => {
             <Users className="h-6 w-6" />
             Gestão de Clubes
           </h2>
-          <p className="text-gray-600">Gerir clubes, equipas e informações administrativas</p>
+          <p className="text-gray-600">Gerir clubes e informações administrativas</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -156,7 +166,7 @@ const ClubsManagement = () => {
               Novo Clube
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingClub ? 'Editar Clube' : 'Novo Clube'}
@@ -178,19 +188,6 @@ const ClubsManagement = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="city">Cidade *</Label>
-                  <Input
-                    id="city"
-                    value={formData.city}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    required
-                    placeholder="Ex: Praia"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
                   <Label htmlFor="island">Ilha *</Label>
                   <Select value={formData.island} onValueChange={(value) => handleInputChange('island', value)}>
                     <SelectTrigger>
@@ -203,6 +200,9 @@ const ClubsManagement = () => {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="founded_year">Ano de Fundação</Label>
                   <Input
@@ -215,21 +215,55 @@ const ClubsManagement = () => {
                     placeholder="Ex: 1985"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="regional_association_id">Associação Regional</Label>
+                  <Select value={formData.regional_association_id} onValueChange={(value) => handleInputChange('regional_association_id', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar associação" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {regionalAssociations.map((association) => (
+                        <SelectItem key={association.id} value={association.id}>
+                          {association.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="status">Status</Label>
-                  <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ativo">Ativo</SelectItem>
-                      <SelectItem value="inativo">Inativo</SelectItem>
-                      <SelectItem value="suspenso">Suspenso</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="contact_email">Email de Contacto</Label>
+                  <Input
+                    id="contact_email"
+                    type="email"
+                    value={formData.contact_email}
+                    onChange={(e) => handleInputChange('contact_email', e.target.value)}
+                    placeholder="clube@exemplo.com"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="contact_phone">Telefone de Contacto</Label>
+                  <Input
+                    id="contact_phone"
+                    value={formData.contact_phone}
+                    onChange={(e) => handleInputChange('contact_phone', e.target.value)}
+                    placeholder="+238 123 456 789"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="website">Website</Label>
+                  <Input
+                    id="website"
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => handleInputChange('website', e.target.value)}
+                    placeholder="https://clube.exemplo.com"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="logo_url">URL do Logo</Label>
@@ -241,6 +275,26 @@ const ClubsManagement = () => {
                     placeholder="https://exemplo.com/logo.png"
                   />
                 </div>
+              </div>
+
+              <div>
+                <Label htmlFor="address">Endereço</Label>
+                <Input
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  placeholder="Endereço completo do clube"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="description">Descrição</Label>
+                <Input
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Breve descrição do clube"
+                />
               </div>
 
               <div className="flex gap-2 pt-4">
@@ -268,7 +322,7 @@ const ClubsManagement = () => {
               <Users className="h-5 w-5 text-cv-blue" />
               <div>
                 <p className="text-sm font-medium">Total de Clubes</p>
-                <p className="text-2xl font-bold text-cv-blue">{teams.length}</p>
+                <p className="text-2xl font-bold text-cv-blue">{clubs.length}</p>
               </div>
             </div>
           </CardContent>
@@ -280,7 +334,7 @@ const ClubsManagement = () => {
               <div>
                 <p className="text-sm font-medium">Clubes Ativos</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {teams.filter(team => team.status === 'ativo').length}
+                  {clubs.filter(club => club.active).length}
                 </p>
               </div>
             </div>
@@ -293,7 +347,7 @@ const ClubsManagement = () => {
               <div>
                 <p className="text-sm font-medium">Fundados Este Ano</p>
                 <p className="text-2xl font-bold text-orange-600">
-                  {teams.filter(team => team.founded_year === new Date().getFullYear()).length}
+                  {clubs.filter(club => club.founded_year === new Date().getFullYear()).length}
                 </p>
               </div>
             </div>
@@ -306,7 +360,7 @@ const ClubsManagement = () => {
               <div>
                 <p className="text-sm font-medium">Ilhas Representadas</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {new Set(teams.map(team => team.island)).size}
+                  {new Set(clubs.map(club => club.island)).size}
                 </p>
               </div>
             </div>
@@ -316,7 +370,7 @@ const ClubsManagement = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Clubes Registados ({teams.length})</CardTitle>
+          <CardTitle>Clubes Registados ({clubs.length})</CardTitle>
           <CardDescription>
             Lista completa de clubes no sistema
           </CardDescription>
@@ -326,26 +380,34 @@ const ClubsManagement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>Cidade/Ilha</TableHead>
+                <TableHead>Ilha</TableHead>
                 <TableHead>Fundação</TableHead>
+                <TableHead>Contacto</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {teams.map((club: any) => (
+              {clubs.map((club: any) => (
                 <TableRow key={club.id}>
                   <TableCell className="font-medium">{club.name}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-1">
                       <MapPin className="h-3 w-3 text-gray-400" />
-                      <span>{club.city}, {club.island}</span>
+                      <span>{club.island}</span>
                     </div>
                   </TableCell>
                   <TableCell>{club.founded_year || '—'}</TableCell>
                   <TableCell>
-                    <Badge variant={club.status === 'ativo' ? 'default' : 'secondary'}>
-                      {club.status}
+                    <div className="text-sm">
+                      {club.contact_email && <div>{club.contact_email}</div>}
+                      {club.contact_phone && <div>{club.contact_phone}</div>}
+                      {!club.contact_email && !club.contact_phone && '—'}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={club.active ? 'default' : 'secondary'}>
+                      {club.active ? 'Ativo' : 'Inativo'}
                     </Badge>
                   </TableCell>
                   <TableCell>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import PageLayout from '@/pages/PageLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
@@ -33,8 +32,12 @@ import {
   User,
   UserCheck,
   GraduationCap,
-  GamepadIcon
+  GamepadIcon,
+  Building2,
+  Building
 } from 'lucide-react';
+import RegionalAssociationsManagement from '@/components/admin/RegionalAssociationsManagement';
+import FederationsManagement from '@/components/admin/FederationsManagement';
 
 const AreaReservadaPage = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -51,6 +54,8 @@ const AreaReservadaPage = () => {
       { id: 'news', label: 'Notícias', icon: FileText, permission: { resource: 'news', action: 'create' } },
       { id: 'events', label: 'Eventos', icon: Calendar, permission: { resource: 'events', action: 'create' } },
       { id: 'competitions', label: 'Competições', icon: Trophy, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'federations', label: 'Federações', icon: Building2, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'regionalAssociations', label: 'Ass. Regionais', icon: Building, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'clubs', label: 'Clubes', icon: Users, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'players', label: 'Jogadores', icon: UserCheck, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'coaches', label: 'Treinadores', icon: GraduationCap, permission: { resource: 'dashboard', action: 'view' } },
@@ -108,6 +113,18 @@ const AreaReservadaPage = () => {
         return (
           <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
             <CompetitionsManagementAdvanced />
+          </PermissionGuard>
+        );
+      case 'federations':
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <FederationsManagement />
+          </PermissionGuard>
+        );
+      case 'regionalAssociations':
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <RegionalAssociationsManagement />
           </PermissionGuard>
         );
       case 'clubs':

@@ -55,7 +55,8 @@ const PlayersManagementAdvanced = () => {
         jersey_number: formData.jersey_number ? parseInt(formData.jersey_number) : null,
         height_cm: formData.height_cm ? parseInt(formData.height_cm) : null,
         weight_kg: formData.weight_kg ? parseInt(formData.weight_kg) : null,
-        birth_date: formData.birth_date || null
+        birth_date: formData.birth_date || null,
+        active: formData.status === 'ativo'
       };
 
       if (editingPlayer) {
@@ -99,7 +100,7 @@ const PlayersManagementAdvanced = () => {
       weight_kg: player.weight_kg?.toString() || '',
       birth_date: player.birth_date || '',
       nationality: player.nationality || 'Cabo Verde',
-      status: player.status || 'ativo'
+      status: player.active ? 'ativo' : 'inativo'
     });
     setIsDialogOpen(true);
   };
@@ -331,8 +332,8 @@ const PlayersManagementAdvanced = () => {
                   <TableCell>{player.jersey_number || '—'}</TableCell>
                   <TableCell>{player.nationality || '—'}</TableCell>
                   <TableCell>
-                    <Badge variant={player.status === 'ativo' ? 'default' : 'secondary'}>
-                      {player.status || 'ativo'}
+                    <Badge variant={player.active ? 'default' : 'secondary'}>
+                      {player.active ? 'Ativo' : 'Inativo'}
                     </Badge>
                   </TableCell>
                   <TableCell>
