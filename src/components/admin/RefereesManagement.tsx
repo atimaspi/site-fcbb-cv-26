@@ -21,45 +21,46 @@ const RefereesManagement = () => {
   const [editingReferee, setEditingReferee] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    first_name: '',
+    last_name: '',
     license_number: '',
-    category: '',
+    level: '',
     phone: '',
     email: '',
     island: '',
-    status: 'ativo'
+    active: true
   });
 
   const islands = ['Santiago', 'São Vicente', 'Santo Antão', 'Fogo', 'Maio', 'Sal', 'Boa Vista', 'Brava', 'São Nicolau'];
-  const categories = ['Nacional', 'Regional', 'Distrital', 'Juventude', 'Formação'];
+  const levels = ['Nacional', 'Regional', 'Distrital', 'Juventude', 'Formação'];
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const validateForm = () => {
-    if (!formData.name?.trim()) {
+    if (!formData.first_name?.trim()) {
       toast({
         title: "Erro de Validação",
-        description: "Nome é obrigatório.",
+        description: "Primeiro nome é obrigatório.",
         variant: "destructive"
       });
       return false;
     }
     
-    if (!formData.category) {
+    if (!formData.last_name?.trim()) {
       toast({
         title: "Erro de Validação",
-        description: "Categoria é obrigatória.",
+        description: "Último nome é obrigatório.",
         variant: "destructive"
       });
       return false;
     }
     
-    if (!formData.island) {
+    if (!formData.level) {
       toast({
         title: "Erro de Validação",
-        description: "Ilha é obrigatória.",
+        description: "Nível é obrigatório.",
         variant: "destructive"
       });
       return false;
@@ -87,7 +88,8 @@ const RefereesManagement = () => {
     try {
       const dataToSubmit = {
         ...formData,
-        name: formData.name.trim(),
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
         license_number: formData.license_number?.trim() || null,
         phone: formData.phone?.trim() || null,
         email: formData.email?.trim() || null,
@@ -127,13 +129,14 @@ const RefereesManagement = () => {
   const handleEdit = (referee: any) => {
     setEditingReferee(referee);
     setFormData({
-      name: referee.name || '',
+      first_name: referee.first_name || '',
+      last_name: referee.last_name || '',
       license_number: referee.license_number || '',
-      category: referee.category || '',
+      level: referee.level || '',
       phone: referee.phone || '',
       email: referee.email || '',
       island: referee.island || '',
-      status: referee.status || 'ativo'
+      active: referee.active !== false
     });
     setIsDialogOpen(true);
   };
@@ -159,13 +162,14 @@ const RefereesManagement = () => {
 
   const resetForm = () => {
     setFormData({
-      name: '',
+      first_name: '',
+      last_name: '',
       license_number: '',
-      category: '',
+      level: '',
       phone: '',
       email: '',
       island: '',
-      status: 'ativo'
+      active: true
     });
     setEditingReferee(null);
   };
@@ -206,16 +210,29 @@ const RefereesManagement = () => {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Nome Completo *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  required
-                  placeholder="Ex: João Silva Santos"
-                  disabled={isSubmitting}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="first_name">Primeiro Nome *</Label>
+                  <Input
+                    id="first_name"
+                    value={formData.first_name}
+                    onChange={(e) => handleInputChange('first_name', e.target.value)}
+                    required
+                    placeholder="Ex: João"
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="last_name">Último Nome *</Label>
+                  <Input
+                    id="last_name"
+                    value={formData.last_name}
+                    onChange={(e) => handleInputChange('last_name', e.target.value)}
+                    required
+                    placeholder="Ex: Silva Santos"
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -230,18 +247,18 @@ const RefereesManagement = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="category">Categoria *</Label>
+                  <Label htmlFor="level">Nível *</Label>
                   <Select 
-                    value={formData.category} 
-                    onValueChange={(value) => handleInputChange('category', value)}
+                    value={formData.level} 
+                    onValueChange={(value) => handleInputChange('level', value)}
                     disabled={isSubmitting}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecionar categoria" />
+                      <SelectValue placeholder="Selecionar nível" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>{category}</SelectItem>
+                      {levels.map((level) => (
+                        <SelectItem key={level} value={level}>{level}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -274,7 +291,7 @@ const RefereesManagement = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="island">Ilha *</Label>
+                  <Label htmlFor="island">Ilha</Label>
                   <Select 
                     value={formData.island} 
                     onValueChange={(value) => handleInputChange('island', value)}
@@ -291,19 +308,18 @@ const RefereesManagement = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="active">Status</Label>
                   <Select 
-                    value={formData.status} 
-                    onValueChange={(value) => handleInputChange('status', value)}
+                    value={formData.active ? 'true' : 'false'} 
+                    onValueChange={(value) => handleInputChange('active', value === 'true')}
                     disabled={isSubmitting}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="ativo">Ativo</SelectItem>
-                      <SelectItem value="inativo">Inativo</SelectItem>
-                      <SelectItem value="suspenso">Suspenso</SelectItem>
+                      <SelectItem value="true">Ativo</SelectItem>
+                      <SelectItem value="false">Inativo</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -358,7 +374,7 @@ const RefereesManagement = () => {
               <div>
                 <p className="text-sm font-medium">Árbitros Ativos</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {referees.filter(ref => ref.status === 'ativo').length}
+                  {referees.filter(ref => ref.active !== false).length}
                 </p>
               </div>
             </div>
@@ -369,9 +385,9 @@ const RefereesManagement = () => {
             <div className="flex items-center space-x-2">
               <Shield className="h-5 w-5 text-orange-600" />
               <div>
-                <p className="text-sm font-medium">Categoria Nacional</p>
+                <p className="text-sm font-medium">Nível Nacional</p>
                 <p className="text-2xl font-bold text-orange-600">
-                  {referees.filter(ref => ref.category === 'Nacional').length}
+                  {referees.filter(ref => ref.level === 'Nacional').length}
                 </p>
               </div>
             </div>
@@ -384,7 +400,7 @@ const RefereesManagement = () => {
               <div>
                 <p className="text-sm font-medium">Ilhas Cobertas</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {new Set(referees.map(ref => ref.island)).size}
+                  {new Set(referees.map(ref => ref.island).filter(Boolean)).size}
                 </p>
               </div>
             </div>
@@ -413,7 +429,7 @@ const RefereesManagement = () => {
                 <TableRow>
                   <TableHead>Nome</TableHead>
                   <TableHead>Licença</TableHead>
-                  <TableHead>Categoria</TableHead>
+                  <TableHead>Nível</TableHead>
                   <TableHead>Contacto</TableHead>
                   <TableHead>Ilha</TableHead>
                   <TableHead>Status</TableHead>
@@ -423,10 +439,12 @@ const RefereesManagement = () => {
               <TableBody>
                 {referees.map((referee: any) => (
                   <TableRow key={referee.id}>
-                    <TableCell className="font-medium">{referee.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {referee.first_name} {referee.last_name}
+                    </TableCell>
                     <TableCell>{referee.license_number || '—'}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{referee.category}</Badge>
+                      <Badge variant="outline">{referee.level}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
@@ -445,14 +463,16 @@ const RefereesManagement = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="h-3 w-3 text-gray-400" />
-                        <span>{referee.island}</span>
-                      </div>
+                      {referee.island && (
+                        <div className="flex items-center space-x-1">
+                          <MapPin className="h-3 w-3 text-gray-400" />
+                          <span>{referee.island}</span>
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={referee.status === 'ativo' ? 'default' : 'secondary'}>
-                        {referee.status}
+                      <Badge variant={referee.active !== false ? 'default' : 'secondary'}>
+                        {referee.active !== false ? 'Ativo' : 'Inativo'}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -467,7 +487,7 @@ const RefereesManagement = () => {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => handleDelete(referee.id, referee.name)}
+                          onClick={() => handleDelete(referee.id, `${referee.first_name} ${referee.last_name}`)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
