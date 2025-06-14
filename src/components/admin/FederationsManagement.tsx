@@ -4,14 +4,30 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Plus, Building, RefreshCw } from 'lucide-react';
+import { Plus, Building, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import FederationForm from './federations/FederationForm';
 import FederationsTable from './federations/FederationsTable';
 
 const FederationsManagement = () => {
-  const { federations, federationsLoading, federationsError, operations } = useBackendData();
+  const { 
+    federations, 
+    federationsLoading, 
+    federationsError, 
+    operations,
+    // Get all errors for comprehensive debugging
+    teamsError,
+    clubsError,
+    competitionsError,
+    gamesError,
+    playersError,
+    newsError,
+    eventsError,
+    refereesError,
+    regionalAssociationsError
+  } = useBackendData();
+  
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingFederation, setEditingFederation] = useState<any>(null);
@@ -27,28 +43,54 @@ const FederationsManagement = () => {
     foundation_date: ''
   });
 
-  // Teste direto da conexão Supabase para debug
+  // Test direct Supabase connection
   useEffect(() => {
     const testSupabaseConnection = async () => {
       try {
-        console.log('=== TESTING SUPABASE CONNECTION ===');
+        console.log('=== COMPREHENSIVE SUPABASE TEST ===');
         
-        // Test 1: Check if we can connect to Supabase
-        const { data: testData, error: testError } = await supabase.from('federations').select('count');
-        console.log('Supabase connection test:', { testData, testError });
+        // Test 1: Basic connection
+        const { data: testConnection, error: connectionError } = await supabase
+          .from('federations')
+          .select('count');
+        console.log('Connection test:', { testConnection, connectionError });
         
-        // Test 2: Try to fetch all federations directly
-        const { data: directFetch, error: directError } = await supabase.from('federations').select('*');
-        console.log('Direct federations fetch:', { directFetch, directError });
+        // Test 2: Direct fetch all federations
+        const { data: directFederations, error: directError } = await supabase
+          .from('federations')
+          .select('*');
+        console.log('Direct federations fetch:', { directFederations, directError });
+        
+        // Test 3: Check table existence
+        const { data: tableCheck, error: tableError } = await supabase
+          .from('information_schema.tables')
+          .select('table_name')
+          .eq('table_schema', 'public')
+          .eq('table_name', 'federations');
+        console.log('Table existence check:', { tableCheck, tableError });
+        
+        // Test 4: Check current user
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        console.log('Current user:', { userData, userError });
+        
+        // Test 5: Check RLS policies
+        const { data: policies, error: policiesError } = await supabase
+          .from('pg_policies')
+          .select('*')
+          .eq('tablename', 'federations');
+        console.log('RLS policies:', { policies, policiesError });
         
         setDebugInfo({
-          connectionTest: { testData, testError },
-          directFetch: { directFetch, directError }
+          connectionTest: { testConnection, connectionError },
+          directFetch: { directFederations, directError },
+          tableCheck: { tableCheck, tableError },
+          currentUser: { userData, userError },
+          rlsPolicies: { policies, policiesError }
         });
         
         console.log('===========================');
       } catch (error) {
-        console.error('Supabase test error:', error);
+        console.error('Comprehensive test error:', error);
         setDebugInfo({ error: error.message });
       }
     };
@@ -56,21 +98,21 @@ const FederationsManagement = () => {
     testSupabaseConnection();
   }, []);
 
-  // Log detalhado para debug do componente
+  // Log all errors
   useEffect(() => {
-    console.log('=== FEDERATIONS MANAGEMENT DEBUG ===');
-    console.log('Component federations:', federations);
-    console.log('Component federationsLoading:', federationsLoading);
-    console.log('Component federationsError:', federationsError);
-    console.log('Total federations in component:', federations?.length || 0);
-    console.log('Federations type in component:', typeof federations);
-    console.log('Is array in component?', Array.isArray(federations));
-    if (federations && federations.length > 0) {
-      console.log('First federation in component:', federations[0]);
-    }
-    console.log('Debug info:', debugInfo);
-    console.log('====================================');
-  }, [federations, federationsLoading, federationsError, debugInfo]);
+    console.log('=== ALL SYSTEM ERRORS ===');
+    console.log('Teams error:', teamsError);
+    console.log('Clubs error:', clubsError);
+    console.log('Competitions error:', competitionsError);
+    console.log('Games error:', gamesError);
+    console.log('Players error:', playersError);
+    console.log('News error:', newsError);
+    console.log('Events error:', eventsError);
+    console.log('Referees error:', refereesError);
+    console.log('Federations error:', federationsError);
+    console.log('Regional Associations error:', regionalAssociationsError);
+    console.log('========================');
+  }, [teamsError, clubsError, competitionsError, gamesError, playersError, newsError, eventsError, refereesError, federationsError, regionalAssociationsError]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -115,7 +157,6 @@ const FederationsManagement = () => {
       
     } catch (error: any) {
       console.error('Error saving federation:', error);
-      console.error('Error details:', error.message, error.code, error.details);
       toast({
         title: "Erro",
         description: `Erro ao salvar federação: ${error.message || 'Erro desconhecido'}`,
@@ -158,11 +199,6 @@ const FederationsManagement = () => {
     }
   };
 
-  const handleForceRefresh = () => {
-    console.log('Force refreshing page...');
-    window.location.reload();
-  };
-
   const resetForm = () => {
     setFormData({
       name: '',
@@ -186,8 +222,43 @@ const FederationsManagement = () => {
     );
   }
 
+  // Show all errors if any exist
+  const allErrors = [
+    { name: 'Federações', error: federationsError },
+    { name: 'Equipas', error: teamsError },
+    { name: 'Clubes', error: clubsError },
+    { name: 'Competições', error: competitionsError },
+    { name: 'Jogos', error: gamesError },
+    { name: 'Jogadores', error: playersError },
+    { name: 'Notícias', error: newsError },
+    { name: 'Eventos', error: eventsError },
+    { name: 'Árbitros', error: refereesError },
+    { name: 'Associações Regionais', error: regionalAssociationsError }
+  ].filter(item => item.error);
+
   return (
     <div className="space-y-6">
+      {/* Show system errors if any */}
+      {allErrors.length > 0 && (
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-red-700 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Erros de Sistema Detectados
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {allErrors.map((item, index) => (
+                <div key={index} className="text-sm text-red-600">
+                  <strong>{item.name}:</strong> {item.error?.message || 'Erro desconhecido'}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-cv-blue flex items-center gap-2">
@@ -195,21 +266,16 @@ const FederationsManagement = () => {
             Gestão de Federações
           </h2>
           <p className="text-gray-600">Gerir federações de basquetebol</p>
-          {federationsError && (
-            <p className="text-red-600 text-sm mt-1">
-              Erro ao carregar: {federationsError.message}
-            </p>
-          )}
         </div>
         
         <div className="flex gap-2">
           <Button 
             variant="outline" 
-            onClick={handleForceRefresh}
+            onClick={() => window.location.reload()}
             className="flex items-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />
-            Atualizar
+            Recarregar
           </Button>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -245,23 +311,17 @@ const FederationsManagement = () => {
           <CardTitle>Federações ({federations?.length || 0})</CardTitle>
           <CardDescription>
             Lista de federações de basquetebol
-            {federations?.length === 0 && !federationsLoading && (
-              <span className="text-yellow-600 block mt-1">
-                {federationsError 
-                  ? 'Erro ao carregar federações. Verifique a conexão com a base de dados.'
-                  : 'Nenhuma federação encontrada. Verifique se a tabela "federations" existe no Supabase.'
-                }
-              </span>
-            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Debug info for troubleshooting */}
+          {/* Enhanced debug info */}
           {debugInfo && (
             <div className="mb-4 p-3 bg-gray-100 rounded text-xs">
               <details>
-                <summary className="cursor-pointer font-medium">Debug Info (clique para expandir)</summary>
-                <pre className="mt-2 overflow-auto">
+                <summary className="cursor-pointer font-medium">
+                  Informações Técnicas de Debug (clique para expandir)
+                </summary>
+                <pre className="mt-2 overflow-auto max-h-64">
                   {JSON.stringify(debugInfo, null, 2)}
                 </pre>
               </details>
@@ -285,7 +345,7 @@ const FederationsManagement = () => {
               </h3>
               <p className="text-gray-500 mb-4">
                 {federationsError 
-                  ? 'Verifique a conexão com a base de dados e as permissões'
+                  ? `Erro: ${federationsError.message}`
                   : 'Comece criando a primeira federação'
                 }
               </p>
