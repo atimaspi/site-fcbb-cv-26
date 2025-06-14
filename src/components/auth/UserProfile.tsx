@@ -115,7 +115,7 @@ const UserProfile = () => {
 
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user?.id) return;
+    if (!user?.id || !profile) return;
     
     setUpdating(true);
     setError('');
@@ -127,6 +127,7 @@ const UserProfile = () => {
         .upsert({ 
           id: user.id,
           full_name: fullName,
+          role: profile.role, // Include the current role
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'id'
