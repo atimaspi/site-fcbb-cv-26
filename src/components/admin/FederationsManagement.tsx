@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,54 +44,30 @@ const FederationsManagement = () => {
     foundation_date: ''
   });
 
-  // Test direct Supabase connection
+  // Simplified Supabase connection test
   useEffect(() => {
     const testSupabaseConnection = async () => {
       try {
-        console.log('=== COMPREHENSIVE SUPABASE TEST ===');
+        console.log('=== TESTING SUPABASE CONNECTION ===');
         
-        // Test 1: Basic connection
-        const { data: testConnection, error: connectionError } = await supabase
-          .from('federations')
-          .select('count');
-        console.log('Connection test:', { testConnection, connectionError });
-        
-        // Test 2: Direct fetch all federations
+        // Test 1: Basic connection to federations
         const { data: directFederations, error: directError } = await supabase
           .from('federations')
           .select('*');
         console.log('Direct federations fetch:', { directFederations, directError });
         
-        // Test 3: Check table existence
-        const { data: tableCheck, error: tableError } = await supabase
-          .from('information_schema.tables')
-          .select('table_name')
-          .eq('table_schema', 'public')
-          .eq('table_name', 'federations');
-        console.log('Table existence check:', { tableCheck, tableError });
-        
-        // Test 4: Check current user
+        // Test 2: Check current user
         const { data: userData, error: userError } = await supabase.auth.getUser();
         console.log('Current user:', { userData, userError });
         
-        // Test 5: Check RLS policies
-        const { data: policies, error: policiesError } = await supabase
-          .from('pg_policies')
-          .select('*')
-          .eq('tablename', 'federations');
-        console.log('RLS policies:', { policies, policiesError });
-        
         setDebugInfo({
-          connectionTest: { testConnection, connectionError },
           directFetch: { directFederations, directError },
-          tableCheck: { tableCheck, tableError },
-          currentUser: { userData, userError },
-          rlsPolicies: { policies, policiesError }
+          currentUser: { userData, userError }
         });
         
         console.log('===========================');
-      } catch (error) {
-        console.error('Comprehensive test error:', error);
+      } catch (error: any) {
+        console.error('Connection test error:', error);
         setDebugInfo({ error: error.message });
       }
     };
