@@ -5,16 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Plus, Building } from 'lucide-react';
+import { Plus, Building, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import FederationForm from './federations/FederationForm';
 import FederationsTable from './federations/FederationsTable';
 
 const FederationsManagement = () => {
-  const { federations, federationsLoading, operations } = useBackendData();
+  const { federations, federationsLoading, federationsError, operations } = useBackendData();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingFederation, setEditingFederation] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '',
     acronym: '',
@@ -26,19 +28,55 @@ const FederationsManagement = () => {
     foundation_date: ''
   });
 
-  // Log detalhado para debug
+  // Teste direto da conexão Supabase para debug
   useEffect(() => {
-    console.log('=== DEBUG FEDERATIONS ===');
-    console.log('Federations data:', federations);
-    console.log('Federations loading:', federationsLoading);
-    console.log('Total federations:', federations?.length || 0);
-    console.log('Federations type:', typeof federations);
-    console.log('Is array?', Array.isArray(federations));
+    const testSupabaseConnection = async () => {
+      try {
+        console.log('=== TESTING SUPABASE CONNECTION ===');
+        
+        // Test 1: Check if we can connect to Supabase
+        const { data: testData, error: testError } = await supabase.from('federations').select('count');
+        console.log('Supabase connection test:', { testData, testError });
+        
+        // Test 2: Try to fetch all federations directly
+        const { data: directFetch, error: directError } = await supabase.from('federations').select('*');
+        console.log('Direct federations fetch:', { directFetch, directError });
+        
+        // Test 3: Check table existence
+        const { data: tables, error: tablesError } = await supabase.rpc('get_tables');
+        console.log('Available tables:', { tables, tablesError });
+        
+        setDebugInfo({
+          connectionTest: { testData, testError },
+          directFetch: { directFetch, directError },
+          tablesInfo: { tables, tablesError }
+        });
+        
+        console.log('===========================');
+      } catch (error) {
+        console.error('Supabase test error:', error);
+        setDebugInfo({ error: error.message });
+      }
+    };
+
+    testSupabaseConnection();
+  }, []);
+
+  // Log detalhado para debug do componente
+  useEffect(() => {
+    console.log('=== FEDERATIONS MANAGEMENT DEBUG ===');
+    console.log('Component federations:', federations);
+    console.log('Component federationsLoading:', federationsLoading);
+    console.log('Component federationsError:', federationsError);
+    console.log('Total federations in component:', federations?.length || 0);
+    console.log('Federations type in component:', typeof federations);
+    console.log('Is array in component?', Array.isArray(federations));
     if (federations && federations.length > 0) {
-      console.log('First federation:', federations[0]);
+      console.log('First federation in component:', federations[0]);
     }
-    console.log('=========================');
-  }, [federations, federationsLoading]);
+    console.log('Debug info:', debugInfo);
+    console.log('====================================');
+  }, [federations, federationsLoading, federationsError, debugInfo]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -80,10 +118,6 @@ const FederationsManagement = () => {
       
       setIsDialogOpen(false);
       resetForm();
-      
-      // Force refresh após criar/editar
-      console.log('Forcing data refresh...');
-      window.location.reload();
       
     } catch (error: any) {
       console.error('Error saving federation:', error);
@@ -130,6 +164,11 @@ const FederationsManagement = () => {
     }
   };
 
+  const handleForceRefresh = () => {
+    console.log('Force refreshing page...');
+    window.location.reload();
+  };
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -162,33 +201,49 @@ const FederationsManagement = () => {
             Gestão de Federações
           </h2>
           <p className="text-gray-600">Gerir federações de basquetebol</p>
+          {federationsError && (
+            <p className="text-red-600 text-sm mt-1">
+              Erro ao carregar: {federationsError.message}
+            </p>
+          )}
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm} className="bg-cv-blue hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Federação
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {editingFederation ? 'Editar Federação' : 'Nova Federação'}
-              </DialogTitle>
-              <DialogDescription>
-                Preencha as informações da federação
-              </DialogDescription>
-            </DialogHeader>
-            <FederationForm
-              formData={formData}
-              isEditing={!!editingFederation}
-              onInputChange={handleInputChange}
-              onSubmit={handleSubmit}
-              onCancel={() => setIsDialogOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleForceRefresh}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Atualizar
+          </Button>
+          
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={resetForm} className="bg-cv-blue hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Nova Federação
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingFederation ? 'Editar Federação' : 'Nova Federação'}
+                </DialogTitle>
+                <DialogDescription>
+                  Preencha as informações da federação
+                </DialogDescription>
+              </DialogHeader>
+              <FederationForm
+                formData={formData}
+                isEditing={!!editingFederation}
+                onInputChange={handleInputChange}
+                onSubmit={handleSubmit}
+                onCancel={() => setIsDialogOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
@@ -198,12 +253,27 @@ const FederationsManagement = () => {
             Lista de federações de basquetebol
             {federations?.length === 0 && !federationsLoading && (
               <span className="text-yellow-600 block mt-1">
-                Nenhuma federação encontrada. Verifique a conexão com a base de dados.
+                {federationsError 
+                  ? 'Erro ao carregar federações. Verifique a conexão com a base de dados.'
+                  : 'Nenhuma federação encontrada. Verifique se a tabela "federations" existe no Supabase.'
+                }
               </span>
             )}
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Debug info for troubleshooting */}
+          {debugInfo && (
+            <div className="mb-4 p-3 bg-gray-100 rounded text-xs">
+              <details>
+                <summary className="cursor-pointer font-medium">Debug Info (clique para expandir)</summary>
+                <pre className="mt-2 overflow-auto">
+                  {JSON.stringify(debugInfo, null, 2)}
+                </pre>
+              </details>
+            </div>
+          )}
+          
           {federations?.length > 0 ? (
             <FederationsTable
               federations={federations}
@@ -214,10 +284,16 @@ const FederationsManagement = () => {
             <div className="text-center py-8">
               <Building className="mx-auto h-16 w-16 text-gray-400 mb-4" />
               <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                Nenhuma federação encontrada
+                {federationsError 
+                  ? 'Erro ao carregar federações'
+                  : 'Nenhuma federação encontrada'
+                }
               </h3>
               <p className="text-gray-500 mb-4">
-                Comece criando a primeira federação
+                {federationsError 
+                  ? 'Verifique a conexão com a base de dados e as permissões'
+                  : 'Comece criando a primeira federação'
+                }
               </p>
               <Button onClick={() => setIsDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />

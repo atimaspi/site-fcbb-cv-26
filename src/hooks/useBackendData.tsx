@@ -31,13 +31,30 @@ export const useBackendData = () => {
   const { data: newsData, isLoading: newsLoading } = useFetch('news');
   const { data: eventsData, isLoading: eventsLoading } = useFetch('events');
   const { data: refereesData, isLoading: refereesLoading } = useFetch('referees');
+  
+  // Tentar fetch direto das federações com debug detalhado
   const { data: federationsData, isLoading: federationsLoading, error: federationsError } = useFetch('federations');
   const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading } = useFetch('regional_associations');
 
-  // Debug federations especificamente
-  console.log('useBackendData - federationsData raw:', federationsData);
-  console.log('useBackendData - federationsLoading:', federationsLoading);
-  console.log('useBackendData - federationsError:', federationsError);
+  // Debug federations com informações mais detalhadas
+  console.log('=== DETAILED FEDERATIONS DEBUG ===');
+  console.log('Raw federationsData:', federationsData);
+  console.log('Type of federationsData:', typeof federationsData);
+  console.log('Is federationsData null?', federationsData === null);
+  console.log('Is federationsData undefined?', federationsData === undefined);
+  console.log('Is federationsData an array?', Array.isArray(federationsData));
+  console.log('federationsData length:', federationsData?.length);
+  console.log('federationsLoading:', federationsLoading);
+  console.log('federationsError:', federationsError);
+  if (federationsError) {
+    console.error('Federations error details:', {
+      message: federationsError.message,
+      code: federationsError.code,
+      details: federationsError.details,
+      hint: federationsError.hint
+    });
+  }
+  console.log('==============================');
 
   // Process arrays with memoization
   const teams: Team[] = useMemo(() => safeArrayCast<Team>(teamsData), [teamsData]);
@@ -49,8 +66,11 @@ export const useBackendData = () => {
   const events: Event[] = useMemo(() => safeArrayCast<Event>(eventsData), [eventsData]);
   const referees: Referee[] = useMemo(() => safeArrayCast<Referee>(refereesData), [refereesData]);
   const federations: Federation[] = useMemo(() => {
+    console.log('Processing federations data in useMemo...');
+    console.log('Input federationsData:', federationsData);
     const result = safeArrayCast<Federation>(federationsData);
-    console.log('useBackendData - processed federations:', result);
+    console.log('Processed federations result:', result);
+    console.log('Processed federations length:', result.length);
     return result;
   }, [federationsData]);
   const regionalAssociations: RegionalAssociation[] = useMemo(() => safeArrayCast<RegionalAssociation>(regionalAssociationsData), [regionalAssociationsData]);
