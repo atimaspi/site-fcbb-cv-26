@@ -14,6 +14,9 @@ import GalleryManagement from '@/components/admin/GalleryManagement';
 import StatisticsManagement from '@/components/admin/StatisticsManagement';
 import RefereesManagement from '@/components/admin/RefereesManagement';
 import SystemSettings from '@/components/admin/SystemSettings';
+import PlayersManagementAdvanced from '@/components/admin/PlayersManagementAdvanced';
+import CoachesManagement from '@/components/admin/CoachesManagement';
+import GamesManagementAdvanced from '@/components/admin/GamesManagementAdvanced';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,7 +30,10 @@ import {
   BarChart3,
   Shield,
   Upload,
-  User
+  User,
+  UserCheck,
+  GraduationCap,
+  GamepadIcon
 } from 'lucide-react';
 
 const AreaReservadaPage = () => {
@@ -46,6 +52,9 @@ const AreaReservadaPage = () => {
       { id: 'events', label: 'Eventos', icon: Calendar, permission: { resource: 'events', action: 'create' } },
       { id: 'competitions', label: 'Competições', icon: Trophy, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'clubs', label: 'Clubes', icon: Users, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'players', label: 'Jogadores', icon: UserCheck, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'coaches', label: 'Treinadores', icon: GraduationCap, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'games', label: 'Jogos', icon: GamepadIcon, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'gallery', label: 'Galeria', icon: Upload, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'stats', label: 'Estatísticas', icon: BarChart3, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'referees', label: 'Arbitragem', icon: Shield, permission: { resource: 'dashboard', action: 'view' } },
@@ -105,6 +114,24 @@ const AreaReservadaPage = () => {
         return (
           <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
             <ClubsManagement />
+          </PermissionGuard>
+        );
+      case 'players':
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <PlayersManagementAdvanced />
+          </PermissionGuard>
+        );
+      case 'coaches':
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <CoachesManagement />
+          </PermissionGuard>
+        );
+      case 'games':
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <GamesManagementAdvanced />
           </PermissionGuard>
         );
       case 'gallery':
