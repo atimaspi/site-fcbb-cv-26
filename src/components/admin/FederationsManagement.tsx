@@ -1,15 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Plus, Building, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import FederationForm from './federations/FederationForm';
-import FederationsTable from './federations/FederationsTable';
+import ErrorDisplayCard from './federations/ErrorDisplayCard';
+import FederationsHeader from './federations/FederationsHeader';
+import FederationsContent from './federations/FederationsContent';
 
 const FederationsManagement = () => {
   const { 
@@ -17,7 +14,6 @@ const FederationsManagement = () => {
     federationsLoading, 
     federationsError, 
     operations,
-    // Get all errors for comprehensive debugging
     teamsError,
     clubsError,
     competitionsError,
@@ -50,13 +46,11 @@ const FederationsManagement = () => {
       try {
         console.log('=== TESTING SUPABASE CONNECTION ===');
         
-        // Test 1: Basic connection to federations
         const { data: directFederations, error: directError } = await supabase
           .from('federations')
           .select('*');
         console.log('Direct federations fetch:', { directFederations, directError });
         
-        // Test 2: Check current user
         const { data: userData, error: userError } = await supabase.auth.getUser();
         console.log('Current user:', { userData, userError });
         
@@ -215,125 +209,26 @@ const FederationsManagement = () => {
 
   return (
     <div className="space-y-6">
-      {/* Show system errors if any */}
-      {allErrors.length > 0 && (
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader>
-            <CardTitle className="text-red-700 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Erros de Sistema Detectados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {allErrors.map((item, index) => (
-                <div key={index} className="text-sm text-red-600">
-                  <strong>{item.name}:</strong> {item.error?.message || 'Erro desconhecido'}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <ErrorDisplayCard allErrors={allErrors} />
 
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-cv-blue flex items-center gap-2">
-            <Building className="h-6 w-6" />
-            Gestão de Federações
-          </h2>
-          <p className="text-gray-600">Gerir federações de basquetebol</p>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.reload()}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Recarregar
-          </Button>
-          
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={resetForm} className="bg-cv-blue hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Nova Federação
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingFederation ? 'Editar Federação' : 'Nova Federação'}
-                </DialogTitle>
-                <DialogDescription>
-                  Preencha as informações da federação
-                </DialogDescription>
-              </DialogHeader>
-              <FederationForm
-                formData={formData}
-                isEditing={!!editingFederation}
-                onInputChange={handleInputChange}
-                onSubmit={handleSubmit}
-                onCancel={() => setIsDialogOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+      <FederationsHeader
+        isDialogOpen={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
+        editingFederation={editingFederation}
+        formData={formData}
+        onInputChange={handleInputChange}
+        onSubmit={handleSubmit}
+        resetForm={resetForm}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Federações ({federations?.length || 0})</CardTitle>
-          <CardDescription>
-            Lista de federações de basquetebol
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* Enhanced debug info */}
-          {debugInfo && (
-            <div className="mb-4 p-3 bg-gray-100 rounded text-xs">
-              <details>
-                <summary className="cursor-pointer font-medium">
-                  Informações Técnicas de Debug (clique para expandir)
-                </summary>
-                <pre className="mt-2 overflow-auto max-h-64">
-                  {JSON.stringify(debugInfo, null, 2)}
-                </pre>
-              </details>
-            </div>
-          )}
-          
-          {federations?.length > 0 ? (
-            <FederationsTable
-              federations={federations}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ) : (
-            <div className="text-center py-8">
-              <Building className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                {federationsError 
-                  ? 'Erro ao carregar federações'
-                  : 'Nenhuma federação encontrada'
-                }
-              </h3>
-              <p className="text-gray-500 mb-4">
-                {federationsError 
-                  ? `Erro: ${federationsError.message}`
-                  : 'Comece criando a primeira federação'
-                }
-              </p>
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Criar Primeira Federação
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <FederationsContent
+        federations={federations}
+        federationsError={federationsError}
+        debugInfo={debugInfo}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onCreateClick={() => setIsDialogOpen(true)}
+      />
     </div>
   );
 };
