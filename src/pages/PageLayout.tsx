@@ -33,9 +33,9 @@ const PageLayout = ({ title, children, description, keywords, image }: PageLayou
           role="main"
           aria-labelledby="page-title"
         >
-          <ResponsiveContainer maxWidth="xl" padding="md" className="py-8">
+          <ResponsiveContainer maxWidth="xl" padding="md" className="py-6">
             <SmoothTransition direction="up" duration={0.3}>
-              <header className="mb-6">
+              <header className="mb-4">
                 <h1 
                   id="page-title"
                   className="section-title text-2xl md:text-3xl font-bold text-cv-blue mb-2"

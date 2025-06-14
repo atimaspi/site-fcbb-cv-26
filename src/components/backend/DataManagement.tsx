@@ -6,6 +6,9 @@ import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import ClubForm from './ClubForm';
 import { 
   Users, 
   Trophy, 
@@ -31,7 +34,12 @@ const DataManagement = () => {
     isLoading
   } = useBackendData();
 
+  const { toast } = useToast();
+
   const [activeTab, setActiveTab] = useState('teams');
+  const [isClubFormOpen, setIsClubFormOpen] = useState(false);
+  const [editingClub, setEditingClub] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isLoading) {
     return (
@@ -41,14 +49,70 @@ const DataManagement = () => {
     );
   }
 
+  const handleClubSubmit = async (data: any) => {
+    setIsSubmitting(true);
+    try {
+      if (editingClub) {
+        await operations.teams.update.mutateAsync({ id: editingClub.id, data });
+        toast({ title: "Sucesso", description: "Clube atualizado com sucesso!" });
+      } else {
+        await operations.teams.create.mutateAsync(data);
+        toast({ title: "Sucesso", description: "Clube criado com sucesso!" });
+      }
+      setIsClubFormOpen(false);
+      setEditingClub(null);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: `Não foi possível salvar o clube: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const handleClubDelete = async (clubId: string) => {
+    if (window.confirm('Tem a certeza que quer eliminar este clube?')) {
+      try {
+        await operations.teams.delete.mutateAsync(clubId);
+        toast({ title: "Sucesso", description: "Clube eliminado com sucesso!" });
+      } catch (error: any) {
+        toast({
+          title: "Erro",
+          description: `Não foi possível eliminar o clube: ${error.message}`,
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const renderTeamsTab = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Gestão de Clubes</h3>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Clube
-        </Button>
+        <Dialog open={isClubFormOpen} onOpenChange={setIsClubFormOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => { setEditingClub(null); setIsClubFormOpen(true); }}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Clube
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingClub ? 'Editar Clube' : 'Novo Clube'}</DialogTitle>
+              <DialogDescription>
+                Preencha os detalhes do clube abaixo.
+              </DialogDescription>
+            </DialogHeader>
+            <ClubForm
+              onSubmit={handleClubSubmit}
+              initialData={editingClub}
+              onCancel={() => setIsClubFormOpen(false)}
+              isSubmitting={isSubmitting}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
       
       <Table>
@@ -76,10 +140,10 @@ const DataManagement = () => {
               </TableCell>
               <TableCell>
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => { setEditingClub(team); setIsClubFormOpen(true); }}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleClubDelete(team.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
