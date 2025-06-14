@@ -179,7 +179,7 @@ const Dashboard = () => {
                             {teams.find((t: Team) => t.id === game.home_team_id)?.name || 'Casa'} {game.home_score} - {game.away_score} {teams.find((t: Team) => t.id === game.away_team_id)?.name || 'Visitante'}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {new Date(game.game_date).toLocaleDateString('pt-PT')}
+                            {new Date(game.scheduled_date).toLocaleDateString('pt-PT')}
                           </p>
                         </div>
                       </div>

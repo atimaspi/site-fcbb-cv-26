@@ -75,8 +75,10 @@ export interface NewsItem {
   content: string;
   excerpt?: string;
   image_url?: string;
+  featured_image_url?: string;
   category?: string;
   published?: boolean;
+  published_at?: string;
   status?: string;
   author?: string;
   author_id?: string;
@@ -94,6 +96,7 @@ export interface Event {
   location?: string;
   type?: string;
   organizer?: string;
+  status?: string;
   created_at?: string;
 }
 
@@ -181,6 +184,7 @@ export const useBackendData = () => {
   const { data: newsData, isLoading: newsLoading, refetch: refetchNews } = useFetch('news');
   const { data: eventsData, isLoading: eventsLoading, refetch: refetchEvents } = useFetch('events');
   const { data: refereesData, isLoading: refereesLoading, refetch: refetchReferees } = useFetch('referees');
+  const { data: coachesData, isLoading: coachesLoading, refetch: refetchCoaches } = useFetch('coaches');
   const { data: regionalAssociationsData, isLoading: regionalAssociationsLoading, refetch: refetchRegionalAssociations } = useFetch('regional_associations');
   const { data: federationsData, isLoading: federationsLoading, refetch: refetchFederations } = useFetch('federations');
 
@@ -217,6 +221,10 @@ export const useBackendData = () => {
     return safeArrayCast<Referee>(refereesData, ['id', 'first_name', 'last_name', 'level']);
   }, [refereesData]);
 
+  const coaches: Coach[] = useMemo(() => {
+    return safeArrayCast<Coach>(coachesData, ['id', 'name', 'status']);
+  }, [coachesData]);
+
   const regionalAssociations: RegionalAssociation[] = useMemo(() => {
     return safeArrayCast<RegionalAssociation>(regionalAssociationsData, ['id', 'name', 'federation_id']);
   }, [regionalAssociationsData]);
@@ -224,6 +232,29 @@ export const useBackendData = () => {
   const federations: Federation[] = useMemo(() => {
     return safeArrayCast<Federation>(federationsData, ['id', 'name']);
   }, [federationsData]);
+
+  // Computed properties for backward compatibility
+  const publishedNews = useMemo(() => {
+    return news.filter(item => item.published === true || item.status === 'published');
+  }, [news]);
+
+  const activeEvents = useMemo(() => {
+    return events.filter(event => event.status === 'active' || !event.status);
+  }, [events]);
+
+  const recentGames = useMemo(() => {
+    return games
+      .filter(game => game.status === 'finalizado')
+      .sort((a, b) => new Date(b.scheduled_date).getTime() - new Date(a.scheduled_date).getTime())
+      .slice(0, 5);
+  }, [games]);
+
+  const upcomingGames = useMemo(() => {
+    return games
+      .filter(game => game.status === 'agendado' || new Date(game.scheduled_date) > new Date())
+      .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
+      .slice(0, 5);
+  }, [games]);
 
   // Função para forçar atualização de dados específicos
   const refreshData = {
@@ -259,6 +290,10 @@ export const useBackendData = () => {
       queryClient.invalidateQueries({ queryKey: ['referees'] });
       refetchReferees();
     },
+    coaches: () => {
+      queryClient.invalidateQueries({ queryKey: ['coaches'] });
+      refetchCoaches();
+    },
     regionalAssociations: () => {
       queryClient.invalidateQueries({ queryKey: ['regional_associations'] });
       refetchRegionalAssociations();
@@ -277,6 +312,7 @@ export const useBackendData = () => {
       refetchNews();
       refetchEvents();
       refetchReferees();
+      refetchCoaches();
       refetchRegionalAssociations();
       refetchFederations();
     }
@@ -324,6 +360,11 @@ export const useBackendData = () => {
       update: useUpdate('referees'),
       delete: useDelete('referees')
     },
+    coaches: {
+      create: useCreate('coaches'),
+      update: useUpdate('coaches'),
+      delete: useDelete('coaches')
+    },
     regionalAssociations: {
       create: useCreate('regional_associations'),
       update: useUpdate('regional_associations'),
@@ -346,13 +387,24 @@ export const useBackendData = () => {
     news,
     events,
     referees,
+    coaches,
     regionalAssociations,
     federations,
+
+    // Computed properties for backward compatibility
+    publishedNews,
+    activeEvents,
+    recentGames,
+    upcomingGames,
+
+    // Raw data for DataManagement component
+    newsData,
+    eventsData,
 
     // Loading states
     isLoading: teamsLoading || clubsLoading || competitionsLoading || gamesLoading || 
                playersLoading || newsLoading || eventsLoading || refereesLoading ||
-               regionalAssociationsLoading || federationsLoading,
+               coachesLoading || regionalAssociationsLoading || federationsLoading,
 
     // Individual loading states
     teamsLoading,
@@ -363,6 +415,7 @@ export const useBackendData = () => {
     newsLoading,
     eventsLoading,
     refereesLoading,
+    coachesLoading,
     regionalAssociationsLoading,
     federationsLoading,
 
