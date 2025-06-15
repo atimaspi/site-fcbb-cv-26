@@ -64,27 +64,28 @@ const Hero = memo(() => {
   return (
     <section className="relative">
       {/* Main Hero Slider */}
-      <div className="relative h-[70vh] overflow-hidden">
+      <div className="relative h-[60vh] md:h-[70vh] overflow-hidden">
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-transform duration-700 ease-in-out ${
+            className={`absolute inset-0 transition-transform duration-500 ease-out ${
               index === currentSlide ? 'translate-x-0' : 
               index < currentSlide ? '-translate-x-full' : 'translate-x-full'
             }`}
           >
             <div className="relative h-full">
               <OptimizedImage
-                src={`${slide.image}?auto=format&fit=crop&w=1920&h=1080&q=75`}
+                src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover"
                 width={1920}
                 height={1080}
                 priority={index === 0}
                 sizes="100vw"
-                quality={75}
+                quality={70}
+                lazy={index !== 0}
               />
-              <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
               
               <div className="absolute inset-0 flex items-center">
                 <div className="cv-container">
@@ -92,13 +93,13 @@ const Hero = memo(() => {
                     <span className="inline-block px-3 py-1 bg-cv-red text-sm font-medium rounded-full mb-4">
                       {slide.subtitle}
                     </span>
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                    <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
                       {slide.title}
                     </h1>
-                    <p className="text-xl mb-6 text-gray-200">
+                    <p className="text-lg md:text-xl mb-6 text-gray-200">
                       {slide.description}
                     </p>
-                    <div className="flex space-x-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <Button size="lg" className="bg-cv-blue hover:bg-blue-700" asChild>
                         <Link to={slide.link}>{slide.cta}</Link>
                       </Button>
@@ -117,17 +118,17 @@ const Hero = memo(() => {
         {/* Navigation arrows */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 md:p-3 rounded-full transition-all"
           aria-label="Slide anterior"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-4 w-4 md:h-6 md:w-6" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition-all"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 md:p-3 rounded-full transition-all"
           aria-label="Próximo slide"
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-4 w-4 md:h-6 md:w-6" />
         </button>
 
         {/* Slide indicators */}
@@ -137,7 +138,7 @@ const Hero = memo(() => {
               key={index}
               onClick={() => goToSlide(index)}
               className={`w-3 h-3 rounded-full transition-all ${
-                index === currentSlide ? 'bg-white' : 'bg-white bg-opacity-50'
+                index === currentSlide ? 'bg-white' : 'bg-white/50'
               }`}
               aria-label={`Ir para slide ${index + 1}`}
             />
@@ -146,17 +147,17 @@ const Hero = memo(() => {
       </div>
 
       {/* Quick Stats Bar */}
-      <div className="bg-cv-blue text-white py-6">
+      <div className="bg-cv-blue text-white py-4 md:py-6">
         <div className="cv-container">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {quickStats.map((stat, index) => (
               <div key={index} className="flex items-center justify-center md:justify-start space-x-3">
-                <div className="bg-cv-red p-3 rounded-full">
-                  <stat.icon className="h-6 w-6" />
+                <div className="bg-cv-red p-2 md:p-3 rounded-full flex-shrink-0">
+                  <stat.icon className="h-4 w-4 md:h-6 md:w-6" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="text-sm opacity-90">{stat.label}</div>
+                  <div className="text-xl md:text-2xl font-bold">{stat.value}</div>
+                  <div className="text-xs md:text-sm opacity-90">{stat.label}</div>
                 </div>
               </div>
             ))}
@@ -165,13 +166,13 @@ const Hero = memo(() => {
       </div>
 
       {/* Latest Results ticker */}
-      <div className="bg-cv-dark text-white py-3">
+      <div className="bg-cv-dark text-white py-2 md:py-3">
         <div className="cv-container">
           <div className="flex items-center">
-            <span className="bg-cv-red px-3 py-1 text-sm font-bold rounded mr-4">AO VIVO</span>
+            <span className="bg-cv-red px-2 md:px-3 py-1 text-xs md:text-sm font-bold rounded mr-3 md:mr-4 flex-shrink-0">AO VIVO</span>
             <div className="flex-1 overflow-hidden">
               <div className="animate-slide-in">
-                <span className="text-sm">
+                <span className="text-xs md:text-sm">
                   ABC 78 - 65 Seven Stars • Académica 72 - 68 Inter • Spartak 85 - 79 Unidos
                 </span>
               </div>

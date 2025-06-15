@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface OptimizedImageProps {
@@ -13,6 +13,7 @@ interface OptimizedImageProps {
   onError?: () => void;
   sizes?: string;
   quality?: number;
+  lazy?: boolean;
 }
 
 const OptimizedImage = ({
@@ -25,32 +26,65 @@ const OptimizedImage = ({
   onLoad,
   onError,
   sizes = "100vw",
-  quality = 80
+  quality = 75,
+  lazy = true
 }: OptimizedImageProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState<string>('');
+  const [isIntersecting, setIsIntersecting] = useState(!lazy);
+  const imgRef = React.useRef<HTMLImageElement>(null);
 
-  // Generate WebP and AVIF sources for Unsplash images
+  // Intersection Observer for lazy loading
+  useEffect(() => {
+    if (!lazy || priority || isIntersecting) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsIntersecting(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: '50px',
+        threshold: 0.1
+      }
+    );
+
+    const currentImg = imgRef.current;
+    if (currentImg) {
+      observer.observe(currentImg);
+    }
+
+    return () => {
+      if (currentImg) {
+        observer.unobserve(currentImg);
+      }
+    };
+  }, [lazy, priority, isIntersecting]);
+
+  // Generate optimized sources with WebP and AVIF
   const generateSources = useCallback(() => {
-    if (!src.includes('unsplash.com')) {
+    if (!src.includes('unsplash.com') && !src.includes('images.')) {
       return { webp: src, avif: src, original: src };
     }
 
     const baseUrl = src.split('?')[0];
-    const params = new URLSearchParams(src.split('?')[1] || '');
+    const params = new URLSearchParams();
     
-    // Set quality and format optimizations
-    params.set('q', quality.toString());
-    params.set('fm', 'webp');
+    // Aggressive optimization for performance
+    params.set('auto', 'format,compress');
+    params.set('q', Math.min(quality, 75).toString()); // Max quality 75 for performance
     if (width) params.set('w', width.toString());
     if (height) params.set('h', height.toString());
     params.set('fit', 'crop');
-    params.set('auto', 'format,compress');
+    params.set('dpr', '2'); // Support retina displays
 
+    // WebP version (smaller than JPEG)
+    params.set('fm', 'webp');
     const webpSrc = `${baseUrl}?${params.toString()}`;
     
-    // AVIF version
+    // AVIF version (smallest, most modern)
     params.set('fm', 'avif');
     const avifSrc = `${baseUrl}?${params.toString()}`;
     
@@ -81,13 +115,13 @@ const OptimizedImage = ({
         role="img"
         aria-label={`Erro ao carregar imagem: ${alt}`}
       >
-        <span className="text-xs">Imagem não disponível</span>
+        <span className="text-xs">Imagem indisponível</span>
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden" ref={imgRef}>
       {isLoading && (
         <div 
           className={cn(
@@ -99,39 +133,42 @@ const OptimizedImage = ({
         />
       )}
       
-      <picture>
-        {/* AVIF format for modern browsers */}
-        <source 
-          srcSet={sources.avif} 
-          type="image/avif"
-          sizes={sizes}
-        />
-        
-        {/* WebP format for most browsers */}
-        <source 
-          srcSet={sources.webp} 
-          type="image/webp"
-          sizes={sizes}
-        />
-        
-        {/* Fallback to original format */}
-        <img
-          src={sources.original}
-          alt={alt}
-          width={width}
-          height={height}
-          className={cn(
-            'transition-opacity duration-300',
-            isLoading ? 'opacity-0' : 'opacity-100',
-            className
-          )}
-          onLoad={handleLoad}
-          onError={handleError}
-          loading={priority ? 'eager' : 'lazy'}
-          decoding="async"
-          sizes={sizes}
-        />
-      </picture>
+      {(isIntersecting || priority) && (
+        <picture>
+          {/* AVIF format for maximum compression */}
+          <source 
+            srcSet={sources.avif} 
+            type="image/avif"
+            sizes={sizes}
+          />
+          
+          {/* WebP format for good compression */}
+          <source 
+            srcSet={sources.webp} 
+            type="image/webp"
+            sizes={sizes}
+          />
+          
+          {/* Fallback */}
+          <img
+            src={sources.original}
+            alt={alt}
+            width={width}
+            height={height}
+            className={cn(
+              'transition-opacity duration-300',
+              isLoading ? 'opacity-0' : 'opacity-100',
+              className
+            )}
+            onLoad={handleLoad}
+            onError={handleError}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+            sizes={sizes}
+            fetchPriority={priority ? 'high' : 'low'}
+          />
+        </picture>
+      )}
     </div>
   );
 };
