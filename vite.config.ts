@@ -15,14 +15,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
-    react({
-      // Configurações otimizadas do SWC
-      jsxImportSource: '@emotion/react',
-      plugins: [
-        // Plugin para otimização automática de imports
-        ['@swc/plugin-emotion', {}]
-      ]
-    }),
+    react(),
     mode === 'development' && componentTagger(),
   ].filter(Boolean),
   resolve: {
@@ -42,7 +35,6 @@ export default defineConfig(({ mode }) => ({
     ]
   },
   build: {
-    // Configurações de build otimizadas para performance
     target: 'es2020',
     minify: 'terser',
     terserOptions: {
@@ -55,20 +47,13 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Separar vendors para melhor cache
           'react-vendor': ['react', 'react-dom'],
           'router-vendor': ['react-router-dom'],
           'query-vendor': ['@tanstack/react-query'],
           'ui-vendor': ['lucide-react', '@radix-ui/react-slot'],
           'utils-vendor': ['date-fns', 'clsx', 'tailwind-merge']
         },
-        // Otimizar nomes de arquivos para cache
-        chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId
-            ? chunkInfo.facadeModuleId.split('/').pop()
-            : 'chunk';
-          return `js/${facadeModuleId}-[hash].js`;
-        },
+        chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name?.split('.') || [];
           const ext = info[info.length - 1];
@@ -82,11 +67,9 @@ export default defineConfig(({ mode }) => ({
         }
       }
     },
-    // Configurações de compressão
     reportCompressedSize: false,
     chunkSizeWarningLimit: 1000,
     sourcemap: mode === 'development'
   },
-  // Cache de dependências para builds mais rápidos
   cacheDir: 'node_modules/.vite'
 }));

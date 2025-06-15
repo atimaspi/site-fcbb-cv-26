@@ -1,6 +1,6 @@
 
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 interface PaginatedResponse<T> {
   data: T[];
@@ -53,10 +53,11 @@ export const useOptimizedApi = () => {
     return useInfiniteQuery({
       queryKey: [endpoint, options],
       queryFn: ({ pageParam = 1 }) => 
-        optimizedFetch(endpoint, { ...options, page: pageParam }),
+        optimizedFetch(endpoint, { ...options, page: pageParam as number }),
       getNextPageParam: (lastPage: PaginatedResponse<T>) => {
         return lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined;
       },
+      initialPageParam: 1,
       enabled,
       staleTime,
       gcTime: 10 * 60 * 1000, // 10 minutes
