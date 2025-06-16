@@ -17,7 +17,6 @@ export const useUnifiedApi = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Função otimizada para fetch com tratamento de erros robusto
   const fetchData = useCallback(async (
     table: string, 
     options: QueryOptions = {}
@@ -25,21 +24,18 @@ export const useUnifiedApi = () => {
     try {
       const { select = '*', filters, orderBy, limit } = options;
       
-      let query = (supabase as any).from(table).select(select);
+      let query = supabase.from(table).select(select);
       
-      // Aplicar filtros
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
           query = query.eq(key, value);
         });
       }
       
-      // Aplicar ordenação
       if (orderBy) {
         query = query.order(orderBy.column, { ascending: orderBy.ascending });
       }
       
-      // Aplicar limite
       if (limit) {
         query = query.limit(limit);
       }
@@ -58,7 +54,6 @@ export const useUnifiedApi = () => {
     }
   }, []);
 
-  // Hook otimizado para queries com melhor tratamento de erros
   const useOptimizedFetch = (
     table: string, 
     options: QueryOptions = {}
@@ -75,9 +70,9 @@ export const useUnifiedApi = () => {
       gcTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false,
       retry: (failureCount, error: any) => {
-        // Não tentar novamente se for erro de política RLS
         if (error?.message?.includes('infinite recursion') || 
-            error?.message?.includes('policy')) {
+            error?.message?.includes('policy') ||
+            error?.code === '42P17') {
           return false;
         }
         return failureCount < 2;
@@ -86,12 +81,11 @@ export const useUnifiedApi = () => {
     });
   };
 
-  // CRUD operations com tratamento de erro melhorado
   const useOptimizedCreate = (table: string) => {
     return useMutation({
       mutationFn: async (data: any) => {
         try {
-          const { data: result, error } = await (supabase as any)
+          const { data: result, error } = await supabase
             .from(table)
             .insert(data)
             .select()
@@ -130,7 +124,7 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async ({ id, data }: { id: string; data: any }) => {
         try {
-          const { data: result, error } = await (supabase as any)
+          const { data: result, error } = await supabase
             .from(table)
             .update(data)
             .eq('id', id)
@@ -170,7 +164,7 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async (id: string) => {
         try {
-          const { error } = await (supabase as any)
+          const { error } = await supabase
             .from(table)
             .delete()
             .eq('id', id);
