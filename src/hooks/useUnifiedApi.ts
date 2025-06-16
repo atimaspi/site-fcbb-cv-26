@@ -3,6 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCallback, useMemo } from 'react';
+import type { Database } from '@/integrations/supabase/types';
+
+type TableName = keyof Database['public']['Tables'];
 
 interface QueryOptions {
   enabled?: boolean;
@@ -18,8 +21,8 @@ export const useUnifiedApi = () => {
   const queryClient = useQueryClient();
 
   // Função otimizada para fetch com cache inteligente
-  const fetchData = useCallback(async (
-    table: string, 
+  const fetchData = useCallback(async <T extends TableName>(
+    table: T, 
     options: QueryOptions = {}
   ) => {
     const { select = '*', filters, orderBy, limit } = options;
@@ -53,8 +56,8 @@ export const useUnifiedApi = () => {
   }, []);
 
   // Hook otimizado para queries
-  const useOptimizedFetch = (
-    table: string, 
+  const useOptimizedFetch = <T extends TableName>(
+    table: T, 
     options: QueryOptions = {}
   ) => {
     const { enabled = true, staleTime = 5 * 60 * 1000 } = options;
@@ -73,9 +76,9 @@ export const useUnifiedApi = () => {
   };
 
   // CRUD operations otimizadas
-  const useOptimizedCreate = (table: string) => {
+  const useOptimizedCreate = <T extends TableName>(table: T) => {
     return useMutation({
-      mutationFn: async (data: any) => {
+      mutationFn: async (data: Database['public']['Tables'][T]['Insert']) => {
         const { data: result, error } = await supabase
           .from(table)
           .insert(data)
@@ -102,9 +105,9 @@ export const useUnifiedApi = () => {
     });
   };
 
-  const useOptimizedUpdate = (table: string) => {
+  const useOptimizedUpdate = <T extends TableName>(table: T) => {
     return useMutation({
-      mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      mutationFn: async ({ id, data }: { id: string; data: Database['public']['Tables'][T]['Update'] }) => {
         const { data: result, error } = await supabase
           .from(table)
           .update(data)
@@ -132,7 +135,7 @@ export const useUnifiedApi = () => {
     });
   };
 
-  const useOptimizedDelete = (table: string) => {
+  const useOptimizedDelete = <T extends TableName>(table: T) => {
     return useMutation({
       mutationFn: async (id: string) => {
         const { error } = await supabase
