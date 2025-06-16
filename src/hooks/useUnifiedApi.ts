@@ -24,7 +24,7 @@ export const useUnifiedApi = () => {
   ) => {
     const { select = '*', filters, orderBy, limit } = options;
     
-    let query = supabase.from(table).select(select);
+    let query = supabase.from(table as any).select(select);
     
     // Aplicar filtros
     if (filters) {
@@ -77,7 +77,7 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async (data: any) => {
         const { data: result, error } = await supabase
-          .from(table)
+          .from(table as any)
           .insert(data)
           .select()
           .single();
@@ -106,7 +106,7 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async ({ id, data }: { id: string; data: any }) => {
         const { data: result, error } = await supabase
-          .from(table)
+          .from(table as any)
           .update(data)
           .eq('id', id)
           .select()
@@ -136,7 +136,7 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async (id: string) => {
         const { error } = await supabase
-          .from(table)
+          .from(table as any)
           .delete()
           .eq('id', id);
         
