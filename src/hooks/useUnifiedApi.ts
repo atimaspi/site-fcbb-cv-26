@@ -78,9 +78,9 @@ export const useUnifiedApi = () => {
   // CRUD operations otimizadas
   const useOptimizedCreate = <T extends TableName>(table: T) => {
     return useMutation({
-      mutationFn: async (data: Database['public']['Tables'][T]['Insert']) => {
+      mutationFn: async (data: any) => {
         const { data: result, error } = await supabase
-          .from(table)
+          .from(table as any)
           .insert(data)
           .select()
           .single();
@@ -107,11 +107,11 @@ export const useUnifiedApi = () => {
 
   const useOptimizedUpdate = <T extends TableName>(table: T) => {
     return useMutation({
-      mutationFn: async ({ id, data }: { id: string; data: Database['public']['Tables'][T]['Update'] }) => {
+      mutationFn: async ({ id, data }: { id: string; data: any }) => {
         const { data: result, error } = await supabase
-          .from(table)
+          .from(table as any)
           .update(data)
-          .eq('id', id)
+          .eq('id' as any, id)
           .select()
           .single();
         
@@ -139,9 +139,9 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async (id: string) => {
         const { error } = await supabase
-          .from(table)
+          .from(table as any)
           .delete()
-          .eq('id', id);
+          .eq('id' as any, id);
         
         if (error) throw error;
       },
