@@ -24,7 +24,7 @@ export const useUnifiedApi = () => {
     try {
       const { select = '*', filters, orderBy, limit } = options;
       
-      let query = supabase.from(table).select(select);
+      let query = (supabase as any).from(table).select(select);
       
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
@@ -85,7 +85,7 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async (data: any) => {
         try {
-          const { data: result, error } = await supabase
+          const { data: result, error } = await (supabase as any)
             .from(table)
             .insert(data)
             .select()
@@ -124,7 +124,7 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async ({ id, data }: { id: string; data: any }) => {
         try {
-          const { data: result, error } = await supabase
+          const { data: result, error } = await (supabase as any)
             .from(table)
             .update(data)
             .eq('id', id)
@@ -164,7 +164,7 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async (id: string) => {
         try {
-          const { error } = await supabase
+          const { error } = await (supabase as any)
             .from(table)
             .delete()
             .eq('id', id);
