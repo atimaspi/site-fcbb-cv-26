@@ -3,9 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCallback, useMemo } from 'react';
-import type { Database } from '@/integrations/supabase/types';
-
-type TableName = keyof Database['public']['Tables'];
 
 interface QueryOptions {
   enabled?: boolean;
@@ -21,8 +18,8 @@ export const useUnifiedApi = () => {
   const queryClient = useQueryClient();
 
   // Função otimizada para fetch com cache inteligente
-  const fetchData = useCallback(async <T extends TableName>(
-    table: T, 
+  const fetchData = useCallback(async (
+    table: string, 
     options: QueryOptions = {}
   ) => {
     const { select = '*', filters, orderBy, limit } = options;
@@ -56,8 +53,8 @@ export const useUnifiedApi = () => {
   }, []);
 
   // Hook otimizado para queries
-  const useOptimizedFetch = <T extends TableName>(
-    table: T, 
+  const useOptimizedFetch = (
+    table: string, 
     options: QueryOptions = {}
   ) => {
     const { enabled = true, staleTime = 5 * 60 * 1000 } = options;
@@ -76,11 +73,11 @@ export const useUnifiedApi = () => {
   };
 
   // CRUD operations otimizadas
-  const useOptimizedCreate = <T extends TableName>(table: T) => {
+  const useOptimizedCreate = (table: string) => {
     return useMutation({
       mutationFn: async (data: any) => {
         const { data: result, error } = await supabase
-          .from(table as any)
+          .from(table)
           .insert(data)
           .select()
           .single();
@@ -105,13 +102,13 @@ export const useUnifiedApi = () => {
     });
   };
 
-  const useOptimizedUpdate = <T extends TableName>(table: T) => {
+  const useOptimizedUpdate = (table: string) => {
     return useMutation({
       mutationFn: async ({ id, data }: { id: string; data: any }) => {
         const { data: result, error } = await supabase
-          .from(table as any)
+          .from(table)
           .update(data)
-          .eq('id' as any, id)
+          .eq('id', id)
           .select()
           .single();
         
@@ -135,13 +132,13 @@ export const useUnifiedApi = () => {
     });
   };
 
-  const useOptimizedDelete = <T extends TableName>(table: T) => {
+  const useOptimizedDelete = (table: string) => {
     return useMutation({
       mutationFn: async (id: string) => {
         const { error } = await supabase
-          .from(table as any)
+          .from(table)
           .delete()
-          .eq('id' as any, id);
+          .eq('id', id);
         
         if (error) throw error;
       },
