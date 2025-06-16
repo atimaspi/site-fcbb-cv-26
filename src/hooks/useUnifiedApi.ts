@@ -22,6 +22,7 @@ export const useUnifiedApi = () => {
     options: QueryOptions = {}
   ) => {
     try {
+      console.log(`🔍 Fetching data from table: ${table}`, options);
       const { select = '*', filters, orderBy, limit } = options;
       
       let query = (supabase as any).from(table).select(select);
@@ -43,13 +44,14 @@ export const useUnifiedApi = () => {
       const { data, error } = await query;
       
       if (error) {
-        console.error(`Error fetching ${table}:`, error);
+        console.error(`❌ Error fetching ${table}:`, error);
         throw new Error(`Erro ao carregar ${table}: ${error.message}`);
       }
       
+      console.log(`✅ Successfully fetched ${data?.length || 0} records from ${table}`);
       return data || [];
     } catch (error: any) {
-      console.error(`Fetch error for ${table}:`, error);
+      console.error(`💥 Fetch error for ${table}:`, error);
       throw error;
     }
   }, []);
@@ -58,7 +60,7 @@ export const useUnifiedApi = () => {
     table: string, 
     options: QueryOptions = {}
   ) => {
-    const { enabled = true, staleTime = 5 * 60 * 1000 } = options;
+    const { enabled = true, staleTime = 2 * 60 * 1000 } = options; // Reduced stale time for faster updates
     
     const queryKey = useMemo(() => [table, options], [table, options]);
     
@@ -67,8 +69,9 @@ export const useUnifiedApi = () => {
       queryFn: () => fetchData(table, options),
       enabled,
       staleTime,
-      gcTime: 10 * 60 * 1000,
-      refetchOnWindowFocus: false,
+      gcTime: 5 * 60 * 1000, // Reduced garbage collection time
+      refetchOnWindowFocus: true, // Enable refetch on focus for real-time updates
+      refetchInterval: 30000, // Auto-refetch every 30 seconds for live data
       retry: (failureCount, error: any) => {
         if (error?.message?.includes('infinite recursion') || 
             error?.message?.includes('policy') ||
@@ -77,7 +80,7 @@ export const useUnifiedApi = () => {
         }
         return failureCount < 2;
       },
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
+      retryDelay: (attemptIndex) => Math.min(500 * 2 ** attemptIndex, 5000) // Faster retry
     });
   };
 
@@ -85,35 +88,57 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async (data: any) => {
         try {
+          console.log(`➕ Creating record in ${table}:`, data);
+          
+          // Ensure all required fields are present
+          const createData = {
+            ...data,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+
           const { data: result, error } = await (supabase as any)
             .from(table)
-            .insert(data)
+            .insert(createData)
             .select()
             .single();
           
           if (error) {
-            console.error(`Create error for ${table}:`, error);
+            console.error(`❌ Create error for ${table}:`, error);
             throw new Error(`Erro ao criar item: ${error.message}`);
           }
           
+          console.log(`✅ Successfully created record in ${table}:`, result);
           return result;
         } catch (error: any) {
-          console.error(`Create mutation error for ${table}:`, error);
+          console.error(`💥 Create mutation error for ${table}:`, error);
           throw error;
         }
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
+        // Invalidate and refetch related queries immediately
         queryClient.invalidateQueries({ queryKey: [table] });
+        queryClient.refetchQueries({ queryKey: [table] });
+        
+        // Also invalidate any related tables
+        if (table === 'clubs') {
+          queryClient.invalidateQueries({ queryKey: ['teams'] });
+        }
+        if (table === 'teams') {
+          queryClient.invalidateQueries({ queryKey: ['players'] });
+        }
+        
         toast({
-          title: "Sucesso",
-          description: "Item criado com sucesso.",
+          title: "✅ Sucesso",
+          description: `Item criado com sucesso em ${table}.`,
         });
+        console.log(`🔄 Cache invalidated for ${table}`);
       },
       onError: (error: any) => {
-        console.error(`Create error:`, error);
+        console.error(`❌ Create error:`, error);
         toast({
-          title: "Erro",
-          description: error.message || "Erro ao criar item",
+          title: "❌ Erro",
+          description: error.message || `Erro ao criar item em ${table}`,
           variant: "destructive",
         });
       },
@@ -124,36 +149,49 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async ({ id, data }: { id: string; data: any }) => {
         try {
+          console.log(`📝 Updating record in ${table}:`, { id, data });
+          
+          // Ensure updated_at is set
+          const updateData = {
+            ...data,
+            updated_at: new Date().toISOString()
+          };
+
           const { data: result, error } = await (supabase as any)
             .from(table)
-            .update(data)
+            .update(updateData)
             .eq('id', id)
             .select()
             .single();
           
           if (error) {
-            console.error(`Update error for ${table}:`, error);
+            console.error(`❌ Update error for ${table}:`, error);
             throw new Error(`Erro ao atualizar item: ${error.message}`);
           }
           
+          console.log(`✅ Successfully updated record in ${table}:`, result);
           return result;
         } catch (error: any) {
-          console.error(`Update mutation error for ${table}:`, error);
+          console.error(`💥 Update mutation error for ${table}:`, error);
           throw error;
         }
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
+        // Immediate cache updates
         queryClient.invalidateQueries({ queryKey: [table] });
+        queryClient.refetchQueries({ queryKey: [table] });
+        
         toast({
-          title: "Sucesso",
-          description: "Item atualizado com sucesso.",
+          title: "✅ Sucesso",
+          description: `Item atualizado com sucesso em ${table}.`,
         });
+        console.log(`🔄 Cache invalidated for ${table} after update`);
       },
       onError: (error: any) => {
-        console.error(`Update error:`, error);
+        console.error(`❌ Update error:`, error);
         toast({
-          title: "Erro",
-          description: error.message || "Erro ao atualizar item",
+          title: "❌ Erro",
+          description: error.message || `Erro ao atualizar item em ${table}`,
           variant: "destructive",
         });
       },
@@ -164,32 +202,41 @@ export const useUnifiedApi = () => {
     return useMutation({
       mutationFn: async (id: string) => {
         try {
+          console.log(`🗑️ Deleting record from ${table}:`, id);
+          
           const { error } = await (supabase as any)
             .from(table)
             .delete()
             .eq('id', id);
           
           if (error) {
-            console.error(`Delete error for ${table}:`, error);
+            console.error(`❌ Delete error for ${table}:`, error);
             throw new Error(`Erro ao eliminar item: ${error.message}`);
           }
+          
+          console.log(`✅ Successfully deleted record from ${table}`);
+          return { id };
         } catch (error: any) {
-          console.error(`Delete mutation error for ${table}:`, error);
+          console.error(`💥 Delete mutation error for ${table}:`, error);
           throw error;
         }
       },
       onSuccess: () => {
+        // Immediate cache updates
         queryClient.invalidateQueries({ queryKey: [table] });
+        queryClient.refetchQueries({ queryKey: [table] });
+        
         toast({
-          title: "Sucesso",
-          description: "Item eliminado com sucesso.",
+          title: "✅ Sucesso",
+          description: `Item eliminado com sucesso de ${table}.`,
         });
+        console.log(`🔄 Cache invalidated for ${table} after delete`);
       },
       onError: (error: any) => {
-        console.error(`Delete error:`, error);
+        console.error(`❌ Delete error:`, error);
         toast({
-          title: "Erro",
-          description: error.message || "Erro ao eliminar item",
+          title: "❌ Erro",
+          description: error.message || `Erro ao eliminar item de ${table}`,
           variant: "destructive",
         });
       },

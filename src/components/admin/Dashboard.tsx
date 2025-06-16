@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApi } from '@/hooks/useApi';
 import { useBackendData, Team, Game } from '@/hooks/useBackendData';
@@ -44,59 +44,109 @@ const Dashboard = () => {
   const { data: events, isLoading: eventsLoading } = useFetch('events');
   const { data: clubs, isLoading: clubsLoading } = useFetch('clubs');
 
-  // Use backend data if available, fallback to API data
-  const newsList = publishedNews.length > 0 ? publishedNews : (Array.isArray(news) ? news : []);
-  const eventsList = activeEvents.length > 0 ? activeEvents : (Array.isArray(events) ? events : []);
-  const clubsList = teams.length > 0 ? teams : (Array.isArray(clubs) ? clubs : []);
-  const playersList = Array.isArray(players) ? players : [];
+  // Memoize computed data for better performance
+  const computedData = useMemo(() => {
+    const newsList = publishedNews.length > 0 ? publishedNews : (Array.isArray(news) ? news : []);
+    const eventsList = activeEvents.length > 0 ? activeEvents : (Array.isArray(events) ? events : []);
+    const clubsList = teams.length > 0 ? teams : (Array.isArray(clubs) ? clubs : []);
+    const playersList = Array.isArray(players) ? players : [];
 
-  const stats = [
+    return {
+      newsList,
+      eventsList,
+      clubsList,
+      playersList,
+      finishedGames: games.filter((g: any) => g.status === 'finalizado').length,
+      liveGames: games.filter((g: any) => g.status === 'ao_vivo').length
+    };
+  }, [publishedNews, news, activeEvents, events, teams, clubs, players, games]);
+
+  // Memoize stats for performance
+  const stats = useMemo(() => [
     {
       title: 'Total de Notícias',
-      value: newsList.length,
+      value: computedData.newsList.length,
       description: 'Artigos publicados',
       icon: FileText,
       color: 'text-blue-600'
     },
     {
       title: 'Eventos Ativos',
-      value: eventsList.length,
+      value: computedData.eventsList.length,
       description: 'Próximos eventos',
       icon: Calendar,
       color: 'text-green-600'
     },
     {
       title: 'Clubes Registados',
-      value: clubsList.length,
+      value: computedData.clubsList.length,
       description: 'Clubes ativos',
       icon: Trophy,
       color: 'text-yellow-600'
     },
     {
       title: 'Jogadores',
-      value: playersList.length,
+      value: computedData.playersList.length,
       description: 'Atletas registados',
       icon: Users,
       color: 'text-purple-600'
     }
-  ];
+  ], [computedData]);
 
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const renderContent = () => {
+  // Optimized tab change handler
+  const handleTabChange = useCallback((newTab: string) => {
+    console.log(`🔄 Switching to tab: ${newTab}`);
+    setActiveTab(newTab);
+  }, []);
+
+  // Memoized quick action handlers
+  const quickActions = useMemo(() => [
+    {
+      key: 'data',
+      icon: Database,
+      label: 'Gestão de Dados',
+      color: 'bg-cv-blue/10 hover:bg-cv-blue/20',
+      iconColor: 'text-cv-blue'
+    },
+    {
+      key: 'live',
+      icon: Play,
+      label: 'Pontuação ao Vivo',
+      color: 'bg-cv-red/10 hover:bg-cv-red/20',
+      iconColor: 'text-cv-red'
+    },
+    {
+      key: 'games',
+      icon: Trophy,
+      label: 'Gestão de Jogos',
+      color: 'bg-green-100 hover:bg-green-200',
+      iconColor: 'text-green-600'
+    },
+    {
+      key: 'gallery',
+      icon: ImageIcon,
+      label: 'Galeria',
+      color: 'bg-purple-100 hover:bg-purple-200',
+      iconColor: 'text-purple-600'
+    }
+  ], []);
+
+  const renderContent = useCallback(() => {
     switch (activeTab) {
       case 'dashboard':
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-cv-blue mb-2">Dashboard Administrativo</h2>
-              <p className="text-gray-600">Visão geral da plataforma FCBB com backend completo</p>
+              <h2 className="text-2xl font-bold text-cv-blue mb-2">Dashboard Administrativo FCBB</h2>
+              <p className="text-gray-600">Sistema completo de gestão com sincronização em tempo real</p>
             </div>
 
-            {/* Estatísticas principais */}
+            {/* Estatísticas principais otimizadas */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
+                <Card key={`stat-${index}`} className="hover:shadow-lg transition-shadow duration-200">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600">
                       {stat.title}
@@ -111,7 +161,7 @@ const Dashboard = () => {
               ))}
             </div>
 
-            {/* Estatísticas adicionais de backend */}
+            {/* Estatísticas de backend em tempo real */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
@@ -134,9 +184,7 @@ const Dashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-cv-blue">
-                    {games.filter((g: any) => g.status === 'finalizado').length}
-                  </div>
+                  <div className="text-3xl font-bold text-cv-blue">{computedData.finishedGames}</div>
                   <p className="text-sm text-gray-500">Jogos completados</p>
                 </CardContent>
               </Card>
@@ -149,15 +197,13 @@ const Dashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-cv-blue">
-                    {upcomingGames.length}
-                  </div>
+                  <div className="text-3xl font-bold text-cv-blue">{upcomingGames.length}</div>
                   <p className="text-sm text-gray-500">Jogos agendados</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Atividade recente e acesso rápido */}
+            {/* Atividade recente e acesso rápido otimizado */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -166,7 +212,7 @@ const Dashboard = () => {
                     Últimos Resultados
                   </CardTitle>
                   <CardDescription>
-                    Resultados dos jogos mais recentes
+                    Resultados dos jogos mais recentes (tempo real)
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -195,39 +241,21 @@ const Dashboard = () => {
                     Acesso Rápido
                   </CardTitle>
                   <CardDescription>
-                    Ações mais utilizadas
+                    Ações mais utilizadas - resposta instantânea
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-3">
-                    <button 
-                      onClick={() => setActiveTab('data')}
-                      className="flex flex-col items-center p-4 bg-cv-blue/10 hover:bg-cv-blue/20 rounded-lg transition-colors"
-                    >
-                      <Database className="h-6 w-6 text-cv-blue mb-2" />
-                      <span className="text-sm font-medium">Gestão de Dados</span>
-                    </button>
-                    <button 
-                      onClick={() => setActiveTab('live')}
-                      className="flex flex-col items-center p-4 bg-cv-red/10 hover:bg-cv-red/20 rounded-lg transition-colors"
-                    >
-                      <Play className="h-6 w-6 text-cv-red mb-2" />
-                      <span className="text-sm font-medium">Pontuação ao Vivo</span>
-                    </button>
-                    <button 
-                      onClick={() => setActiveTab('games')}
-                      className="flex flex-col items-center p-4 bg-green-100 hover:bg-green-200 rounded-lg transition-colors"
-                    >
-                      <Trophy className="h-6 w-6 text-green-600 mb-2" />
-                      <span className="text-sm font-medium">Gestão de Jogos</span>
-                    </button>
-                    <button 
-                      onClick={() => setActiveTab('gallery')}
-                      className="flex flex-col items-center p-4 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors"
-                    >
-                      <ImageIcon className="h-6 w-6 text-purple-600 mb-2" />
-                      <span className="text-sm font-medium">Galeria</span>
-                    </button>
+                    {quickActions.map((action) => (
+                      <button 
+                        key={action.key}
+                        onClick={() => handleTabChange(action.key)}
+                        className={`flex flex-col items-center p-4 ${action.color} rounded-lg transition-all duration-200 transform hover:scale-105`}
+                      >
+                        <action.icon className={`h-6 w-6 ${action.iconColor} mb-2`} />
+                        <span className="text-sm font-medium text-center">{action.label}</span>
+                      </button>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -247,92 +275,63 @@ const Dashboard = () => {
       case 'gallery':
         return <GalleryManagement />;
       default:
-        return <div className="text-center py-8">Selecione uma opção no menu lateral</div>;
+        return (
+          <div className="text-center py-8">
+            <Database className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+            <p className="text-gray-600">Selecione uma opção no menu lateral</p>
+          </div>
+        );
     }
-  };
+  }, [activeTab, stats, competitions.length, computedData, upcomingGames.length, recentGames, teams, quickActions, handleTabChange]);
 
+  // Show loading only for critical data
   if (newsLoading || eventsLoading || clubsLoading || backendLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" />
+        <span className="ml-3 text-gray-600">Carregando dados em tempo real...</span>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
+      {/* Sidebar otimizada */}
       <div className="w-64 bg-cv-blue text-white p-6">
-        <h2 className="text-xl font-bold mb-8">Painel Admin FCBB</h2>
-        <nav className="space-y-2">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`w-full text-left p-3 rounded-lg transition-colors ${
-              activeTab === 'dashboard' ? 'bg-blue-600' : 'hover:bg-blue-600'
-            }`}
-          >
-            <BarChart3 className="inline w-4 h-4 mr-2" />
-            Dashboard
-          </button>
-          <button
-            onClick={() => setActiveTab('data')}
-            className={`w-full text-left p-3 rounded-lg transition-colors ${
-              activeTab === 'data' ? 'bg-blue-600' : 'hover:bg-blue-600'
-            }`}
-          >
-            <Database className="inline w-4 h-4 mr-2" />
-            Gestão de Dados
-          </button>
-          <button
-            onClick={() => setActiveTab('live')}
-            className={`w-full text-left p-3 rounded-lg transition-colors ${
-              activeTab === 'live' ? 'bg-blue-600' : 'hover:bg-blue-600'
-            }`}
-          >
-            <Play className="inline w-4 h-4 mr-2" />
-            Pontuação ao Vivo
-          </button>
-          <button
-            onClick={() => setActiveTab('games')}
-            className={`w-full text-left p-3 rounded-lg transition-colors ${
-              activeTab === 'games' ? 'bg-blue-600' : 'hover:bg-blue-600'
-            }`}
-          >
-            <Trophy className="inline w-4 h-4 mr-2" />
-            Gestão de Jogos
-          </button>
-          <button
-            onClick={() => setActiveTab('results')}
-            className={`w-full text-left p-3 rounded-lg transition-colors ${
-              activeTab === 'results' ? 'bg-blue-600' : 'hover:bg-blue-600'
-            }`}
-          >
-            <FileText className="inline w-4 h-4 mr-2" />
-            Gestão de Resultados
-          </button>
-          <button
-            onClick={() => setActiveTab('gallery')}
-            className={`w-full text-left p-3 rounded-lg transition-colors ${
-              activeTab === 'gallery' ? 'bg-blue-600' : 'hover:bg-blue-600'
-            }`}
-          >
-            <ImageIcon className="inline w-4 h-4 mr-2" />
-            Gestão de Galeria
-          </button>
-          <button
-            onClick={() => setActiveTab('integrations')}
-            className={`w-full text-left p-3 rounded-lg transition-colors ${
-              activeTab === 'integrations' ? 'bg-blue-600' : 'hover:bg-blue-600'
-            }`}
-          >
-            <Star className="inline w-4 h-4 mr-2" />
-            Integrações
-          </button>
+        <div className="flex items-center mb-8">
+          <img 
+            src="/lovable-uploads/39194785-9ce8-4849-82cb-ad92f0086855.png" 
+            alt="FCBB Logo" 
+            className="w-8 h-8 mr-3 object-contain"
+          />
+          <h2 className="text-lg font-bold">Admin FCBB</h2>
+        </div>
+        <nav className="space-y-1">
+          {[
+            { id: 'dashboard', icon: BarChart3, label: 'Dashboard' },
+            { id: 'data', icon: Database, label: 'Gestão de Dados' },
+            { id: 'live', icon: Play, label: 'Pontuação ao Vivo' },
+            { id: 'games', icon: Trophy, label: 'Gestão de Jogos' },
+            { id: 'results', icon: FileText, label: 'Gestão de Resultados' },
+            { id: 'gallery', icon: ImageIcon, label: 'Gestão de Galeria' },
+            { id: 'integrations', icon: Star, label: 'Integrações' }
+          ].map(item => (
+            <button
+              key={item.id}
+              onClick={() => handleTabChange(item.id)}
+              className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
+                activeTab === item.id ? 'bg-blue-600 shadow-lg' : 'hover:bg-blue-600/70'
+              }`}
+            >
+              <item.icon className="inline w-4 h-4 mr-3" />
+              {item.label}
+            </button>
+          ))}
         </nav>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 p-8">
+      {/* Main Content otimizado */}
+      <div className="flex-1 p-8 overflow-y-auto">
         {renderContent()}
       </div>
     </div>

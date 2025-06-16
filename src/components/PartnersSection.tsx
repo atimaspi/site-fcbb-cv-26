@@ -38,7 +38,7 @@ const PartnersSection = () => {
               <img 
                 src={partner.logo} 
                 alt={partner.name} 
-                className="max-h-16 max-w-full object-contain filter grayscale hover:grayscale-0 transition-all"
+                className="max-h-12 max-w-full object-contain filter grayscale hover:grayscale-0 transition-all"
               />
             </div>
           ))}
