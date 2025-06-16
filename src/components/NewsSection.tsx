@@ -1,6 +1,6 @@
 
 import { ArrowRight } from "lucide-react";
-import { useOptimizedApi } from '@/hooks/useOptimizedApi';
+import { useUnifiedApi } from '@/hooks/useUnifiedApi';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
 import { OptimizedImage } from '@/components/ui/optimized-image';
@@ -9,16 +9,17 @@ import { ptBR } from 'date-fns/locale';
 import { memo, useMemo } from 'react';
 
 const NewsSection = memo(() => {
-  const { useOptimizedQuery } = useOptimizedApi();
+  const { useOptimizedFetch } = useUnifiedApi();
   
   const { 
     data: newsData, 
     isLoading: newsLoading,
     error: newsError 
-  } = useOptimizedQuery('news', {
+  } = useOptimizedFetch('news', {
     limit: 4,
-    cache: true,
-    staleTime: 5 * 60 * 1000 // 5 minutes cache
+    orderBy: { column: 'published_at', ascending: false },
+    select: 'id, title, published_at, featured_image_url, category',
+    staleTime: 5 * 60 * 1000
   });
 
   // Fallback para notícias estáticas (otimizado)
@@ -54,8 +55,11 @@ const NewsSection = memo(() => {
   ], []);
 
   const newsToShow = useMemo(() => {
-    if (newsError || !newsData?.data) return fallbackNews;
-    return newsData.data.slice(0, 4);
+    if (newsError || !newsData) {
+      console.log('Using fallback news due to error or no data:', newsError);
+      return fallbackNews;
+    }
+    return newsData.slice(0, 4);
   }, [newsData, newsError, fallbackNews]);
 
   if (newsLoading) {
