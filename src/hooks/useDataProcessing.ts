@@ -1,21 +1,20 @@
 
 import { useMemo } from 'react';
-import { safeArrayCast } from '@/utils/dataUtils';
-import type {
-  Team,
-  Club,
-  Competition,
-  Game,
-  Player,
-  NewsItem,
-  Event,
-  Referee,
-  Coach,
-  Federation,
-  RegionalAssociation
+import type { 
+  Team, 
+  Club, 
+  Competition, 
+  Game, 
+  Player, 
+  NewsItem, 
+  Event, 
+  Referee, 
+  Coach, 
+  Federation, 
+  RegionalAssociation 
 } from '@/types/backend';
 
-interface UseDataProcessingProps {
+interface DataProcessingProps {
   teamsData: any;
   clubsData: any;
   competitionsData: any;
@@ -39,98 +38,63 @@ export const useDataProcessing = ({
   refereesData,
   federationsData,
   regionalAssociationsData
-}: UseDataProcessingProps) => {
+}: DataProcessingProps) => {
   
-  // Process arrays with detailed logging
-  const teams: Team[] = useMemo(() => {
-    const result = safeArrayCast<Team>(teamsData);
-    console.log('Processed teams:', result);
-    return result;
-  }, [teamsData]);
+  // Process and type all data arrays
+  const processedData = useMemo(() => {
+    console.log('🔄 Processing all backend data...');
+    
+    const teams: Team[] = Array.isArray(teamsData) ? teamsData : [];
+    const clubs: Club[] = Array.isArray(clubsData) ? clubsData : [];
+    const competitions: Competition[] = Array.isArray(competitionsData) ? competitionsData : [];
+    const games: Game[] = Array.isArray(gamesData) ? gamesData : [];
+    const players: Player[] = Array.isArray(playersData) ? playersData : [];
+    const news: NewsItem[] = Array.isArray(newsData) ? newsData : [];
+    const events: Event[] = Array.isArray(eventsData) ? eventsData : [];
+    const referees: Referee[] = Array.isArray(refereesData) ? refereesData : [];
+    const coaches: Coach[] = []; // Will be loaded separately
+    const federations: Federation[] = Array.isArray(federationsData) ? federationsData : [];
+    const regionalAssociations: RegionalAssociation[] = Array.isArray(regionalAssociationsData) ? regionalAssociationsData : [];
 
-  const clubs: Club[] = useMemo(() => {
-    const result = safeArrayCast<Club>(clubsData);
-    console.log('Processed clubs:', result);
-    return result;
-  }, [clubsData]);
+    console.log('✅ Data processing complete:', {
+      teams: teams.length,
+      clubs: clubs.length,
+      competitions: competitions.length,
+      games: games.length,
+      players: players.length,
+      news: news.length,
+      events: events.length,
+      referees: referees.length,
+      coaches: coaches.length,
+      federations: federations.length,
+      regionalAssociations: regionalAssociations.length
+    });
 
-  const competitions: Competition[] = useMemo(() => {
-    const result = safeArrayCast<Competition>(competitionsData);
-    console.log('Processed competitions:', result);
-    return result;
-  }, [competitionsData]);
+    return {
+      teams,
+      clubs,
+      competitions,
+      games,
+      players,
+      news,
+      events,
+      referees,
+      coaches,
+      federations,
+      regionalAssociations
+    };
+  }, [
+    teamsData,
+    clubsData,
+    competitionsData,
+    gamesData,
+    playersData,
+    newsData,
+    eventsData,
+    refereesData,
+    federationsData,
+    regionalAssociationsData
+  ]);
 
-  const games: Game[] = useMemo(() => {
-    const result = safeArrayCast<Game>(gamesData);
-    console.log('Processed games:', result);
-    return result;
-  }, [gamesData]);
-
-  const players: Player[] = useMemo(() => {
-    const result = safeArrayCast<Player>(playersData);
-    console.log('Processed players:', result);
-    return result;
-  }, [playersData]);
-
-  const news: NewsItem[] = useMemo(() => {
-    const result = safeArrayCast<NewsItem>(newsData);
-    console.log('Processed news:', result);
-    return result;
-  }, [newsData]);
-
-  const events: Event[] = useMemo(() => {
-    const result = safeArrayCast<Event>(eventsData);
-    console.log('Processed events:', result);
-    return result;
-  }, [eventsData]);
-
-  const referees: Referee[] = useMemo(() => {
-    const result = safeArrayCast<Referee>(refereesData);
-    console.log('Processed referees:', result);
-    return result;
-  }, [refereesData]);
-
-  const federations: Federation[] = useMemo(() => {
-    console.log('Processing federations - raw data:', federationsData);
-    const result = safeArrayCast<Federation>(federationsData);
-    console.log('Processed federations result:', result);
-    return result;
-  }, [federationsData]);
-
-  const regionalAssociations: RegionalAssociation[] = useMemo(() => {
-    const result = safeArrayCast<RegionalAssociation>(regionalAssociationsData);
-    console.log('Processed regional associations:', result);
-    return result;
-  }, [regionalAssociationsData]);
-
-  // Handle coaches separately since the table doesn't exist
-  const coaches: Coach[] = useMemo(() => [], []);
-
-  // Log summary
-  console.log('=== DATA SUMMARY ===');
-  console.log('Teams count:', teams.length);
-  console.log('Clubs count:', clubs.length);
-  console.log('Competitions count:', competitions.length);
-  console.log('Games count:', games.length);
-  console.log('Players count:', players.length);
-  console.log('News count:', news.length);
-  console.log('Events count:', events.length);
-  console.log('Referees count:', referees.length);
-  console.log('Federations count:', federations.length);
-  console.log('Regional Associations count:', regionalAssociations.length);
-  console.log('===================');
-
-  return {
-    teams,
-    clubs,
-    competitions,
-    games,
-    players,
-    news,
-    events,
-    referees,
-    coaches,
-    federations,
-    regionalAssociations
-  };
+  return processedData;
 };

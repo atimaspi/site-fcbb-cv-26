@@ -60,7 +60,7 @@ export const useUnifiedApi = () => {
     table: string, 
     options: QueryOptions = {}
   ) => {
-    const { enabled = true, staleTime = 2 * 60 * 1000 } = options; // Reduced stale time for faster updates
+    const { enabled = true, staleTime = 1 * 60 * 1000 } = options; // 1 minute for faster updates
     
     const queryKey = useMemo(() => [table, options], [table, options]);
     
@@ -69,9 +69,9 @@ export const useUnifiedApi = () => {
       queryFn: () => fetchData(table, options),
       enabled,
       staleTime,
-      gcTime: 5 * 60 * 1000, // Reduced garbage collection time
-      refetchOnWindowFocus: true, // Enable refetch on focus for real-time updates
-      refetchInterval: 30000, // Auto-refetch every 30 seconds for live data
+      gcTime: 3 * 60 * 1000, // 3 minutes garbage collection
+      refetchOnWindowFocus: true,
+      refetchInterval: 15000, // Auto-refetch every 15 seconds for real-time updates
       retry: (failureCount, error: any) => {
         if (error?.message?.includes('infinite recursion') || 
             error?.message?.includes('policy') ||
@@ -80,7 +80,7 @@ export const useUnifiedApi = () => {
         }
         return failureCount < 2;
       },
-      retryDelay: (attemptIndex) => Math.min(500 * 2 ** attemptIndex, 5000) // Faster retry
+      retryDelay: (attemptIndex) => Math.min(300 * 2 ** attemptIndex, 3000) // Faster retry
     });
   };
 
@@ -116,23 +116,29 @@ export const useUnifiedApi = () => {
         }
       },
       onSuccess: (data) => {
-        // Invalidate and refetch related queries immediately
+        // Immediate cache updates with multiple strategies
         queryClient.invalidateQueries({ queryKey: [table] });
         queryClient.refetchQueries({ queryKey: [table] });
         
-        // Also invalidate any related tables
+        // Also invalidate any related tables for referential integrity
         if (table === 'clubs') {
           queryClient.invalidateQueries({ queryKey: ['teams'] });
+          queryClient.refetchQueries({ queryKey: ['teams'] });
         }
         if (table === 'teams') {
           queryClient.invalidateQueries({ queryKey: ['players'] });
+          queryClient.refetchQueries({ queryKey: ['players'] });
+        }
+        if (table === 'championships') {
+          queryClient.invalidateQueries({ queryKey: ['games'] });
+          queryClient.refetchQueries({ queryKey: ['games'] });
         }
         
         toast({
           title: "✅ Sucesso",
           description: `Item criado com sucesso em ${table}.`,
         });
-        console.log(`🔄 Cache invalidated for ${table}`);
+        console.log(`🔄 Cache invalidated and refetched for ${table}`);
       },
       onError: (error: any) => {
         console.error(`❌ Create error:`, error);
@@ -181,6 +187,14 @@ export const useUnifiedApi = () => {
         queryClient.invalidateQueries({ queryKey: [table] });
         queryClient.refetchQueries({ queryKey: [table] });
         
+        // Also update related tables
+        if (table === 'clubs') {
+          queryClient.invalidateQueries({ queryKey: ['teams'] });
+        }
+        if (table === 'teams') {
+          queryClient.invalidateQueries({ queryKey: ['players'] });
+        }
+        
         toast({
           title: "✅ Sucesso",
           description: `Item atualizado com sucesso em ${table}.`,
@@ -225,6 +239,14 @@ export const useUnifiedApi = () => {
         // Immediate cache updates
         queryClient.invalidateQueries({ queryKey: [table] });
         queryClient.refetchQueries({ queryKey: [table] });
+        
+        // Also update related tables
+        if (table === 'clubs') {
+          queryClient.invalidateQueries({ queryKey: ['teams'] });
+        }
+        if (table === 'teams') {
+          queryClient.invalidateQueries({ queryKey: ['players'] });
+        }
         
         toast({
           title: "✅ Sucesso",

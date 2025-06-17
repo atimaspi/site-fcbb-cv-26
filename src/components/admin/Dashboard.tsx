@@ -1,8 +1,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useApi } from '@/hooks/useApi';
-import { useBackendData, Team, Game } from '@/hooks/useBackendData';
+import { useBackendData } from '@/hooks/useBackendData';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { 
   Users, 
@@ -10,8 +9,6 @@ import {
   Calendar, 
   FileText, 
   TrendingUp,
-  Eye,
-  MessageSquare,
   Star,
   ImageIcon,
   Play,
@@ -27,7 +24,6 @@ import DataManagement from '../backend/DataManagement';
 import LiveScoring from '../backend/LiveScoring';
 
 const Dashboard = () => {
-  const { useFetch } = useApi();
   const {
     teams,
     competitions,
@@ -39,66 +35,59 @@ const Dashboard = () => {
     upcomingGames,
     isLoading: backendLoading
   } = useBackendData();
-  
-  const { data: news, isLoading: newsLoading } = useFetch('news');
-  const { data: events, isLoading: eventsLoading } = useFetch('events');
-  const { data: clubs, isLoading: clubsLoading } = useFetch('clubs');
 
-  // Memoize computed data for better performance
+  // Memoized computed data for better performance
   const computedData = useMemo(() => {
-    const newsList = publishedNews.length > 0 ? publishedNews : (Array.isArray(news) ? news : []);
-    const eventsList = activeEvents.length > 0 ? activeEvents : (Array.isArray(events) ? events : []);
-    const clubsList = teams.length > 0 ? teams : (Array.isArray(clubs) ? clubs : []);
-    const playersList = Array.isArray(players) ? players : [];
+    const finishedGames = games.filter((g: any) => g.status === 'finalizado').length;
+    const liveGames = games.filter((g: any) => g.status === 'ao_vivo').length;
 
     return {
-      newsList,
-      eventsList,
-      clubsList,
-      playersList,
-      finishedGames: games.filter((g: any) => g.status === 'finalizado').length,
-      liveGames: games.filter((g: any) => g.status === 'ao_vivo').length
+      finishedGames,
+      liveGames
     };
-  }, [publishedNews, news, activeEvents, events, teams, clubs, players, games]);
+  }, [games]);
 
-  // Memoize stats for performance
+  // Memoized stats for performance
   const stats = useMemo(() => [
     {
       title: 'Total de Notícias',
-      value: computedData.newsList.length,
+      value: publishedNews.length,
       description: 'Artigos publicados',
       icon: FileText,
       color: 'text-blue-600'
     },
     {
       title: 'Eventos Ativos',
-      value: computedData.eventsList.length,
+      value: activeEvents.length,
       description: 'Próximos eventos',
       icon: Calendar,
       color: 'text-green-600'
     },
     {
       title: 'Clubes Registados',
-      value: computedData.clubsList.length,
+      value: teams.length,
       description: 'Clubes ativos',
       icon: Trophy,
       color: 'text-yellow-600'
     },
     {
       title: 'Jogadores',
-      value: computedData.playersList.length,
+      value: players.length,
       description: 'Atletas registados',
       icon: Users,
       color: 'text-purple-600'
     }
-  ], [computedData]);
+  ], [publishedNews.length, activeEvents.length, teams.length, players.length]);
 
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  // Optimized tab change handler
+  // Optimized tab change handler with performance boost
   const handleTabChange = useCallback((newTab: string) => {
     console.log(`🔄 Switching to tab: ${newTab}`);
-    setActiveTab(newTab);
+    // Use requestAnimationFrame for smoother transitions
+    requestAnimationFrame(() => {
+      setActiveTab(newTab);
+    });
   }, []);
 
   // Memoized quick action handlers
@@ -217,12 +206,12 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentGames.slice(0, 3).map((game: Game) => (
+                    {recentGames.slice(0, 3).map((game: any) => (
                       <div key={game.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                         <Trophy className="h-4 w-4 text-cv-blue" />
                         <div className="flex-1">
                           <p className="text-sm font-medium">
-                            {teams.find((t: Team) => t.id === game.home_team_id)?.name || 'Casa'} {game.home_score} - {game.away_score} {teams.find((t: Team) => t.id === game.away_team_id)?.name || 'Visitante'}
+                            {teams.find((t: any) => t.id === game.home_team_id)?.name || 'Casa'} {game.home_score} - {game.away_score} {teams.find((t: any) => t.id === game.away_team_id)?.name || 'Visitante'}
                           </p>
                           <p className="text-xs text-gray-500">
                             {new Date(game.scheduled_date).toLocaleDateString('pt-PT')}
@@ -285,7 +274,7 @@ const Dashboard = () => {
   }, [activeTab, stats, competitions.length, computedData, upcomingGames.length, recentGames, teams, quickActions, handleTabChange]);
 
   // Show loading only for critical data
-  if (newsLoading || eventsLoading || clubsLoading || backendLoading) {
+  if (backendLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" />
@@ -296,13 +285,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar otimizada */}
+      {/* Sidebar otimizada com logo menor */}
       <div className="w-64 bg-cv-blue text-white p-6">
         <div className="flex items-center mb-8">
           <img 
             src="/lovable-uploads/39194785-9ce8-4849-82cb-ad92f0086855.png" 
             alt="FCBB Logo" 
-            className="w-8 h-8 mr-3 object-contain"
+            className="w-6 h-6 mr-3 object-contain"
           />
           <h2 className="text-lg font-bold">Admin FCBB</h2>
         </div>
@@ -319,8 +308,8 @@ const Dashboard = () => {
             <button
               key={item.id}
               onClick={() => handleTabChange(item.id)}
-              className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
-                activeTab === item.id ? 'bg-blue-600 shadow-lg' : 'hover:bg-blue-600/70'
+              className={`w-full text-left p-3 rounded-lg transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                activeTab === item.id ? 'bg-blue-600 shadow-lg' : ''
               }`}
             >
               <item.icon className="inline w-4 h-4 mr-3" />
