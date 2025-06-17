@@ -31,39 +31,39 @@ const CompactNavigation = () => {
   }, [location.pathname]);
 
   return (
-    <nav ref={navRef} className="hidden lg:block bg-cv-blue py-0.5">
+    <nav ref={navRef} className="hidden lg:block bg-cv-blue py-2">
       <div className="cv-container">
-        <div className="flex items-center justify-center space-x-2">
+        <div className="flex items-center justify-center space-x-6">
           {navItems.map((item) => (
             <div key={item.title} className="relative">
               {item.dropdown ? (
                 <button
                   onClick={() => toggleDropdown(item.title)}
-                  className="flex items-center px-1 py-0.5 text-white hover:text-cv-yellow transition-colors text-xs font-medium focus-visible-cv"
+                  className="flex items-center px-3 py-2 text-white hover:text-cv-yellow transition-colors font-medium focus-visible-cv"
                   aria-expanded={activeDropdown === item.title}
                   aria-haspopup="true"
                 >
                   {item.title}
                   <ChevronDown 
-                    size={10} 
-                    className={`ml-0.5 transition-transform ${
+                    size={16} 
+                    className={`ml-1 transition-transform ${
                       activeDropdown === item.title ? 'rotate-180' : ''
                     }`} 
                   />
                 </button>
               ) : (
-                <span className="block px-1 py-0.5 text-white hover:text-cv-yellow transition-colors text-xs font-medium">
+                <span className="block px-3 py-2 text-white hover:text-cv-yellow transition-colors font-medium">
                   {item.title}
                 </span>
               )}
 
               {item.dropdown && item.items && activeDropdown === item.title && (
-                <div className="absolute top-full left-0 mt-0.5 dropdown-menu shadow-lg z-50 min-w-40">
+                <div className="absolute top-full left-0 mt-1 dropdown-menu shadow-lg z-50 min-w-48">
                   {item.items.map((child) => (
                     <Link
                       key={child.name}
                       to={child.path || '/'}
-                      className="dropdown-item text-xs py-2"
+                      className="dropdown-item py-3 px-4"
                       onClick={closeDropdowns}
                     >
                       {child.name}
