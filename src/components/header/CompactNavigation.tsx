@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { navigationData } from './navigationData';
+import { navItems } from './navigationData';
 
 const CompactNavigation = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -34,38 +34,38 @@ const CompactNavigation = () => {
     <nav ref={navRef} className="hidden lg:block bg-cv-blue py-1">
       <div className="cv-container">
         <div className="flex items-center justify-center space-x-4">
-          {navigationData.map((item) => (
-            <div key={item.name} className="relative">
-              {item.children ? (
+          {navItems.map((item) => (
+            <div key={item.title} className="relative">
+              {item.dropdown ? (
                 <button
-                  onClick={() => toggleDropdown(item.name)}
+                  onClick={() => toggleDropdown(item.title)}
                   className="flex items-center px-2 py-1 text-white hover:text-cv-yellow transition-colors text-sm font-medium focus-visible-cv"
-                  aria-expanded={activeDropdown === item.name}
+                  aria-expanded={activeDropdown === item.title}
                   aria-haspopup="true"
                 >
-                  {item.name}
+                  {item.title}
                   <ChevronDown 
                     size={12} 
                     className={`ml-1 transition-transform ${
-                      activeDropdown === item.name ? 'rotate-180' : ''
+                      activeDropdown === item.title ? 'rotate-180' : ''
                     }`} 
                   />
                 </button>
               ) : (
                 <Link
-                  to={item.href || '/'}
+                  to={item.path || '/'}
                   className="block px-2 py-1 text-white hover:text-cv-yellow transition-colors text-sm font-medium focus-visible-cv"
                 >
-                  {item.name}
+                  {item.title}
                 </Link>
               )}
 
-              {item.children && activeDropdown === item.name && (
+              {item.dropdown && item.items && activeDropdown === item.title && (
                 <div className="absolute top-full left-0 mt-1 dropdown-menu shadow-lg z-50 min-w-48">
-                  {item.children.map((child) => (
+                  {item.items.map((child) => (
                     <Link
                       key={child.name}
-                      to={child.href || '/'}
+                      to={child.path || '/'}
                       className="dropdown-item text-xs"
                       onClick={closeDropdowns}
                     >
