@@ -5,7 +5,7 @@ import CompactNavigation from './header/CompactNavigation';
 
 const CompactHeader = () => {
   return (
-    <header className="bg-white shadow-sm relative z-50 max-h-20">
+    <header className="bg-white shadow-sm relative z-50 h-16">
       <a 
         href="#main-content" 
         className="skip-nav focus:top-0"

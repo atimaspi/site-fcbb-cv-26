@@ -1,5 +1,5 @@
 
-import Header from '@/components/Header';
+import CompactHeader from '@/components/CompactHeader';
 import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import SEO from '@/components/SEO';
@@ -25,7 +25,7 @@ const PageLayout = ({ title, children, description, keywords, image }: PageLayou
         url={window.location.pathname}
       />
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <CompactHeader />
         <Breadcrumbs />
         <main 
           id="main-content" 

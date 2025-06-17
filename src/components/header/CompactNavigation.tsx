@@ -1,186 +1,84 @@
 
-import { useState } from 'react';
-import { ChevronDown, Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-const navItems = [
-  { title: 'Início', path: '/' },
-  { 
-    title: 'Sobre a FCBB', 
-    items: [
-      { name: 'Missão e Visão', path: '/sobre/missao-visao' },
-      { name: 'História', path: '/sobre/historia' },
-      { name: 'Direção', path: '/sobre/direcao' },
-      { name: 'Órgãos Sociais', path: '/sobre/orgaos-sociais' },
-      { name: 'Estatutos', path: '/sobre/estatutos' },
-      { name: 'Contactos', path: '/sobre/contactos' }
-    ]
-  },
-  { 
-    title: 'Competições', 
-    items: [
-      { name: 'Nacional Masculino', path: '/competicoes/nacional-masculino' },
-      { name: 'Liga Nacional', path: '/competicoes/liga-nacional' },
-      { name: 'Taça de Cabo Verde', path: '/competicoes/taca-cabo-verde' },
-      { name: 'Super Taça', path: '/competicoes/super-taca' },
-      { name: 'Competições Regionais', path: '/competicoes/competicoes-regionais' },
-      { name: 'Classificações', path: '/competicoes/classificacoes' },
-      { name: 'Calendário', path: '/competicoes/calendario' }
-    ]
-  },
-  { 
-    title: 'Seleções Nacionais', 
-    items: [
-      { name: 'Sénior Masculina', path: '/selecoes/senior-masculina' },
-      { name: 'Sénior Feminina', path: '/selecoes/senior-feminina' },
-      { name: 'Sub-18 Masculina', path: '/selecoes/sub-18-masculina' },
-      { name: 'Sub-18 Feminina', path: '/selecoes/sub-18-feminina' },
-      { name: 'Sub-16 Masculina', path: '/selecoes/sub-16-masculina' },
-      { name: 'Sub-16 Feminina', path: '/selecoes/sub-16-feminina' }
-    ]
-  },
-  { 
-    title: 'Clubes', 
-    items: [
-      { name: 'Direção de Clubes', path: '/clubes' },
-      { name: 'Transferências', path: '/transferencias' },
-      { name: 'Formação', path: '/formacao' },
-      { name: 'Arbitragem', path: '/arbitragem' }
-    ]
-  },
-  { 
-    title: 'Resultados & Estatísticas', 
-    items: [
-      { name: 'Resultados ao Vivo', path: '/resultados/ao-vivo' },
-      { name: 'Estatísticas', path: '/estatisticas' },
-      { name: 'Resultados', path: '/resultados' },
-      { name: 'FIBA LiveStats', path: '/resultados/fiba-livestats' }
-    ]
-  },
-  { 
-    title: 'Multimédia', 
-    items: [
-      { name: 'Notícias', path: '/noticias' },
-      { name: 'Galeria de Imagens', path: '/galeria' },
-      { name: 'Vídeos', path: '/videos' },
-      { name: 'Área de Imprensa', path: '/imprensa' },
-      { name: 'Transmissões', path: '/transmissoes' }
-    ]
-  }
-];
+import { useState, useRef, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { navigationData } from './navigationData';
 
 const CompactNavigation = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  const navRef = useRef<HTMLDivElement>(null);
+
+  const toggleDropdown = (dropdown: string) => {
+    setActiveDropdown(activeDropdown === dropdown ? null : dropdown);
+  };
+
+  const closeDropdowns = () => setActiveDropdown(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        closeDropdowns();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    closeDropdowns();
+  }, [location.pathname]);
 
   return (
-    <div className="cv-container">
-      {/* Desktop Navigation */}
-      <nav className="hidden lg:block border-t border-gray-200">
-        <ul className="flex">
-          {navItems.map((item) => (
-            <li key={item.title} className="relative group">
-              {item.path ? (
-                <Link 
-                  to={item.path}
-                  className="block px-3 py-1.5 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
+    <nav ref={navRef} className="hidden lg:block bg-cv-blue py-1">
+      <div className="cv-container">
+        <div className="flex items-center justify-center space-x-4">
+          {navigationData.map((item) => (
+            <div key={item.name} className="relative">
+              {item.children ? (
+                <button
+                  onClick={() => toggleDropdown(item.name)}
+                  className="flex items-center px-2 py-1 text-white hover:text-cv-yellow transition-colors text-sm font-medium focus-visible-cv"
+                  aria-expanded={activeDropdown === item.name}
+                  aria-haspopup="true"
                 >
-                  {item.title}
-                </Link>
+                  {item.name}
+                  <ChevronDown 
+                    size={12} 
+                    className={`ml-1 transition-transform ${
+                      activeDropdown === item.name ? 'rotate-180' : ''
+                    }`} 
+                  />
+                </button>
               ) : (
-                <div className="relative">
-                  <button 
-                    className="flex items-center px-3 py-1.5 text-sm text-cv-dark hover:text-cv-blue font-medium transition-colors"
-                    onMouseEnter={() => setActiveDropdown(item.title)}
-                    onMouseLeave={() => setActiveDropdown(null)}
-                  >
-                    {item.title}
-                    <ChevronDown className="ml-1 w-3 h-3" />
-                  </button>
-                  {activeDropdown === item.title && (
-                    <div 
-                      className="absolute left-0 top-full w-56 bg-white shadow-xl border border-gray-200 z-50 rounded-md"
-                      onMouseEnter={() => setActiveDropdown(item.title)}
-                      onMouseLeave={() => setActiveDropdown(null)}
+                <Link
+                  to={item.href || '/'}
+                  className="block px-2 py-1 text-white hover:text-cv-yellow transition-colors text-sm font-medium focus-visible-cv"
+                >
+                  {item.name}
+                </Link>
+              )}
+
+              {item.children && activeDropdown === item.name && (
+                <div className="absolute top-full left-0 mt-1 dropdown-menu shadow-lg z-50 min-w-48">
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.name}
+                      to={child.href || '/'}
+                      className="dropdown-item text-xs"
+                      onClick={closeDropdowns}
                     >
-                      <div className="py-1">
-                        {item.items?.map((subItem) => (
-                          <Link 
-                            key={subItem.name}
-                            to={subItem.path}
-                            className="block px-3 py-1.5 text-sm text-cv-dark hover:bg-cv-blue hover:text-white transition-colors"
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                      {child.name}
+                    </Link>
+                  ))}
                 </div>
               )}
-            </li>
+            </div>
           ))}
-        </ul>
-      </nav>
-
-      {/* Mobile Menu Button */}
-      <div className="lg:hidden flex justify-end py-0.5">
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-1"
-          aria-label="Menu"
-        >
-          {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileOpen && (
-        <div className="lg:hidden bg-white border-t shadow-lg">
-          <div className="py-1">
-            {navItems.map((item) => (
-              <div key={item.title}>
-                {item.path ? (
-                  <Link 
-                    to={item.path}
-                    className="block py-1.5 px-4 text-cv-dark hover:bg-gray-50"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {item.title}
-                  </Link>
-                ) : (
-                  <div>
-                    <button 
-                      className="w-full text-left py-1.5 px-4 text-cv-dark font-medium hover:bg-gray-50"
-                      onClick={() => setActiveDropdown(activeDropdown === item.title ? null : item.title)}
-                    >
-                      <span className="flex items-center justify-between">
-                        {item.title}
-                        <ChevronDown className={`w-4 h-4 transition-transform ${activeDropdown === item.title ? 'rotate-180' : ''}`} />
-                      </span>
-                    </button>
-                    {activeDropdown === item.title && (
-                      <div className="bg-gray-50">
-                        {item.items?.map((subItem) => (
-                          <Link 
-                            key={subItem.name}
-                            to={subItem.path}
-                            className="block py-1.5 px-8 text-sm text-cv-dark hover:bg-gray-100"
-                            onClick={() => setMobileOpen(false)}
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
         </div>
-      )}
-    </div>
+      </div>
+    </nav>
   );
 };
 

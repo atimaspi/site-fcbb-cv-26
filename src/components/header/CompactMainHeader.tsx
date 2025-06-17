@@ -9,11 +9,11 @@ const CompactMainHeader = () => {
           <img 
             src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
             alt="FCBB" 
-            className="h-8 w-auto mr-2"
+            className="h-6 w-auto mr-2"
             loading="eager"
           />
           <div className="flex flex-col">
-            <h1 className="text-lg font-bold text-cv-blue leading-tight">FCBB</h1>
+            <h1 className="text-base font-bold text-cv-blue leading-tight">FCBB</h1>
             <p className="text-xs text-cv-dark font-medium">Federação Cabo-verdiana de Basquetebol</p>
           </div>
         </Link>
