@@ -4,13 +4,19 @@ import { useApi } from '@/hooks/useApi';
 export const useDataFetching = () => {
   const { useFetch } = useApi();
 
-  // Fetch data with simplified approach
+  // Fetch data with simplified approach - using correct column names
   const { data: teamsData, isLoading: teamsLoading, error: teamsError } = useFetch('teams');
   const { data: clubsData, isLoading: clubsLoading, error: clubsError } = useFetch('clubs');
   const { data: competitionsData, isLoading: competitionsLoading, error: competitionsError } = useFetch('championships');
   const { data: gamesData, isLoading: gamesLoading, error: gamesError } = useFetch('games');
   const { data: playersData, isLoading: playersLoading, error: playersError } = useFetch('players');
-  const { data: newsData, isLoading: newsLoading, error: newsError } = useFetch('news');
+  
+  // Fix news fetch to use correct column name
+  const { data: newsData, isLoading: newsLoading, error: newsError } = useFetch('news', {
+    select: 'id, title, published, featured_image_url, category, content, created_at',
+    orderBy: { column: 'published', ascending: false }
+  });
+  
   const { data: eventsData, isLoading: eventsLoading, error: eventsError } = useFetch('events');
   const { data: refereesData, isLoading: refereesLoading, error: refereesError } = useFetch('referees');
   const { data: federationsData, isLoading: federationsLoading, error: federationsError } = useFetch('federations');
