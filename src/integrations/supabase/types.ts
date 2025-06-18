@@ -116,7 +116,9 @@ export type Database = {
           contact_phone: string | null
           created_at: string | null
           description: string | null
+          documents: Json | null
           founded_year: number | null
+          gallery_images: Json | null
           id: string
           island: string
           logo_url: string | null
@@ -132,7 +134,9 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          documents?: Json | null
           founded_year?: number | null
+          gallery_images?: Json | null
           id?: string
           island: string
           logo_url?: string | null
@@ -148,7 +152,9 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          documents?: Json | null
           founded_year?: number | null
+          gallery_images?: Json | null
           id?: string
           island?: string
           logo_url?: string | null
@@ -518,8 +524,63 @@ export type Database = {
         }
         Relationships: []
       }
+      media_files: {
+        Row: {
+          alt_text: string | null
+          category: string
+          created_at: string | null
+          description: string | null
+          entity_id: string | null
+          entity_type: string | null
+          file_path: string
+          file_size: number
+          filename: string
+          id: string
+          is_featured: boolean | null
+          mime_type: string
+          original_filename: string
+          updated_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          file_path: string
+          file_size: number
+          filename: string
+          id?: string
+          is_featured?: boolean | null
+          mime_type: string
+          original_filename: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          file_path?: string
+          file_size?: number
+          filename?: string
+          id?: string
+          is_featured?: boolean | null
+          mime_type?: string
+          original_filename?: string
+          updated_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       news: {
         Row: {
+          attachments: Json | null
           author: string | null
           author_id: string | null
           category: string
@@ -527,14 +588,19 @@ export type Database = {
           created_at: string | null
           excerpt: string | null
           featured: boolean | null
+          featured_image_url: string | null
+          gallery_images: Json | null
           id: string
           image_url: string | null
           published: boolean | null
           status: string | null
+          tags: string[] | null
           title: string
           updated_at: string | null
+          video_url: string | null
         }
         Insert: {
+          attachments?: Json | null
           author?: string | null
           author_id?: string | null
           category?: string
@@ -542,14 +608,19 @@ export type Database = {
           created_at?: string | null
           excerpt?: string | null
           featured?: boolean | null
+          featured_image_url?: string | null
+          gallery_images?: Json | null
           id?: string
           image_url?: string | null
           published?: boolean | null
           status?: string | null
+          tags?: string[] | null
           title: string
           updated_at?: string | null
+          video_url?: string | null
         }
         Update: {
+          attachments?: Json | null
           author?: string | null
           author_id?: string | null
           category?: string
@@ -557,12 +628,16 @@ export type Database = {
           created_at?: string | null
           excerpt?: string | null
           featured?: boolean | null
+          featured_image_url?: string | null
+          gallery_images?: Json | null
           id?: string
           image_url?: string | null
           published?: boolean | null
           status?: string | null
+          tags?: string[] | null
           title?: string
           updated_at?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -573,12 +648,14 @@ export type Database = {
           birth_date: string | null
           club: string | null
           created_at: string | null
+          documents: Json | null
           first_name: string
           height_cm: number | null
           id: string
           jersey_number: number | null
           last_name: string
           nationality: string | null
+          photo_url: string | null
           position: string | null
           status: string | null
           team_id: string | null
@@ -590,12 +667,14 @@ export type Database = {
           birth_date?: string | null
           club?: string | null
           created_at?: string | null
+          documents?: Json | null
           first_name: string
           height_cm?: number | null
           id?: string
           jersey_number?: number | null
           last_name: string
           nationality?: string | null
+          photo_url?: string | null
           position?: string | null
           status?: string | null
           team_id?: string | null
@@ -607,12 +686,14 @@ export type Database = {
           birth_date?: string | null
           club?: string | null
           created_at?: string | null
+          documents?: Json | null
           first_name?: string
           height_cm?: number | null
           id?: string
           jersey_number?: number | null
           last_name?: string
           nationality?: string | null
+          photo_url?: string | null
           position?: string | null
           status?: string | null
           team_id?: string | null
@@ -676,6 +757,7 @@ export type Database = {
       referees: {
         Row: {
           active: boolean | null
+          certificates: Json | null
           certified_date: string | null
           created_at: string | null
           email: string | null
@@ -686,9 +768,11 @@ export type Database = {
           level: string
           license_number: string | null
           phone: string | null
+          photo_url: string | null
         }
         Insert: {
           active?: boolean | null
+          certificates?: Json | null
           certified_date?: string | null
           created_at?: string | null
           email?: string | null
@@ -699,9 +783,11 @@ export type Database = {
           level: string
           license_number?: string | null
           phone?: string | null
+          photo_url?: string | null
         }
         Update: {
           active?: boolean | null
+          certificates?: Json | null
           certified_date?: string | null
           created_at?: string | null
           email?: string | null
@@ -712,6 +798,7 @@ export type Database = {
           level?: string
           license_number?: string | null
           phone?: string | null
+          photo_url?: string | null
         }
         Relationships: []
       }
@@ -840,6 +927,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_orphaned_media: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
