@@ -53,7 +53,7 @@ const CompactNavigation = () => {
                 </button>
               ) : (
                 <Link 
-                  to={item.path || '/'}
+                  to="/"
                   className="block px-3 py-2 text-white hover:text-cv-yellow transition-colors font-medium"
                 >
                   {item.title}
