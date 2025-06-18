@@ -52,9 +52,12 @@ const CompactNavigation = () => {
                   />
                 </button>
               ) : (
-                <span className="block px-3 py-2 text-white hover:text-cv-yellow transition-colors font-medium">
+                <Link 
+                  to={item.path || '/'}
+                  className="block px-3 py-2 text-white hover:text-cv-yellow transition-colors font-medium"
+                >
                   {item.title}
-                </span>
+                </Link>
               )}
 
               {item.dropdown && item.items && activeDropdown === item.title && (
