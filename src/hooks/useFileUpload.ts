@@ -69,14 +69,18 @@ export const useFileUpload = (options: FileUploadOptions = {}) => {
       const fileName = `${timestamp}_${randomString}.${fileExtension}`;
       const filePath = folder ? `${folder}/${fileName}` : fileName;
 
+      // Simular progresso durante o upload
+      const progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 90));
+      }, 100);
+
       // Upload para o Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(filePath, file, {
-          onUploadProgress: (progress) => {
-            setProgress((progress.loaded / progress.total) * 100);
-          }
-        });
+        .upload(filePath, file);
+
+      clearInterval(progressInterval);
+      setProgress(100);
 
       if (uploadError) throw uploadError;
 
