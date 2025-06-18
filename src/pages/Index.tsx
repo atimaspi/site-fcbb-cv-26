@@ -31,13 +31,13 @@ const Index = () => {
         <Hero />
         
         {/* High-priority content */}
-        <NewsSection data={newsData} loading={isLoading} />
+        <NewsSection />
         
         {/* Secondary content */}
         <div className="space-y-12 md:space-y-16">
-          <UpcomingGames data={gamesData} loading={isLoading} />
-          <CompetitionsSection data={competitionsData} loading={isLoading} />
-          <TeamsSection data={teamsData} loading={isLoading} />
+          <UpcomingGames />
+          <CompetitionsSection />
+          <TeamsSection />
           
           {/* Lazy-loaded components */}
           <Suspense fallback={
