@@ -5,3 +5,56 @@
 @import './styles/utilities.css';
 @import './styles/animations.css';
 @import './styles/accessibility.css';
+@import './styles/glassmorphism.css';
+
+/* Additional modern styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-poppins;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Enhanced focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-cv-blue ring-offset-2 ring-offset-background;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-cv-blue rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-cv-red;
+}
+
+/* Text selection */
+::selection {
+  @apply bg-cv-blue text-white;
+}
+
+/* Line clamp utility */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
