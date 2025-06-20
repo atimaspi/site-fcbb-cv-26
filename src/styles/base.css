@@ -35,6 +35,36 @@
 
     --radius: 0.5rem;
   }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
 }
 
 @layer base {
@@ -43,8 +73,12 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
@@ -53,19 +87,112 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Cape Verde color palette utilities */
-.text-cv-blue { color: #003893; }
-.text-cv-red { color: #CF2027; }
-.text-cv-yellow { color: #F7D116; }
-.text-cv-dark { color: #1f2937; }
+/* Cape Verde color palette utilities with dark mode support */
+.text-cv-blue { 
+  color: #003893; 
+}
+.dark .text-cv-blue { 
+  color: #4A9EFF; 
+}
 
-.bg-cv-blue { background-color: #003893; }
-.bg-cv-red { background-color: #CF2027; }
-.bg-cv-yellow { background-color: #F7D116; }
+.text-cv-red { 
+  color: #CF2027; 
+}
+.dark .text-cv-red { 
+  color: #FF6B6B; 
+}
 
-.border-cv-blue { border-color: #003893; }
-.border-cv-red { border-color: #CF2027; }
-.border-cv-yellow { border-color: #F7D116; }
+.text-cv-yellow { 
+  color: #F7D116; 
+}
+.dark .text-cv-yellow { 
+  color: #FFE066; 
+}
 
-.hover\:bg-cv-blue:hover { background-color: #002766; }
-.hover\:bg-cv-red:hover { background-color: #a01a1f; }
+.text-cv-dark { 
+  color: #1f2937; 
+}
+.dark .text-cv-dark { 
+  color: #f9fafb; 
+}
+
+.bg-cv-blue { 
+  background-color: #003893; 
+}
+.dark .bg-cv-blue { 
+  background-color: #1e40af; 
+}
+
+.bg-cv-red { 
+  background-color: #CF2027; 
+}
+.dark .bg-cv-red { 
+  background-color: #dc2626; 
+}
+
+.bg-cv-yellow { 
+  background-color: #F7D116; 
+}
+.dark .bg-cv-yellow { 
+  background-color: #fbbf24; 
+}
+
+.border-cv-blue { 
+  border-color: #003893; 
+}
+.dark .border-cv-blue { 
+  border-color: #4A9EFF; 
+}
+
+.border-cv-red { 
+  border-color: #CF2027; 
+}
+.dark .border-cv-red { 
+  border-color: #FF6B6B; 
+}
+
+.border-cv-yellow { 
+  border-color: #F7D116; 
+}
+.dark .border-cv-yellow { 
+  border-color: #FFE066; 
+}
+
+.hover\:bg-cv-blue:hover { 
+  background-color: #002766; 
+}
+.dark .hover\:bg-cv-blue:hover { 
+  background-color: #1e3a8a; 
+}
+
+.hover\:bg-cv-red:hover { 
+  background-color: #a01a1f; 
+}
+.dark .hover\:bg-cv-red:hover { 
+  background-color: #b91c1c; 
+}
+
+/* Glassmorphism effects */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-effect {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark .glass-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
