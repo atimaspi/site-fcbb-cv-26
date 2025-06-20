@@ -11,11 +11,8 @@ export const useDataFetching = () => {
   const { data: gamesData, isLoading: gamesLoading, error: gamesError } = useFetch('games');
   const { data: playersData, isLoading: playersLoading, error: playersError } = useFetch('players');
   
-  // Fix news fetch to use correct column name
-  const { data: newsData, isLoading: newsLoading, error: newsError } = useFetch('news', {
-    select: 'id, title, published, featured_image_url, category, content, created_at',
-    orderBy: { column: 'published', ascending: false }
-  });
+  // Fix news fetch - remove the invalid orderBy configuration
+  const { data: newsData, isLoading: newsLoading, error: newsError } = useFetch('news');
   
   const { data: eventsData, isLoading: eventsLoading, error: eventsError } = useFetch('events');
   const { data: refereesData, isLoading: refereesLoading, error: refereesError } = useFetch('referees');
