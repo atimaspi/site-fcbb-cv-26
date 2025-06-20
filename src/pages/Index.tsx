@@ -1,66 +1,36 @@
 
-import Hero from '@/components/Hero';
+import CompactHeader from '@/components/CompactHeader';
+import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import ModernHeroSection from '@/components/ModernHeroSection';
+import InteractiveStatsCards from '@/components/InteractiveStatsCards';
 import NewsSection from '@/components/NewsSection';
 import CompetitionsSection from '@/components/CompetitionsSection';
 import TeamsSection from '@/components/TeamsSection';
 import UpcomingGames from '@/components/UpcomingGames';
 import PartnersSection from '@/components/PartnersSection';
-import PerformanceDashboard from '@/components/PerformanceDashboard';
-import { useOptimizedDataFetching } from '@/hooks/useOptimizedDataFetching';
-import { Suspense, lazy } from 'react';
-import CriticalCSS from '@/components/CriticalCSS';
-
-// Lazy load non-critical components
-const FeaturedVideos = lazy(() => import('@/components/FeaturedVideos'));
-const LiveResultsWidget = lazy(() => import('@/components/LiveResultsWidget'));
 
 const Index = () => {
-  const {
-    newsData,
-    competitionsData,
-    teamsData,
-    gamesData,
-    isLoading
-  } = useOptimizedDataFetching();
-
   return (
     <>
-      <CriticalCSS />
-      <div className="min-h-screen bg-white">
-        {/* Critical above-the-fold content */}
-        <Hero />
-        
-        {/* High-priority content */}
-        <NewsSection />
-        
-        {/* Secondary content */}
-        <div className="space-y-12 md:space-y-16">
+      <SEO 
+        title="FCBB - Federação Cabo-verdiana de Basquetebol" 
+        description="Site oficial da Federação Cabo-verdiana de Basquetebol. Acompanhe as últimas notícias, resultados, classificações e competições do basquetebol cabo-verdiano."
+        keywords="FCBB, basquetebol, Cabo Verde, federação, liga nacional, competições, resultados"
+        url="/"
+      />
+      <div className="min-h-screen flex flex-col">
+        <CompactHeader />
+        <main className="flex-grow">
+          <ModernHeroSection />
+          <InteractiveStatsCards />
+          <NewsSection />
           <UpcomingGames />
           <CompetitionsSection />
           <TeamsSection />
-          
-          {/* Lazy-loaded components */}
-          <Suspense fallback={
-            <div className="cv-container">
-              <div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>
-            </div>
-          }>
-            <LiveResultsWidget />
-          </Suspense>
-          
-          <Suspense fallback={
-            <div className="cv-container">
-              <div className="h-48 bg-gray-100 animate-pulse rounded-lg"></div>
-            </div>
-          }>
-            <FeaturedVideos />
-          </Suspense>
-          
           <PartnersSection />
-        </div>
-        
-        {/* Performance monitoring (dev only) */}
-        <PerformanceDashboard />
+        </main>
+        <Footer />
       </div>
     </>
   );
