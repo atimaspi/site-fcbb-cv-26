@@ -2,13 +2,14 @@
 import CompactHeader from '@/components/CompactHeader';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import ModernHeroSection from '@/components/ModernHeroSection';
-import InteractiveStatsCards from '@/components/InteractiveStatsCards';
+import EnhancedHeroSection from '@/components/EnhancedHeroSection';
+import PremiumStatsSection from '@/components/PremiumStatsSection';
 import NewsSection from '@/components/NewsSection';
 import CompetitionsSection from '@/components/CompetitionsSection';
 import TeamsSection from '@/components/TeamsSection';
 import UpcomingGames from '@/components/UpcomingGames';
 import PartnersSection from '@/components/PartnersSection';
+import InteractiveFloatingButtons from '@/components/InteractiveFloatingButtons';
 
 const Index = () => {
   return (
@@ -22,8 +23,8 @@ const Index = () => {
       <div className="min-h-screen flex flex-col">
         <CompactHeader />
         <main className="flex-grow">
-          <ModernHeroSection />
-          <InteractiveStatsCards />
+          <EnhancedHeroSection />
+          <PremiumStatsSection />
           <NewsSection />
           <UpcomingGames />
           <CompetitionsSection />
@@ -31,6 +32,7 @@ const Index = () => {
           <PartnersSection />
         </main>
         <Footer />
+        <InteractiveFloatingButtons />
       </div>
     </>
   );
