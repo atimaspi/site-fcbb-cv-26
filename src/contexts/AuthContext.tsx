@@ -9,7 +9,8 @@ interface AuthContextType {
   loading: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: any }>;
+  createAdminUser: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -57,14 +58,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, fullName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
+        emailRedirectTo: redirectUrl,
+        data: fullName ? { full_name: fullName } : undefined
+      }
+    });
+    return { error };
+  };
+
+  const createAdminUser = async (email: string, password: string, fullName: string) => {
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: { full_name: fullName }
       }
     });
     return { error };
@@ -83,6 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAdmin,
     signIn,
     signUp,
+    createAdminUser,
     signOut,
   };
 
