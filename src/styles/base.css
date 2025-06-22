@@ -34,6 +34,12 @@
     --ring: 216 87% 29%;
 
     --radius: 0.5rem;
+
+    /* Cores da bandeira de Cabo Verde */
+    --primary-color: #002b7f;
+    --secondary-color: #ffcc00;
+    --accent-color: #ce1126;
+    --white: #ffffff;
   }
 
   .dark {
@@ -88,88 +94,55 @@ html {
 }
 
 /* Cape Verde color palette utilities with dark mode support */
-.text-cv-blue { 
-  color: #003893; 
+.text-cv-primary { 
+  color: var(--primary-color); 
 }
-.dark .text-cv-blue { 
+.dark .text-cv-primary { 
   color: #4A9EFF; 
 }
 
-.text-cv-red { 
-  color: #CF2027; 
+.text-cv-secondary { 
+  color: var(--secondary-color); 
 }
-.dark .text-cv-red { 
-  color: #FF6B6B; 
-}
-
-.text-cv-yellow { 
-  color: #F7D116; 
-}
-.dark .text-cv-yellow { 
+.dark .text-cv-secondary { 
   color: #FFE066; 
 }
 
-.text-cv-dark { 
-  color: #1f2937; 
+.text-cv-accent { 
+  color: var(--accent-color); 
 }
-.dark .text-cv-dark { 
-  color: #f9fafb; 
+.dark .text-cv-accent { 
+  color: #FF6B6B; 
 }
 
-.bg-cv-blue { 
-  background-color: #003893; 
+.bg-cv-primary { 
+  background-color: var(--primary-color); 
 }
-.dark .bg-cv-blue { 
+.dark .bg-cv-primary { 
   background-color: #1e40af; 
 }
 
-.bg-cv-red { 
-  background-color: #CF2027; 
+.bg-cv-secondary { 
+  background-color: var(--secondary-color); 
 }
-.dark .bg-cv-red { 
-  background-color: #dc2626; 
-}
-
-.bg-cv-yellow { 
-  background-color: #F7D116; 
-}
-.dark .bg-cv-yellow { 
+.dark .bg-cv-secondary { 
   background-color: #fbbf24; 
 }
 
-.border-cv-blue { 
-  border-color: #003893; 
+.bg-cv-accent { 
+  background-color: var(--accent-color); 
 }
-.dark .border-cv-blue { 
-  border-color: #4A9EFF; 
-}
-
-.border-cv-red { 
-  border-color: #CF2027; 
-}
-.dark .border-cv-red { 
-  border-color: #FF6B6B; 
+.dark .bg-cv-accent { 
+  background-color: #dc2626; 
 }
 
-.border-cv-yellow { 
-  border-color: #F7D116; 
-}
-.dark .border-cv-yellow { 
-  border-color: #FFE066; 
+/* Gradientes da bandeira */
+.bg-cv-gradient {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 50%, var(--secondary-color) 100%);
 }
 
-.hover\:bg-cv-blue:hover { 
-  background-color: #002766; 
-}
-.dark .hover\:bg-cv-blue:hover { 
-  background-color: #1e3a8a; 
-}
-
-.hover\:bg-cv-red:hover { 
-  background-color: #a01a1f; 
-}
-.dark .hover\:bg-cv-red:hover { 
-  background-color: #b91c1c; 
+.bg-cv-gradient-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%);
 }
 
 /* Glassmorphism effects */

@@ -58,12 +58,25 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Cape Verde flag colors
-        "cv-blue": "#003893",
-        "cv-red": "#CF2027", 
-        "cv-yellow": "#F7D116",
+        // Cape Verde flag colors with CSS variables
+        "cv-primary": "var(--primary-color)",
+        "cv-secondary": "var(--secondary-color)", 
+        "cv-accent": "var(--accent-color)",
+        "cv-white": "var(--white)",
+        // Legacy support
+        "cv-blue": "#002b7f",
+        "cv-red": "#ce1126", 
+        "cv-yellow": "#ffcc00",
         "cv-dark": "#1a1a1a",
         "cv-light": "#f8f9fa",
+      },
+      screens: {
+        'xs': '480px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
       },
       backdropBlur: {
         xs: '2px',
@@ -95,12 +108,27 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.5" },
         },
+        "slideUp": {
+          "0%": { opacity: "0", transform: "translateY(30px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "slideInLeft": {
+          "0%": { opacity: "0", transform: "translateX(-30px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        "slideInRight": {
+          "0%": { opacity: "0", transform: "translateX(30px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 6s ease-in-out infinite",
         "glow": "glow 2s ease-in-out infinite alternate",
+        "slideUp": "slideUp 0.6s ease-out",
+        "slideInLeft": "slideInLeft 0.6s ease-out",
+        "slideInRight": "slideInRight 0.6s ease-out",
       },
     },
   },

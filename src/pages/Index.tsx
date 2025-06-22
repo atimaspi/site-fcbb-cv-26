@@ -2,13 +2,12 @@
 import CompactHeader from '@/components/CompactHeader';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import FibaStyleHero from '@/components/FibaStyleHero';
-import FibaStyleNews from '@/components/FibaStyleNews';
-import FibaStyleLiveResults from '@/components/FibaStyleLiveResults';
-import PremiumStatsSection from '@/components/PremiumStatsSection';
-import CompetitionsSection from '@/components/CompetitionsSection';
-import TeamsSection from '@/components/TeamsSection';
-import PartnersSection from '@/components/PartnersSection';
+import StickyNavigation from '@/components/StickyNavigation';
+import ModernSlider from '@/components/ModernSlider';
+import SobreSection from '@/components/sections/SobreSection';
+import NoticiasSection from '@/components/sections/NoticiasSection';
+import GaleriaSection from '@/components/sections/GaleriaSection';
+import ContactoSection from '@/components/sections/ContactoSection';
 import InteractiveFloatingButtons from '@/components/InteractiveFloatingButtons';
 
 const Index = () => {
@@ -22,15 +21,27 @@ const Index = () => {
       />
       <div className="min-h-screen flex flex-col">
         <CompactHeader />
+        <StickyNavigation />
+        
         <main className="flex-grow">
-          <FibaStyleHero />
-          <FibaStyleLiveResults />
-          <FibaStyleNews />
-          <PremiumStatsSection />
-          <CompetitionsSection />
-          <TeamsSection />
-          <PartnersSection />
+          {/* Hero Section */}
+          <section id="hero">
+            <ModernSlider />
+          </section>
+
+          {/* Sobre Section */}
+          <SobreSection />
+
+          {/* Notícias Section */}
+          <NoticiasSection />
+
+          {/* Galeria Section */}
+          <GaleriaSection />
+
+          {/* Contacto Section */}
+          <ContactoSection />
         </main>
+
         <Footer />
         <InteractiveFloatingButtons />
       </div>
