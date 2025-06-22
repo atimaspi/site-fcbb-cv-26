@@ -17,7 +17,8 @@ const Index = () => {
     newsData, 
     clubsData, 
     gamesData, 
-    competitionsData, 
+    competitionsData,
+    teamsData,
     statsData,
     playersData,
     refereesData,
@@ -32,11 +33,12 @@ const Index = () => {
     isLoading 
   } = useSupabaseData();
 
-  console.log('Index page - Todos os dados do Supabase:', {
+  console.log('Index page - Conectado com todos os dados do Supabase:', {
     news: newsData?.length || 0,
     clubs: clubsData?.length || 0,
     games: gamesData?.length || 0,
     competitions: competitionsData?.length || 0,
+    teams: teamsData?.length || 0,
     stats: statsData?.length || 0,
     players: playersData?.length || 0,
     referees: refereesData?.length || 0,
@@ -57,53 +59,80 @@ const Index = () => {
       description="Site oficial da Federação Cabo-verdiana de Basquetebol. Acompanhe as últimas notícias, resultados, classificações e competições do basquetebol cabo-verdiano."
       keywords="FCBB, basquetebol, Cabo Verde, federação, liga nacional, competições, resultados"
     >
-      {/* Hero Section */}
+      {/* Hero Section com slides dinâmicos */}
       <section className="relative">
-        <ModernSlider />
+        <ModernSlider heroSlides={heroSlidesData} />
       </section>
 
-      {/* Estatísticas Melhoradas - Background verde-azul */}
+      {/* Estatísticas Melhoradas - dados dinâmicos do backend */}
       <section className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 py-16">
-        <EnhancedStatsSection />
+        <EnhancedStatsSection 
+          statistics={statsData}
+          clubs={clubsData}
+          players={playersData}
+          competitions={competitionsData}
+        />
       </section>
 
-      {/* Resultados de Jogos - Background branco com detalhes azuis */}
+      {/* Resultados de Jogos - dados dinâmicos */}
       <section className="bg-gradient-to-br from-slate-50 to-blue-50/40 py-16">
         <div className="cv-container">
-          <GameResults />
+          <GameResults 
+            games={gamesData}
+            teams={teamsData}
+            competitions={competitionsData}
+          />
         </div>
       </section>
 
-      {/* Calendário de Jogos - Background cinza claro com detalhes vermelhos */}
+      {/* Calendário de Jogos - dados dinâmicos */}
       <section className="bg-gradient-to-br from-gray-100 to-red-50/40 py-16">
         <div className="cv-container">
-          <GameCalendar />
+          <GameCalendar 
+            games={gamesData}
+            teams={teamsData}
+            competitions={competitionsData}
+          />
         </div>
       </section>
 
-      {/* Sobre Section - Background amarelo suave */}
+      {/* Sobre Section - dados dinâmicos das configurações */}
       <section className="bg-gradient-to-br from-yellow-50 to-amber-50/60 py-16">
-        <SobreSection />
+        <SobreSection 
+          federations={federationsData}
+          settings={siteSettingsData}
+        />
       </section>
 
-      {/* Notícias Section - Background azul e vermelho suave */}
+      {/* Notícias Section - dados dinâmicos */}
       <section className="bg-gradient-to-br from-blue-50 via-indigo-50/50 to-red-50/40 py-16">
-        <NoticiasSection />
+        <NoticiasSection 
+          news={newsData}
+          events={eventsData}
+        />
       </section>
 
-      {/* Parceiros Section - Background neutro */}
+      {/* Parceiros Section - dados dinâmicos */}
       <section className="bg-gradient-to-br from-gray-50 to-slate-100/60 py-16">
-        <PartnersSection />
+        <PartnersSection 
+          partners={partnersData}
+        />
       </section>
 
-      {/* Galeria Section - Background quente */}
+      {/* Galeria Section - dados dinâmicos */}
       <section className="bg-gradient-to-br from-orange-50/60 to-yellow-50/80 py-16">
-        <GaleriaSection />
+        <GaleriaSection 
+          gallery={galleryData}
+          galleryImages={galleryImagesData}
+        />
       </section>
 
-      {/* Contacto Section - Manter as cores oficiais da FCBB */}
+      {/* Contacto Section - dados dinâmicos das configurações */}
       <section className="bg-gradient-to-r from-cv-blue to-cv-red py-16 text-white">
-        <ContactoSection />
+        <ContactoSection 
+          settings={siteSettingsData}
+          federations={federationsData}
+        />
       </section>
     </FCBBLayout>
   );

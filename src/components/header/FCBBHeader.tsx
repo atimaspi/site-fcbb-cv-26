@@ -125,8 +125,25 @@ const FCBBHeader = () => {
       {/* Main Header */}
       <div className="cv-container">
         <div className="flex items-center justify-between h-20">
-          {/* Desktop Navigation - Centralized */}
-          <nav className="hidden lg:flex items-center space-x-1 flex-1">
+          {/* Logo - Alinhado à esquerda */}
+          <Link to="/" className="flex items-center space-x-4">
+            <img 
+              src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
+              alt="FCBB" 
+              className="h-16 lg:h-20 w-auto"
+            />
+            <div className="flex flex-col">
+              <h1 className="text-2xl lg:text-3xl font-bold leading-tight text-white">
+                FCBB
+              </h1>
+              <p className="text-sm lg:text-base leading-tight text-blue-100">
+                Federação Cabo-verdiana de Basquetebol
+              </p>
+            </div>
+          </Link>
+
+          {/* Desktop Navigation - Centralizado */}
+          <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
             {navItems.map((item) => (
               <div key={item.id} className="relative group">
                 {item.href ? (
@@ -185,23 +202,6 @@ const FCBBHeader = () => {
               </div>
             ))}
           </nav>
-
-          {/* Logo - Alinhado mais à direita */}
-          <Link to="/" className="flex items-center space-x-4 ml-auto lg:ml-8">
-            <div className="flex flex-col text-right">
-              <h1 className="text-2xl lg:text-3xl font-bold leading-tight text-white">
-                FCBB
-              </h1>
-              <p className="text-sm lg:text-base leading-tight text-blue-100">
-                Federação Cabo-verdiana de Basquetebol
-              </p>
-            </div>
-            <img 
-              src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
-              alt="FCBB" 
-              className="h-16 lg:h-20 w-auto"
-            />
-          </Link>
 
           {/* Mobile Menu Button */}
           <button
