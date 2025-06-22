@@ -25,36 +25,55 @@ const Index = () => {
       <div className="min-h-screen flex flex-col">
         <StickyNavigation />
         
-        <main className="flex-grow">
-          {/* Hero Section */}
-          <section id="hero">
-            <ModernSlider />
-          </section>
+        {/* Adicionar espaçamento para compensar o menu fixo */}
+        <div className="pt-20">
+          <main className="flex-grow">
+            {/* Hero Section */}
+            <section id="hero">
+              <ModernSlider />
+            </section>
 
-          {/* Estatísticas Melhoradas */}
-          <EnhancedStatsSection />
+            {/* Estatísticas Melhoradas */}
+            <section id="estatisticas">
+              <EnhancedStatsSection />
+            </section>
 
-          {/* Resultados de Jogos */}
-          <GameResults />
+            {/* Resultados de Jogos */}
+            <section id="resultados">
+              <GameResults />
+            </section>
 
-          {/* Calendário de Jogos */}
-          <GameCalendar />
+            {/* Calendário de Jogos */}
+            <section id="calendario">
+              <GameCalendar />
+            </section>
 
-          {/* Sobre Section */}
-          <SobreSection />
+            {/* Sobre Section */}
+            <section id="sobre">
+              <SobreSection />
+            </section>
 
-          {/* Notícias Section */}
-          <NoticiasSection />
+            {/* Notícias Section */}
+            <section id="noticias">
+              <NoticiasSection />
+            </section>
 
-          {/* Parceiros Section */}
-          <PartnersSection />
+            {/* Parceiros Section */}
+            <section id="parceiros">
+              <PartnersSection />
+            </section>
 
-          {/* Galeria Section */}
-          <GaleriaSection />
+            {/* Galeria Section */}
+            <section id="galeria">
+              <GaleriaSection />
+            </section>
 
-          {/* Contacto Section */}
-          <ContactoSection />
-        </main>
+            {/* Contacto Section */}
+            <section id="contacto">
+              <ContactoSection />
+            </section>
+          </main>
+        </div>
 
         <Footer />
         <InteractiveFloatingButtons />
