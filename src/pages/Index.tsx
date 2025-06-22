@@ -9,8 +9,28 @@ import PartnersSection from '@/components/PartnersSection';
 import GameResults from '@/components/GameResults';
 import GameCalendar from '@/components/GameCalendar';
 import EnhancedStatsSection from '@/components/EnhancedStatsSection';
+import { useSupabaseData } from '@/hooks/useSupabaseData';
 
 const Index = () => {
+  // Conectar com dados do Supabase
+  const { 
+    newsData, 
+    clubsData, 
+    gamesData, 
+    competitionsData, 
+    statsData,
+    isLoading 
+  } = useSupabaseData();
+
+  console.log('Index page - Supabase data:', {
+    news: newsData?.length || 0,
+    clubs: clubsData?.length || 0,
+    games: gamesData?.length || 0,
+    competitions: competitionsData?.length || 0,
+    stats: statsData?.length || 0,
+    loading: isLoading
+  });
+
   return (
     <FCBBLayout 
       title="FCBB - Federação Cabo-verdiana de Basquetebol" 
@@ -22,46 +42,46 @@ const Index = () => {
         <ModernSlider />
       </section>
 
-      {/* Estatísticas Melhoradas */}
-      <section className="bg-gradient-to-r from-cv-blue via-cv-red to-cv-yellow py-16">
+      {/* Estatísticas Melhoradas - Background verde-azul */}
+      <section className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 py-16">
         <EnhancedStatsSection />
       </section>
 
-      {/* Resultados de Jogos */}
-      <section className="bg-gradient-to-br from-white to-blue-50/30 py-16">
+      {/* Resultados de Jogos - Background branco com detalhes azuis */}
+      <section className="bg-gradient-to-br from-slate-50 to-blue-50/40 py-16">
         <div className="cv-container">
           <GameResults />
         </div>
       </section>
 
-      {/* Calendário de Jogos */}
-      <section className="bg-gradient-to-br from-blue-50/50 to-red-50/30 py-16">
+      {/* Calendário de Jogos - Background cinza claro com detalhes vermelhos */}
+      <section className="bg-gradient-to-br from-gray-100 to-red-50/40 py-16">
         <div className="cv-container">
           <GameCalendar />
         </div>
       </section>
 
-      {/* Sobre Section */}
-      <section className="bg-gradient-to-br from-white to-gray-50 py-16">
+      {/* Sobre Section - Background amarelo suave */}
+      <section className="bg-gradient-to-br from-yellow-50 to-amber-50/60 py-16">
         <SobreSection />
       </section>
 
-      {/* Notícias Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-red-50 py-16">
+      {/* Notícias Section - Background azul e vermelho suave */}
+      <section className="bg-gradient-to-br from-blue-50 via-indigo-50/50 to-red-50/40 py-16">
         <NoticiasSection />
       </section>
 
-      {/* Parceiros Section */}
-      <section className="bg-gradient-to-br from-gray-50 to-blue-50/30 py-16">
+      {/* Parceiros Section - Background neutro */}
+      <section className="bg-gradient-to-br from-gray-50 to-slate-100/60 py-16">
         <PartnersSection />
       </section>
 
-      {/* Galeria Section */}
-      <section className="bg-gradient-to-br from-red-50/30 to-yellow-50/30 py-16">
+      {/* Galeria Section - Background quente */}
+      <section className="bg-gradient-to-br from-orange-50/60 to-yellow-50/80 py-16">
         <GaleriaSection />
       </section>
 
-      {/* Contacto Section */}
+      {/* Contacto Section - Manter as cores oficiais da FCBB */}
       <section className="bg-gradient-to-r from-cv-blue to-cv-red py-16 text-white">
         <ContactoSection />
       </section>
