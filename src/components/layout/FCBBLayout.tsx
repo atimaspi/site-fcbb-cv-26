@@ -36,7 +36,7 @@ const FCBBLayout = ({
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-red-50">
         {showHeader && <FCBBHeader />}
         
-        <main className="flex-grow bg-gradient-to-b from-transparent via-gray-50/30 to-blue-50/50">
+        <main className={`flex-grow ${showHeader ? 'pt-20' : ''}`}>
           {children}
         </main>
 
