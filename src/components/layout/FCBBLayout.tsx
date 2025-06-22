@@ -23,7 +23,7 @@ const FCBBLayout = ({
   showFooter = true
 }: FCBBLayoutProps) => {
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-red-50">
       {title && (
         <SEO 
           title={title}
@@ -33,16 +33,15 @@ const FCBBLayout = ({
           url={typeof window !== 'undefined' ? window.location.pathname : '/'}
         />
       )}
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-red-50">
-        {showHeader && <FCBBHeader />}
-        
-        <main className={`flex-grow ${showHeader ? 'pt-20' : ''}`}>
-          {children}
-        </main>
+      
+      {showHeader && <FCBBHeader />}
+      
+      <main className={`flex-grow ${showHeader ? 'pt-20' : ''}`}>
+        {children}
+      </main>
 
-        {showFooter && <Footer />}
-      </div>
-    </>
+      {showFooter && <Footer />}
+    </div>
   );
 };
 
