@@ -1,7 +1,7 @@
 
 export const navItems = [
   {
-    title: "Sobre a FCBB",
+    title: "Sobre",
     dropdown: true,
     key: "about",
     ariaLabel: "Menu sobre a Federação Cabo-verdiana de Basquetebol",

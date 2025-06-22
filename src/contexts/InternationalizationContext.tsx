@@ -18,7 +18,7 @@ const translations = {
   pt: {
     nav: {
       inicio: 'Início',
-      sobre: 'Sobre a FCBB',
+      sobre: 'Sobre',
       competicoes: 'Competições',
       resultados: 'Resultados',
       selecoes: 'Seleções',
@@ -52,7 +52,7 @@ const translations = {
   en: {
     nav: {
       inicio: 'Home',
-      sobre: 'About FCBB',
+      sobre: 'About',
       competicoes: 'Competitions',
       resultados: 'Results',
       selecoes: 'National Teams',

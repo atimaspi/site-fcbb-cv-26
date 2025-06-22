@@ -1,18 +1,44 @@
-
 import PageLayout from './PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Users, Trophy, Calendar, Target, Award, BookOpen } from 'lucide-react';
+import { Users, Trophy, Calendar, Target, Award, BookOpen, Loader2 } from 'lucide-react';
+import { useFederationData } from '@/hooks/useFederationData';
+import { useBackendData } from '@/hooks/useBackendData';
 
 const SobreFCBBPage = () => {
+  const { federationData, federationLoading, federationError, statsData } = useFederationData();
+  const { clubs, news, players, teams } = useBackendData();
+
+  if (federationLoading) {
+    return (
+      <PageLayout title="Sobre a FCBB">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-cv-blue" />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (federationError) {
+    return (
+      <PageLayout title="Sobre a FCBB">
+        <Card className="bg-red-50 border-red-200">
+          <CardContent className="p-8 text-center">
+            <p className="text-red-600">Erro ao carregar informações da federação.</p>
+          </CardContent>
+        </Card>
+      </PageLayout>
+    );
+  }
+
   const achievements = [
     { year: "1977", event: "Fundação da FCBB" },
     { year: "1980", event: "Primeira Liga Nacional" },
     { year: "1985", event: "Filiação à FIBA África" },
     { year: "1995", event: "Primeira participação no AfroBasket" },
     { year: "2010", event: "Criação da Liga Feminina" },
-    { year: "2023", event: "50+ clubes filiados" }
+    { year: "2024", event: `${clubs?.length || 50}+ clubes filiados` }
   ];
 
   const values = [
@@ -22,7 +48,7 @@ const SobreFCBBPage = () => {
       icon: <Trophy className="w-6 h-6" />
     },
     {
-      title: "Integridade",
+      title: "Integridade", 
       description: "Manter os mais altos padrões éticos e de fair-play em todas as atividades.",
       icon: <Award className="w-6 h-6" />
     },
@@ -45,13 +71,13 @@ const SobreFCBBPage = () => {
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80"
     },
     {
-      name: "Eng. Maria Silva Santos",
+      name: "Eng. Maria Silva Santos", 
       position: "Vice-Presidente",
       image: "https://images.unsplash.com/photo-1494790108755-2616b612b732?auto=format&fit=crop&w=150&h=150&q=80"
     },
     {
       name: "Prof. Carlos Alberto Lima",
-      position: "Secretário-Geral",
+      position: "Secretário-Geral", 
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80"
     },
     {
@@ -67,7 +93,7 @@ const SobreFCBBPage = () => {
       description="Conheça a história, missão e estrutura da Federação Cabo-Verdiana de Basquetebol"
     >
       <div className="space-y-8">
-        {/* História */}
+        {/* História com dados da federação */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -77,15 +103,13 @@ const SobreFCBBPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-lg text-gray-700 leading-relaxed">
-              A Federação Cabo-Verdiana de Basquetebol (FCBB) foi fundada em 1977 com o objetivo de promover, 
-              organizar e desenvolver o basquetebol em todo o arquipélago cabo-verdiano. Desde a sua criação, 
-              a FCBB tem desempenhado um papel fundamental no crescimento do desporto nacional.
-            </p>
-            <p className="text-gray-700 leading-relaxed">
-              Ao longo dos anos, a federação tem trabalhado incansavelmente para elevar o nível do basquetebol 
-              cabo-verdiano, desde a formação de base até às competições de elite. A FCBB orgulha-se de ter 
-              contribuído para o desenvolvimento de atletas que hoje representam Cabo Verde em competições 
-              internacionais.
+              {federationData?.name ? (
+                `A ${federationData.name} foi fundada em ${federationData.foundation_date ? new Date(federationData.foundation_date).getFullYear() : '1977'} com o objetivo de promover, 
+                organizar e desenvolver o basquetebol em todo o arquipélago cabo-verdiano.`
+              ) : (
+                `A Federação Cabo-Verdiana de Basquetebol (FCBB) foi fundada em 1977 com o objetivo de promover, 
+                organizar e desenvolver o basquetebol em todo o arquipélago cabo-verdiano.`
+              )}
             </p>
             
             <div className="mt-6">
@@ -101,6 +125,72 @@ const SobreFCBBPage = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Estatísticas da base de dados */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-cv-blue">FCBB em Números</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-cv-blue">{clubs?.length || 0}</div>
+                <div className="text-sm text-gray-600">Clubes Filiados</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-cv-blue">{players?.length || 0}</div>
+                <div className="text-sm text-gray-600">Atletas Registados</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-cv-blue">{teams?.length || 0}</div>
+                <div className="text-sm text-gray-600">Equipas Ativas</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-cv-blue">{news?.filter(n => n.published).length || 0}</div>
+                <div className="text-sm text-gray-600">Notícias Publicadas</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Dados de contacto da federação */}
+        {federationData && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-cv-blue">Informações de Contacto</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {federationData.address && (
+                  <div>
+                    <h4 className="font-semibold text-cv-blue mb-2">Endereço</h4>
+                    <p className="text-gray-700">{federationData.address}</p>
+                  </div>
+                )}
+                {federationData.contact_email && (
+                  <div>
+                    <h4 className="font-semibold text-cv-blue mb-2">Email</h4>
+                    <p className="text-gray-700">{federationData.contact_email}</p>
+                  </div>
+                )}
+                {federationData.contact_phone && (
+                  <div>
+                    <h4 className="font-semibold text-cv-blue mb-2">Telefone</h4>
+                    <p className="text-gray-700">{federationData.contact_phone}</p>
+                  </div>
+                )}
+                {federationData.website && (
+                  <div>
+                    <h4 className="font-semibold text-cv-blue mb-2">Website</h4>
+                    <a href={federationData.website} target="_blank" rel="noopener noreferrer" className="text-cv-blue hover:underline">
+                      {federationData.website}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Missão, Visão e Valores */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -215,33 +305,6 @@ const SobreFCBBPage = () => {
                 <p className="text-gray-700 text-sm">
                   Órgão responsável pela aplicação de medidas disciplinares e resolução de conflitos.
                 </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Estatísticas */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-cv-blue">FCBB em Números</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-cv-blue">56</div>
-                <div className="text-sm text-gray-600">Clubes Filiados</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-cv-blue">2,847</div>
-                <div className="text-sm text-gray-600">Atletas Registados</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-cv-blue">10</div>
-                <div className="text-sm text-gray-600">Ilhas Representadas</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-cv-blue">8</div>
-                <div className="text-sm text-gray-600">Competições Ativas</div>
               </div>
             </div>
           </CardContent>

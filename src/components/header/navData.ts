@@ -10,7 +10,7 @@ export const createNavItems = (pathname: string): NavItem[] => [
   },
   { 
     id: 'sobre', 
-    label: 'Sobre a FCBB', 
+    label: 'Sobre', 
     submenu: [
       { label: 'História', link: '/sobre/historia' },
       { label: 'Missão e Visão', link: '/sobre/missao-visao' },

@@ -1,9 +1,14 @@
 
 import { motion } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
-import { Target, Eye, Award, Users, Globe, Heart } from 'lucide-react';
+import { Target, Eye, Award, Users, Globe, Heart, Loader2 } from 'lucide-react';
+import { useFederationData } from '@/hooks/useFederationData';
+import { useBackendData } from '@/hooks/useBackendData';
 
 const SobreSection = () => {
+  const { federationData, federationLoading, statsData } = useFederationData();
+  const { clubs, players, teams, news } = useBackendData();
+
   const features = [
     {
       icon: Target,
@@ -13,7 +18,7 @@ const SobreSection = () => {
     },
     {
       icon: Eye,
-      title: "Nossa Visão",
+      title: "Nossa Visão", 
       description: "Ser reconhecida como a federação líder no desenvolvimento do basquetebol africano, com presença forte no cenário internacional.",
       color: "from-red-500 to-red-600"
     },
@@ -25,7 +30,7 @@ const SobreSection = () => {
     },
     {
       icon: Users,
-      title: "Inclusão",
+      title: "Inclusão", 
       description: "Promovemos o basquetebol para todos, independentemente de género, idade ou origem social, em todas as ilhas do arquipélago.",
       color: "from-green-500 to-green-600"
     },
@@ -43,6 +48,19 @@ const SobreSection = () => {
     }
   ];
 
+  const foundationYear = federationData?.foundation_date ? new Date(federationData.foundation_date).getFullYear() : 1977;
+  const yearsOfHistory = new Date().getFullYear() - foundationYear;
+
+  if (federationLoading) {
+    return (
+      <section className="py-20 bg-gradient-to-br from-blue-50 via-white to-red-50">
+        <div className="cv-container text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-cv-blue mx-auto" />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 bg-gradient-to-br from-blue-50 via-white to-red-50">
       <div className="cv-container">
@@ -57,14 +75,19 @@ const SobreSection = () => {
             Sobre a FCBB
           </h2>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-8">
-            Desde 1986, a Federação Cabo-verdiana de Basquetebol tem sido o motor do desenvolvimento 
-            do basquetebol nacional, promovendo valores de excelência, inclusão e paixão pelo desporto.
+            {federationData ? (
+              `Desde ${foundationYear}, a ${federationData.name || 'Federação Cabo-verdiana de Basquetebol'} tem sido o motor do desenvolvimento 
+              do basquetebol nacional, promovendo valores de excelência, inclusão e paixão pelo desporto.`
+            ) : (
+              `Desde 1986, a Federação Cabo-verdiana de Basquetebol tem sido o motor do desenvolvimento 
+              do basquetebol nacional, promovendo valores de excelência, inclusão e paixão pelo desporto.`
+            )}
           </p>
           
-          {/* Stats Summary */}
+          {/* Stats Summary com dados reais */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
             <div className="text-center">
-              <div className="text-3xl font-bold text-cv-blue font-display">39</div>
+              <div className="text-3xl font-bold text-cv-blue font-display">{yearsOfHistory}</div>
               <div className="text-sm text-gray-600 font-semibold">Anos de História</div>
             </div>
             <div className="text-center">
@@ -72,11 +95,11 @@ const SobreSection = () => {
               <div className="text-sm text-gray-600 font-semibold">Ilhas Abrangidas</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-cv-yellow font-display">24+</div>
+              <div className="text-3xl font-bold text-cv-yellow font-display">{clubs?.length || 24}+</div>
               <div className="text-sm text-gray-600 font-semibold">Clubes Filiados</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-cv-blue font-display">1250+</div>
+              <div className="text-3xl font-bold text-cv-blue font-display">{players?.length || 1250}+</div>
               <div className="text-sm text-gray-600 font-semibold">Atletas Federados</div>
             </div>
           </div>
@@ -99,7 +122,6 @@ const SobreSection = () => {
                     <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br ${feature.color} p-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                       <feature.icon className="w-8 h-8 text-white" />
                     </div>
-                    {/* Decorative circle */}
                     <div className={`absolute inset-0 w-16 h-16 mx-auto rounded-full bg-gradient-to-br ${feature.color} opacity-20 blur-lg group-hover:opacity-30 transition-opacity duration-300`} />
                   </div>
                   
@@ -110,7 +132,6 @@ const SobreSection = () => {
                     {feature.description}
                   </p>
 
-                  {/* Bottom accent line */}
                   <div className={`mt-6 h-1 w-0 group-hover:w-full bg-gradient-to-r ${feature.color} transition-all duration-500 mx-auto rounded-full`} />
                 </CardContent>
               </Card>
