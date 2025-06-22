@@ -6,14 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useApi } from '@/hooks/useApi';
+import { useUnifiedApi } from '@/hooks/useUnifiedApi';
 import { Save, Mail, Phone, Globe, Facebook, Instagram, Youtube, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+interface SiteSetting {
+  id: string;
+  setting_key: string;
+  setting_value: string;
+  setting_name: string;
+  description?: string;
+  setting_type?: string;
+}
+
 const SiteSettingsAdvanced = () => {
-  const { useFetch, useUpdate } = useApi();
-  const { data: settings = [], isLoading } = useFetch('site_settings');
-  const updateSetting = useUpdate('site_settings');
+  const { useOptimizedFetch, useOptimizedUpdate } = useUnifiedApi();
+  const { data: settings = [], isLoading, error } = useOptimizedFetch('site_settings');
+  const updateSetting = useOptimizedUpdate('site_settings');
   const { toast } = useToast();
 
   const [formData, setFormData] = useState<Record<string, string>>({});
@@ -21,7 +30,7 @@ const SiteSettingsAdvanced = () => {
 
   useEffect(() => {
     if (Array.isArray(settings) && settings.length > 0) {
-      const settingsObj = settings.reduce((acc: Record<string, string>, setting: any) => {
+      const settingsObj = settings.reduce((acc: Record<string, string>, setting: SiteSetting) => {
         acc[setting.setting_key] = setting.setting_value;
         return acc;
       }, {});
@@ -37,7 +46,7 @@ const SiteSettingsAdvanced = () => {
   const handleSave = async (settingKey: string) => {
     try {
       if (Array.isArray(settings)) {
-        const setting = settings.find((s: any) => s.setting_key === settingKey);
+        const setting = settings.find((s: SiteSetting) => s.setting_key === settingKey);
         if (setting && setting.id) {
           await updateSetting.mutateAsync({
             id: setting.id,
@@ -63,7 +72,7 @@ const SiteSettingsAdvanced = () => {
   const handleSaveAll = async () => {
     try {
       if (Array.isArray(settings)) {
-        const updates = settings.map((setting: any) => 
+        const updates = settings.map((setting: SiteSetting) => 
           updateSetting.mutateAsync({
             id: setting.id,
             data: { setting_value: formData[setting.setting_key] || setting.setting_value }
@@ -89,6 +98,10 @@ const SiteSettingsAdvanced = () => {
 
   if (isLoading) {
     return <div>Carregando configurações...</div>;
+  }
+
+  if (error) {
+    return <div>Erro ao carregar configurações: {error.message}</div>;
   }
 
   if (!Array.isArray(settings)) {
