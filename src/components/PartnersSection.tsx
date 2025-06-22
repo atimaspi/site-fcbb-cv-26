@@ -1,180 +1,109 @@
 
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent } from '@/components/ui/card';
-import { ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const PartnersSection = () => {
-  const { data: partners, isLoading } = useQuery({
-    queryKey: ['partners'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('partners')
-        .select('*')
-        .eq('active', true)
-        .order('order_index', { ascending: true });
-      
-      if (error) throw error;
-      return data || [];
+  const partners = [
+    {
+      name: "FIBA",
+      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=100&fit=crop",
+      category: "Organização Internacional"
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
-
-  if (isLoading) {
-    return (
-      <section className="py-16 bg-gray-50">
-        <div className="cv-container">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-cv-blue mb-4">Parceiros Oficiais</h2>
-            <div className="animate-pulse">
-              <div className="h-4 bg-gray-300 rounded w-64 mx-auto"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  const categorizedPartners = {
-    institutional: partners?.filter(p => p.category === 'institutional') || [],
-    sponsor: partners?.filter(p => p.category === 'sponsor') || [],
-    federation: partners?.filter(p => p.category === 'federation') || [],
-    media: partners?.filter(p => p.category === 'media') || []
-  };
+    {
+      name: "FIBA África",
+      logo: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=100&fit=crop",
+      category: "Organização Continental"
+    },
+    {
+      name: "COC - Comité Olímpico",
+      logo: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=200&h=100&fit=crop",
+      category: "Organização Nacional"
+    },
+    {
+      name: "Governo de Cabo Verde",
+      logo: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=200&h=100&fit=crop",
+      category: "Apoio Institucional"
+    },
+    {
+      name: "Câmara Municipal da Praia",
+      logo: "https://images.unsplash.com/photo-1583291263867-45d5d4d2e0a0?w=200&h=100&fit=crop",
+      category: "Apoio Municipal"
+    },
+    {
+      name: "Banco Comercial do Atlântico",
+      logo: "https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=200&h=100&fit=crop",
+      category: "Parceiro Financeiro"
+    }
+  ];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-white">
       <div className="cv-container">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-cv-blue mb-4">Parceiros Oficiais</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Juntos construímos o futuro do basquetebol cabo-verdiano
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-cv-primary mb-4 font-display">
+            Nossos Parceiros
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Trabalhamos em conjunto com organizações nacionais e internacionais 
+            para promover o desenvolvimento do basquetebol cabo-verdiano
           </p>
+        </motion.div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+          {partners.map((partner, index) => (
+            <motion.div
+              key={partner.name}
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="group"
+            >
+              <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group-hover:border-cv-primary/20">
+                <div className="aspect-[2/1] mb-4 overflow-hidden rounded-lg bg-gray-50 flex items-center justify-center">
+                  <img
+                    src={partner.logo}
+                    alt={`Logo ${partner.name}`}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                </div>
+                <h3 className="font-semibold text-cv-primary text-center mb-2 group-hover:text-cv-accent transition-colors">
+                  {partner.name}
+                </h3>
+                <p className="text-xs text-gray-500 text-center">
+                  {partner.category}
+                </p>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Parceiros Institucionais */}
-        {categorizedPartners.institutional.length > 0 && (
-          <div className="mb-12">
-            <h3 className="text-2xl font-semibold text-cv-blue mb-6 text-center">
-              Parceiros Institucionais
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          viewport={{ once: true }}
+          className="text-center mt-12"
+        >
+          <div className="bg-gradient-to-r from-cv-primary to-cv-accent p-8 rounded-2xl text-white">
+            <h3 className="text-2xl font-bold mb-4 font-display">
+              Seja Nosso Parceiro
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {categorizedPartners.institutional.map((partner) => (
-                <Card key={partner.id} className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6 flex flex-col items-center">
-                    <div className="relative mb-4">
-                      <img
-                        src={partner.logo_url}
-                        alt={partner.name}
-                        className="h-16 w-auto object-contain group-hover:scale-110 transition-transform duration-300"
-                      />
-                      {partner.website_url && (
-                        <ExternalLink className="absolute -top-2 -right-2 h-4 w-4 text-cv-blue opacity-0 group-hover:opacity-100 transition-opacity" />
-                      )}
-                    </div>
-                    <h4 className="text-sm font-medium text-center text-gray-800">
-                      {partner.name}
-                    </h4>
-                    {partner.description && (
-                      <p className="text-xs text-gray-600 text-center mt-1">
-                        {partner.description}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <p className="mb-6 opacity-90">
+              Junte-se a nós no desenvolvimento do basquetebol cabo-verdiano. 
+              Contacte-nos para saber mais sobre oportunidades de parceria.
+            </p>
+            <button className="bg-cv-secondary text-cv-primary px-8 py-3 rounded-lg font-semibold hover:bg-cv-secondary/90 transition-colors transform hover:scale-105 duration-200">
+              Contactar para Parcerias
+            </button>
           </div>
-        )}
-
-        {/* Federações e Organizações */}
-        {categorizedPartners.federation.length > 0 && (
-          <div className="mb-12">
-            <h3 className="text-2xl font-semibold text-cv-blue mb-6 text-center">
-              Federações e Organizações
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {categorizedPartners.federation.map((partner) => (
-                <Card key={partner.id} className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6 flex flex-col items-center">
-                    <div className="relative mb-4">
-                      <img
-                        src={partner.logo_url}
-                        alt={partner.name}
-                        className="h-20 w-auto object-contain group-hover:scale-110 transition-transform duration-300"
-                      />
-                      {partner.website_url && (
-                        <ExternalLink className="absolute -top-2 -right-2 h-4 w-4 text-cv-blue opacity-0 group-hover:opacity-100 transition-opacity" />
-                      )}
-                    </div>
-                    <h4 className="text-sm font-medium text-center text-gray-800">
-                      {partner.name}
-                    </h4>
-                    {partner.description && (
-                      <p className="text-xs text-gray-600 text-center mt-1">
-                        {partner.description}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Patrocinadores */}
-        {categorizedPartners.sponsor.length > 0 && (
-          <div className="mb-12">
-            <h3 className="text-2xl font-semibold text-cv-blue mb-6 text-center">
-              Patrocinadores
-            </h3>
-            <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4">
-              {categorizedPartners.sponsor.map((partner) => (
-                <Card key={partner.id} className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-4 flex flex-col items-center">
-                    <div className="relative">
-                      <img
-                        src={partner.logo_url}
-                        alt={partner.name}
-                        className="h-12 w-auto object-contain group-hover:scale-110 transition-transform duration-300"
-                      />
-                      {partner.website_url && (
-                        <ExternalLink className="absolute -top-1 -right-1 h-3 w-3 text-cv-blue opacity-0 group-hover:opacity-100 transition-opacity" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Parceiros de Mídia */}
-        {categorizedPartners.media.length > 0 && (
-          <div>
-            <h3 className="text-2xl font-semibold text-cv-blue mb-6 text-center">
-              Parceiros de Mídia
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {categorizedPartners.media.map((partner) => (
-                <Card key={partner.id} className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-4 flex flex-col items-center">
-                    <div className="relative">
-                      <img
-                        src={partner.logo_url}
-                        alt={partner.name}
-                        className="h-14 w-auto object-contain group-hover:scale-110 transition-transform duration-300"
-                      />
-                      {partner.website_url && (
-                        <ExternalLink className="absolute -top-2 -right-2 h-4 w-4 text-cv-blue opacity-0 group-hover:opacity-100 transition-opacity" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+        </motion.div>
       </div>
     </section>
   );

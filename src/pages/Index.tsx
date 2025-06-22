@@ -2,12 +2,12 @@
 import CompactHeader from '@/components/CompactHeader';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import StickyNavigation from '@/components/StickyNavigation';
 import ModernSlider from '@/components/ModernSlider';
 import SobreSection from '@/components/sections/SobreSection';
 import NoticiasSection from '@/components/sections/NoticiasSection';
 import GaleriaSection from '@/components/sections/GaleriaSection';
 import ContactoSection from '@/components/sections/ContactoSection';
+import PartnersSection from '@/components/PartnersSection';
 import InteractiveFloatingButtons from '@/components/InteractiveFloatingButtons';
 
 const Index = () => {
@@ -21,7 +21,6 @@ const Index = () => {
       />
       <div className="min-h-screen flex flex-col">
         <CompactHeader />
-        <StickyNavigation />
         
         <main className="flex-grow">
           {/* Hero Section */}
@@ -34,6 +33,9 @@ const Index = () => {
 
           {/* Notícias Section */}
           <NoticiasSection />
+
+          {/* Parceiros Section */}
+          <PartnersSection />
 
           {/* Galeria Section */}
           <GaleriaSection />
