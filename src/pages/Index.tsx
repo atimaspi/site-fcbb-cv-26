@@ -61,7 +61,7 @@ const Index = () => {
         <GaleriaSection />
       </section>
 
-      {/* Contacto Section */>
+      {/* Contacto Section */}
       <section className="bg-gradient-to-r from-cv-blue to-cv-red py-16 text-white">
         <ContactoSection />
       </section>
