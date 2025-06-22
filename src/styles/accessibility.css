@@ -1,4 +1,5 @@
 
+
 /* High Contrast Mode */
 .high-contrast {
   --cv-primary: #000000;
@@ -36,6 +37,12 @@
 }
 
 /* Focus indicators for accessibility */
+@layer components {
+  .focus-visible-cv {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cv-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-cv-blue;
+  }
+}
+
 .focus\:ring-cv-yellow:focus {
   --tw-ring-color: #FDB927;
 }
@@ -69,3 +76,4 @@ textarea:focus-visible {
   outline: 2px solid #FDB927;
   outline-offset: 2px;
 }
+
