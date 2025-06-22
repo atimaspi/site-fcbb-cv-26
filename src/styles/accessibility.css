@@ -1,5 +1,4 @@
 
-
 /* High Contrast Mode */
 .high-contrast {
   --cv-primary: #000000;
@@ -76,4 +75,3 @@ textarea:focus-visible {
   outline: 2px solid #FDB927;
   outline-offset: 2px;
 }
-
