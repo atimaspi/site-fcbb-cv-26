@@ -28,36 +28,36 @@ const Index = () => {
       </section>
 
       {/* Resultados de Jogos */}
-      <section className="bg-white py-16">
+      <section className="bg-gradient-to-br from-white to-blue-50/30 py-16">
         <div className="cv-container">
           <GameResults />
         </div>
       </section>
 
       {/* Calendário de Jogos */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gradient-to-br from-blue-50/50 to-red-50/30 py-16">
         <div className="cv-container">
           <GameCalendar />
         </div>
       </section>
 
       {/* Sobre Section */}
-      <section className="bg-white py-16">
+      <section className="bg-gradient-to-br from-white to-gray-50 py-16">
         <SobreSection />
       </section>
 
       {/* Notícias Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-red-50 py-16">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-red-50 py-16">
         <NoticiasSection />
       </section>
 
       {/* Parceiros Section */}
-      <section className="bg-white py-16">
+      <section className="bg-gradient-to-br from-gray-50 to-blue-50/30 py-16">
         <PartnersSection />
       </section>
 
       {/* Galeria Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gradient-to-br from-red-50/30 to-yellow-50/30 py-16">
         <GaleriaSection />
       </section>
 
