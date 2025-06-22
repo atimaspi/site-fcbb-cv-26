@@ -2,10 +2,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Users, Calendar, Target, TrendingUp, Star } from 'lucide-react';
 import { useOptimizedDataFetching } from '@/hooks/useOptimizedDataFetching';
+import { useContentData } from '@/hooks/useContentData';
 import { motion } from 'framer-motion';
 
 const EnhancedStatsSection = () => {
   const { clubsData, gamesData, teamsData, isLoading } = useOptimizedDataFetching();
+  const { statisticsData } = useContentData();
 
   // Calcular estatísticas em tempo real
   const stats = {
@@ -17,7 +19,26 @@ const EnhancedStatsSection = () => {
     liveGames: gamesData?.filter(game => game.status === 'live' || game.status === 'in_progress')?.length || 2
   };
 
-  const statsData = [
+  // Usar estatísticas do backend se disponíveis, senão usar as padrão
+  const statsData = statisticsData?.length > 0 ? statisticsData.map(stat => {
+    const iconMap: { [key: string]: any } = {
+      'trophy': Trophy,
+      'users': Users,
+      'calendar': Calendar,
+      'target': Target,
+      'trending-up': TrendingUp,
+      'star': Star
+    };
+
+    return {
+      title: stat.stat_name,
+      value: stat.stat_value,
+      icon: iconMap[stat.icon_name] || Trophy,
+      color: "text-blue-600",
+      bgColor: "bg-blue-100",
+      change: stat.description || ""
+    };
+  }) : [
     {
       title: "Clubes Licenciados",
       value: stats.totalClubs.toString(),

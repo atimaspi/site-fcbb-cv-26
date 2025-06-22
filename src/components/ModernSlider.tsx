@@ -1,194 +1,160 @@
 
-import { useState, useEffect, useMemo, memo, useCallback } from 'react';
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useContentData } from '@/hooks/useContentData';
 
-const ModernSlider = memo(() => {
+const ModernSlider = () => {
+  const { heroSlidesData, isContentLoading } = useContentData();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = useMemo(() => [
+  // Usar dados do backend ou fallback
+  const slides = heroSlidesData?.length > 0 ? heroSlidesData : [
     {
-      id: 1,
-      image: "https://images.unsplash.com/photo-1546519638-68e109498ffc",
-      title: "Liga Nacional 2024/25 em grande forma",
-      subtitle: "Temporada Emocionante",
-      description: "12 equipas disputam o título nacional numa das épocas mais competitivas",
-      cta: "Classificações",
-      link: "/competicoes/classificacoes"
-    },
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4",
-      title: "Seleção Nacional conquista histórica vitória",
-      subtitle: "Cabo Verde no cenário internacional",
-      description: "A nossa seleção nacional alcança novo patamar competitivo no AfroBasket 2024",
-      cta: "Ver Resultados",
-      link: "/resultados"
-    },
-    {
-      id: 3,
-      image: "https://images.unsplash.com/photo-1552847661-dddc6d9e71ba",
-      title: "Desenvolvimento do Basquetebol Feminino",
-      subtitle: "Programa especial de formação",
-      description: "FCBB lança programa inovador para promover o basquetebol feminino em todas as ilhas",
-      cta: "Saber Mais",
-      link: "/selecoes/senior-feminina"
+      id: 'default-1',
+      title: 'FCBB - Federação Cabo-verdiana de Basquetebol',
+      subtitle: 'Promovendo o basquetebol em Cabo Verde',
+      description: 'Acompanhe as últimas notícias, resultados e competições do basquetebol cabo-verdiano.',
+      image_url: '/lovable-uploads/39194785-9ce8-4849-82cb-ad92f0086855.png',
+      cta_text: 'Ver Mais',
+      cta_link: '/sobre'
     }
-  ], []);
-
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  }, [slides.length]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  }, [slides.length]);
-
-  const goToSlide = useCallback((index: number) => {
-    setCurrentSlide(index);
-  }, []);
+  ];
 
   useEffect(() => {
+    if (slides.length === 0) return;
+    
     const timer = setInterval(() => {
-      if (!document.hidden) {
-        nextSlide();
-      }
-    }, 6000);
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+
     return () => clearInterval(timer);
-  }, [nextSlide]);
+  }, [slides.length]);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  if (isContentLoading) {
+    return (
+      <div className="relative h-[70vh] bg-gradient-to-r from-cv-blue to-cv-red flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+      </div>
+    );
+  }
 
   return (
-    <section className="relative">
-      {/* Main Hero Slider - altura reduzida */}
-      <div className="relative h-[50vh] md:h-[55vh] overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.7, ease: "easeInOut" }}
-            className="absolute inset-0"
-          >
-            <div className="relative h-full">
-              <img
-                src={slides[currentSlide].image}
-                alt={slides[currentSlide].title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-cv-primary/80 via-cv-primary/60 to-transparent"></div>
-              
-              <div className="absolute inset-0 flex items-center">
-                <div className="cv-container">
-                  <div className="max-w-2xl text-white">
-                    <motion.span 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="inline-block px-4 py-2 bg-cv-accent text-sm font-semibold rounded-full mb-4"
-                    >
-                      {slides[currentSlide].subtitle}
-                    </motion.span>
-                    <motion.h1 
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                      className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight font-display"
-                    >
-                      {slides[currentSlide].title}
-                    </motion.h1>
-                    <motion.p 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="text-lg md:text-xl mb-6 text-gray-200 leading-relaxed"
-                    >
-                      {slides[currentSlide].description}
-                    </motion.p>
-                    <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="flex flex-col sm:flex-row gap-3"
-                    >
-                      <Button size="lg" className="bg-cv-secondary hover:bg-cv-secondary/90 text-cv-primary font-semibold shadow-xl" asChild>
-                        <Link to={slides[currentSlide].link}>{slides[currentSlide].cta}</Link>
-                      </Button>
-                      <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-cv-primary">
-                        <Play className="mr-2 h-5 w-5" />
-                        Ver Vídeo
-                      </Button>
-                    </motion.div>
-                  </div>
-                </div>
+    <div className="relative h-[70vh] overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentSlide}
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -100 }}
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0"
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${slides[currentSlide]?.image_url || '/lovable-uploads/39194785-9ce8-4849-82cb-ad92f0086855.png'})`
+            }}
+          />
+          
+          <div className="relative z-10 h-full flex items-center">
+            <div className="cv-container">
+              <div className="max-w-3xl text-white">
+                <motion.h1
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-4xl md:text-6xl font-bold mb-4 leading-tight"
+                >
+                  {slides[currentSlide]?.title}
+                </motion.h1>
+                
+                {slides[currentSlide]?.subtitle && (
+                  <motion.h2
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-xl md:text-2xl mb-6 text-cv-yellow font-semibold"
+                  >
+                    {slides[currentSlide].subtitle}
+                  </motion.h2>
+                )}
+                
+                {slides[currentSlide]?.description && (
+                  <motion.p
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-lg md:text-xl mb-8 leading-relaxed"
+                  >
+                    {slides[currentSlide].description}
+                  </motion.p>
+                )}
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <a
+                    href={slides[currentSlide]?.cta_link || '/sobre'}
+                    className="inline-block bg-cv-yellow text-cv-blue px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-400 transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
+                    {slides[currentSlide]?.cta_text || 'Ver Mais'}
+                  </a>
+                </motion.div>
               </div>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
-        {/* Navigation arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white p-3 rounded-full transition-all duration-200 hover:scale-110 z-10"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white p-3 rounded-full transition-all duration-200 hover:scale-110 z-10"
-        >
-          <ChevronRight className="h-6 w-6" />
-        </button>
+      {/* Navigation Arrows */}
+      {slides.length > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+            aria-label="Slide anterior"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          
+          <button
+            onClick={nextSlide}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+            aria-label="Próximo slide"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </>
+      )}
 
-        {/* Slide indicators */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+      {/* Dots Indicator */}
+      {slides.length > 1 && (
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
           {slides.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToSlide(index)}
-              className={`transition-all duration-300 ${
-                index === currentSlide 
-                  ? 'w-8 h-3 bg-cv-secondary rounded-full' 
-                  : 'w-3 h-3 bg-white/50 rounded-full hover:bg-white/75'
+              onClick={() => setCurrentSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentSlide ? 'bg-cv-yellow' : 'bg-white/50'
               }`}
+              aria-label={`Ir para slide ${index + 1}`}
             />
           ))}
         </div>
-      </div>
-
-      {/* Quick Stats Bar */}
-      <div className="bg-cv-primary text-white py-6">
-        <div className="cv-container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[
-              { label: "Clubes Licenciados", value: "24", icon: "🏆" },
-              { label: "Atletas Federados", value: "1,250+", icon: "👥" },
-              { label: "Jogos por Época", value: "180+", icon: "📅" },
-              { label: "Ilhas Participantes", value: "9", icon: "🏝️" }
-            ].map((stat, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="flex items-center justify-center space-x-3 group hover:scale-105 transition-transform duration-200"
-              >
-                <div className="text-2xl">{stat.icon}</div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-cv-secondary">{stat.value}</div>
-                  <div className="text-sm opacity-90">{stat.label}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
+      )}
+    </div>
   );
-});
-
-ModernSlider.displayName = 'ModernSlider';
+};
 
 export default ModernSlider;

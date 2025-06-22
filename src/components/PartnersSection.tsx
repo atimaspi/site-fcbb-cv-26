@@ -1,43 +1,38 @@
 
 import { motion } from 'framer-motion';
+import { useContentData } from '@/hooks/useContentData';
 
 const PartnersSection = () => {
-  const partners = [
-    {
-      name: "FIBA",
-      logo: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=100&fit=crop",
-      category: "Organização Internacional"
-    },
-    {
-      name: "FIBA África",
-      logo: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=200&h=100&fit=crop",
-      category: "Organização Continental"
-    },
-    {
-      name: "COC - Comité Olímpico",
-      logo: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=200&h=100&fit=crop",
-      category: "Organização Nacional"
-    },
-    {
-      name: "Governo de Cabo Verde",
-      logo: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=200&h=100&fit=crop",
-      category: "Apoio Institucional"
-    },
-    {
-      name: "Câmara Municipal da Praia",
-      logo: "https://images.unsplash.com/photo-1583291263867-45d5d4d2e0a0?w=200&h=100&fit=crop",
-      category: "Apoio Municipal"
-    },
-    {
-      name: "Banco Comercial do Atlântico",
-      logo: "https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=200&h=100&fit=crop",
-      category: "Parceiro Financeiro"
-    }
-  ];
+  const { partnersData, isContentLoading } = useContentData();
+
+  if (isContentLoading) {
+    return (
+      <div className="fcbb-section">
+        <div className="fcbb-container">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cv-blue mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!partnersData || partnersData.length === 0) {
+    return (
+      <div className="fcbb-section">
+        <div className="fcbb-container">
+          <div className="text-center">
+            <h2 className="fcbb-title text-3xl mb-4">Nossos Parceiros</h2>
+            <p className="text-gray-600">Nenhum parceiro cadastrado no momento.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <section className="py-16 bg-white">
-      <div className="cv-container">
+    <section className="fcbb-section">
+      <div className="fcbb-container">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -45,65 +40,85 @@ const PartnersSection = () => {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-cv-primary mb-4 font-display">
+          <h2 className="fcbb-title text-3xl mb-4">
             Nossos Parceiros
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Trabalhamos em conjunto com organizações nacionais e internacionais 
-            para promover o desenvolvimento do basquetebol cabo-verdiano
+          <p className="fcbb-subtitle max-w-2xl mx-auto">
+            Organizações que apoiam e promovem o desenvolvimento do basquetebol em Cabo Verde
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-          {partners.map((partner, index) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8">
+          {partnersData.map((partner, index) => (
             <motion.div
-              key={partner.name}
+              key={partner.id}
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              whileHover={{ scale: 1.05, y: -5 }}
+              whileHover={{ scale: 1.05 }}
               className="group"
             >
-              <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group-hover:border-cv-primary/20">
-                <div className="aspect-[2/1] mb-4 overflow-hidden rounded-lg bg-gray-50 flex items-center justify-center">
-                  <img
-                    src={partner.logo}
-                    alt={`Logo ${partner.name}`}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                </div>
-                <h3 className="font-semibold text-cv-primary text-center mb-2 group-hover:text-cv-accent transition-colors">
-                  {partner.name}
-                </h3>
-                <p className="text-xs text-gray-500 text-center">
-                  {partner.category}
-                </p>
+              <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300 h-full flex flex-col items-center justify-center">
+                {partner.website_url ? (
+                  <a
+                    href={partner.website_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full h-full flex flex-col items-center justify-center"
+                  >
+                    <img
+                      src={partner.logo_url}
+                      alt={partner.name}
+                      className="max-h-16 max-w-full object-contain mb-3 grayscale group-hover:grayscale-0 transition-all duration-300"
+                    />
+                    <h3 className="text-sm font-medium text-gray-700 text-center group-hover:text-cv-blue transition-colors">
+                      {partner.name}
+                    </h3>
+                    {partner.description && (
+                      <p className="text-xs text-gray-500 text-center mt-1">
+                        {partner.description}
+                      </p>
+                    )}
+                  </a>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center">
+                    <img
+                      src={partner.logo_url}
+                      alt={partner.name}
+                      className="max-h-16 max-w-full object-contain mb-3 grayscale group-hover:grayscale-0 transition-all duration-300"
+                    />
+                    <h3 className="text-sm font-medium text-gray-700 text-center group-hover:text-cv-blue transition-colors">
+                      {partner.name}
+                    </h3>
+                    {partner.description && (
+                      <p className="text-xs text-gray-500 text-center mt-1">
+                        {partner.description}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <div className="bg-gradient-to-r from-cv-primary to-cv-accent p-8 rounded-2xl text-white">
-            <h3 className="text-2xl font-bold mb-4 font-display">
-              Seja Nosso Parceiro
-            </h3>
-            <p className="mb-6 opacity-90">
-              Junte-se a nós no desenvolvimento do basquetebol cabo-verdiano. 
-              Contacte-nos para saber mais sobre oportunidades de parceria.
-            </p>
-            <button className="bg-cv-secondary text-cv-primary px-8 py-3 rounded-lg font-semibold hover:bg-cv-secondary/90 transition-colors transform hover:scale-105 duration-200">
-              Contactar para Parcerias
-            </button>
+        {/* Categorias de parceiros */}
+        <div className="mt-12">
+          <div className="flex flex-wrap justify-center gap-4">
+            {Array.from(new Set(partnersData.map(p => p.category))).map((category) => (
+              <span
+                key={category}
+                className="px-4 py-2 bg-cv-blue/10 text-cv-blue rounded-full text-sm font-medium"
+              >
+                {category === 'sponsor' ? 'Patrocinadores' : 
+                 category === 'media' ? 'Média' : 
+                 category === 'institutional' ? 'Institucionais' : 
+                 category}
+              </span>
+            ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
