@@ -18,7 +18,7 @@ const StickyNavigation = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      setIsScrolled(window.scrollY > 50);
 
       // Detectar seção ativa
       const sections = navItems.map(item => document.getElementById(item.id));
@@ -58,26 +58,26 @@ const StickyNavigation = () => {
           ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200' 
           : 'bg-transparent'
       }`}
-      initial={{ y: -100 }}
+      initial={{ y: 0 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
+      style={{ position: 'fixed' }}
     >
       <div className="cv-container">
-        <div className="flex items-center justify-between py-4">
-          {/* Logo */}
+        <div className="flex items-center justify-between py-3">
+          {/* Logo - Melhor alinhamento */}
           <motion.div
             className="flex items-center space-x-3"
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
             <img 
               src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
               alt="FCBB" 
-              className="h-10 w-auto"
+              className="h-12 w-auto"
             />
-            <div>
-              <h1 className="text-lg font-bold text-cv-primary font-display">FCBB</h1>
-              <p className="text-sm text-gray-600 leading-none">Federação Cabo-verdiana de Basquetebol</p>
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold text-cv-primary font-display leading-tight">FCBB</h1>
+              <p className="text-sm text-gray-600 leading-tight">Federação Cabo-verdiana de Basquetebol</p>
             </div>
           </motion.div>
 
@@ -87,7 +87,7 @@ const StickyNavigation = () => {
               <motion.button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`relative px-3 py-2 font-medium transition-colors duration-300 ${
+                className={`relative px-4 py-2 font-medium transition-colors duration-300 ${
                   activeSection === item.id
                     ? 'text-cv-primary'
                     : isScrolled

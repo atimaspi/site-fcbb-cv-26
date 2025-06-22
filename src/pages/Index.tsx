@@ -9,6 +9,7 @@ import GaleriaSection from '@/components/sections/GaleriaSection';
 import ContactoSection from '@/components/sections/ContactoSection';
 import PartnersSection from '@/components/PartnersSection';
 import InteractiveFloatingButtons from '@/components/InteractiveFloatingButtons';
+import StickyNavigation from '@/components/StickyNavigation';
 
 const Index = () => {
   return (
@@ -21,6 +22,7 @@ const Index = () => {
       />
       <div className="min-h-screen flex flex-col">
         <CompactHeader />
+        <StickyNavigation />
         
         <main className="flex-grow">
           {/* Hero Section */}
