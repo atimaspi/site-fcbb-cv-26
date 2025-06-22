@@ -17,7 +17,11 @@ import {
   GraduationCap,
   GamepadIcon,
   Building2,
-  Building
+  Building,
+  Image,
+  Star,
+  Handshake,
+  Sliders
 } from 'lucide-react';
 
 interface MenuItem {
@@ -41,6 +45,13 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
       { id: 'profile', label: 'Perfil', icon: User, permission: null },
     ];
 
+    const contentManagementItems: MenuItem[] = [
+      { id: 'hero-slides', label: 'Slides Banner', icon: Image, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'statistics', label: 'Estatísticas', icon: BarChart3, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'partners', label: 'Parceiros', icon: Handshake, permission: { resource: 'dashboard', action: 'view' } },
+      { id: 'site-settings', label: 'Configurações Site', icon: Sliders, permission: { resource: 'settings', action: 'edit' } },
+    ];
+
     const adminItems: MenuItem[] = [
       { id: 'news', label: 'Notícias', icon: FileText, permission: { resource: 'news', action: 'create' } },
       { id: 'events', label: 'Eventos', icon: Calendar, permission: { resource: 'events', action: 'create' } },
@@ -52,13 +63,17 @@ const AdminSidebar = ({ activeTab, onTabChange }: AdminSidebarProps) => {
       { id: 'coaches', label: 'Treinadores', icon: GraduationCap, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'games', label: 'Jogos', icon: GamepadIcon, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'gallery', label: 'Galeria', icon: Upload, permission: { resource: 'dashboard', action: 'view' } },
-      { id: 'stats', label: 'Estatísticas', icon: BarChart3, permission: { resource: 'dashboard', action: 'view' } },
       { id: 'referees', label: 'Arbitragem', icon: Shield, permission: { resource: 'dashboard', action: 'view' } },
-      { id: 'settings', label: 'Configurações', icon: Settings, permission: { resource: 'settings', action: 'edit' } },
     ];
 
     const filteredItems = [...baseItems];
     
+    // Add content management items if user has admin access
+    if (canAccessAdminArea()) {
+      filteredItems.push(...contentManagementItems);
+    }
+
+    // Add other admin items if user has admin access
     adminItems.forEach(item => {
       if (!item.permission || canAccessAdminArea()) {
         filteredItems.push(item);

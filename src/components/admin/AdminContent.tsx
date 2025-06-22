@@ -9,14 +9,16 @@ import EventsManagement from '@/components/admin/EventsManagement';
 import ClubsManagement from '@/components/admin/ClubsManagement';
 import CompetitionsManagementAdvanced from '@/components/admin/CompetitionsManagementAdvanced';
 import GalleryManagement from '@/components/admin/GalleryManagement';
-import StatisticsManagement from '@/components/admin/StatisticsManagement';
+import StatisticsManagementAdvanced from '@/components/admin/StatisticsManagementAdvanced';
 import RefereesManagement from '@/components/admin/RefereesManagement';
-import SystemSettings from '@/components/admin/SystemSettings';
 import PlayersManagementAdvanced from '@/components/admin/PlayersManagementAdvanced';
 import CoachesManagement from '@/components/admin/CoachesManagement';
 import GamesManagementAdvanced from '@/components/admin/GamesManagementAdvanced';
 import RegionalAssociationsManagement from '@/components/admin/RegionalAssociationsManagement';
 import FederationsManagement from '@/components/admin/FederationsManagement';
+import HeroSlidesManagement from '@/components/admin/HeroSlidesManagement';
+import PartnersManagementAdvanced from '@/components/admin/PartnersManagementAdvanced';
+import SiteSettingsAdvanced from '@/components/admin/SiteSettingsAdvanced';
 
 interface AdminContentProps {
   activeTab: string;
@@ -39,6 +41,30 @@ const AdminContent = memo(({ activeTab }: AdminContentProps) => {
               <AdminUserRegistration />
             </PermissionGuard>
           </div>
+        );
+      case 'hero-slides':
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <HeroSlidesManagement />
+          </PermissionGuard>
+        );
+      case 'statistics':
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <StatisticsManagementAdvanced />
+          </PermissionGuard>
+        );
+      case 'partners':
+        return (
+          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
+            <PartnersManagementAdvanced />
+          </PermissionGuard>
+        );
+      case 'site-settings':
+        return (
+          <PermissionGuard permission={{ resource: 'settings', action: 'edit' }}>
+            <SiteSettingsAdvanced />
+          </PermissionGuard>
         );
       case 'news':
         return (
@@ -100,22 +126,10 @@ const AdminContent = memo(({ activeTab }: AdminContentProps) => {
             <GalleryManagement />
           </PermissionGuard>
         );
-      case 'stats':
-        return (
-          <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
-            <StatisticsManagement />
-          </PermissionGuard>
-        );
       case 'referees':
         return (
           <PermissionGuard permission={{ resource: 'dashboard', action: 'view' }}>
             <RefereesManagement />
-          </PermissionGuard>
-        );
-      case 'settings':
-        return (
-          <PermissionGuard permission={{ resource: 'settings', action: 'edit' }}>
-            <SystemSettings />
           </PermissionGuard>
         );
       default:
