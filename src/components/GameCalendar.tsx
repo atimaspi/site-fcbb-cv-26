@@ -102,7 +102,7 @@ const GameCalendar = () => {
       <div className="fcbb-container">
         <div className="flex justify-between items-center mb-6">
           <h2 className="fcbb-title text-3xl flex items-center">
-            <Calendar className="w-8 h-8 mr-3 text-cv-primary" />
+            <Calendar className="w-8 h-8 mr-3 text-blue-600" />
             Calendário de Jogos
           </h2>
           
@@ -111,7 +111,7 @@ const GameCalendar = () => {
               variant={selectedPeriod === 'today' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedPeriod('today')}
-              className={selectedPeriod === 'today' ? 'fcbb-button-primary' : ''}
+              className={selectedPeriod === 'today' ? 'bg-blue-600 hover:bg-blue-700' : ''}
             >
               Hoje
             </Button>
@@ -119,7 +119,7 @@ const GameCalendar = () => {
               variant={selectedPeriod === 'week' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedPeriod('week')}
-              className={selectedPeriod === 'week' ? 'fcbb-button-primary' : ''}
+              className={selectedPeriod === 'week' ? 'bg-blue-600 hover:bg-blue-700' : ''}
             >
               Esta Semana
             </Button>
@@ -127,7 +127,7 @@ const GameCalendar = () => {
               variant={selectedPeriod === 'month' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedPeriod('month')}
-              className={selectedPeriod === 'month' ? 'fcbb-button-primary' : ''}
+              className={selectedPeriod === 'month' ? 'bg-blue-600 hover:bg-blue-700' : ''}
             >
               Este Mês
             </Button>
@@ -157,11 +157,11 @@ const GameCalendar = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center mb-4">
-                    <div className="team-name text-sm mb-1">
+                    <div className="font-semibold text-sm mb-1 text-gray-800">
                       {game.home_team || 'Equipa Casa'}
                     </div>
                     <div className="text-2xl font-bold text-gray-400 my-2">VS</div>
-                    <div className="team-name text-sm">
+                    <div className="font-semibold text-sm text-gray-800">
                       {game.away_team || 'Equipa Fora'}
                     </div>
                   </div>
@@ -187,7 +187,7 @@ const GameCalendar = () => {
               <h3 className="text-xl font-semibold text-gray-600 mb-2">
                 Nenhum jogo agendado
               </h3>
-              <p className="fcbb-text">
+              <p className="text-gray-700">
                 {selectedPeriod === 'today' 
                   ? 'Não há jogos agendados para hoje'
                   : selectedPeriod === 'week'
@@ -201,7 +201,7 @@ const GameCalendar = () => {
         
         {filteredGames.length > 0 && (
           <div className="text-center mt-8">
-            <Button className="fcbb-button-primary">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
               Ver Calendário Completo
             </Button>
           </div>
