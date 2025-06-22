@@ -1,121 +1,71 @@
 
-/* Enhanced focus styles for accessibility */
+/* High Contrast Mode */
+.high-contrast {
+  --cv-primary: #000000;
+  --cv-secondary: #ffffff;
+  --cv-accent: #ffff00;
+  --cv-white: #ffffff;
+}
+
+.high-contrast * {
+  border-color: #000000 !important;
+}
+
+.high-contrast .bg-cv-blue {
+  background-color: #000000 !important;
+}
+
+.high-contrast .text-cv-blue {
+  color: #000000 !important;
+}
+
+.high-contrast .bg-cv-yellow {
+  background-color: #ffff00 !important;
+}
+
+.high-contrast .text-cv-yellow {
+  color: #ffff00 !important;
+}
+
+.high-contrast .text-white {
+  color: #ffffff !important;
+}
+
+.high-contrast .bg-white {
+  background-color: #ffffff !important;
+}
+
+/* Focus indicators for accessibility */
+.focus\:ring-cv-yellow:focus {
+  --tw-ring-color: #FDB927;
+}
+
+.focus\:ring-offset-cv-blue:focus {
+  --tw-ring-offset-color: #002868;
+}
+
+/* Skip link styles */
+.sr-only:not(:focus):not(:active) {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* Keyboard navigation improvements */
+[tabindex="-1"]:focus:not(:focus-visible) {
+  outline: 0 !important;
+}
+
+/* Improved focus indicators */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-textarea:focus-visible,
 select:focus-visible,
-[tabindex]:focus-visible {
-  outline: 3px solid #003893;
+textarea:focus-visible {
+  outline: 2px solid #FDB927;
   outline-offset: 2px;
-  box-shadow: 0 0 0 2px rgba(0, 56, 147, 0.2);
-  transition: all 0.2s ease;
-}
-
-/* Enhanced high contrast focus for better visibility */
-@media (prefers-contrast: high) {
-  button:focus-visible,
-  a:focus-visible,
-  input:focus-visible,
-  textarea:focus-visible,
-  select:focus-visible,
-  [tabindex]:focus-visible {
-    outline: 4px solid #000000;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
-  }
-
-  .focus-visible-cv {
-    @apply focus-visible:outline-4 focus-visible:outline-black;
-  }
-}
-
-/* Enhanced reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-  
-  .animate-pulse {
-    animation: none;
-  }
-}
-
-/* Enhanced print styles */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-  
-  .print-friendly {
-    @apply bg-white text-black;
-  }
-  
-  /* Ensure good contrast in print */
-  .text-cv-blue, .text-cv-red {
-    color: #000000 !important;
-  }
-  
-  /* Print-specific typography */
-  body {
-    font-size: 12pt;
-    line-height: 1.4;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    page-break-after: avoid;
-  }
-}
-
-/* Enhanced screen reader only content */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Enhanced skip navigation link */
-.skip-nav {
-  position: absolute;
-  top: -40px;
-  left: 6px;
-  background: #003893;
-  color: white;
-  padding: 8px;
-  text-decoration: none;
-  z-index: 100;
-  border-radius: 0 0 4px 4px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.skip-nav:focus {
-  top: 0;
-  box-shadow: 0 2px 8px rgba(0, 56, 147, 0.3);
-}
-
-@layer components {
-  /* Enhanced accessibility improvements */
-  .focus-visible-cv {
-    @apply focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-cv-blue focus-visible:ring-2 focus-visible:ring-cv-blue focus-visible:ring-opacity-50 transition-all duration-200;
-  }
-}
-
-/* hide lovable-related element*/
-a[href*="lovable.dev"], iframe[src*="lovable.dev"], div[style*="Edit with Lovable"], .lovable-badge {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-  position: absolute !important;
-  z-index: -9999 !important;
 }

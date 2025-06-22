@@ -1,5 +1,5 @@
 
-import FibaStyleHeader from '@/components/header/FibaStyleHeader';
+import EnhancedFibaStyleHeader from '@/components/header/EnhancedFibaStyleHeader';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 
@@ -34,7 +34,7 @@ const FibaStyleLayout = ({
         />
       )}
       
-      {showHeader && <FibaStyleHeader />}
+      {showHeader && <EnhancedFibaStyleHeader />}
       
       <main className={`flex-grow ${showHeader ? 'pt-0' : ''}`}>
         {children}
