@@ -186,20 +186,20 @@ const FCBBHeader = () => {
             ))}
           </nav>
 
-          {/* Logo - Alinhado à direita */}
-          <Link to="/" className="flex items-center space-x-3 ml-auto">
+          {/* Logo - Alinhado mais à direita */}
+          <Link to="/" className="flex items-center space-x-4 ml-auto lg:ml-8">
             <div className="flex flex-col text-right">
-              <h1 className="text-2xl font-bold leading-tight text-white">
+              <h1 className="text-2xl lg:text-3xl font-bold leading-tight text-white">
                 FCBB
               </h1>
-              <p className="text-sm leading-tight text-blue-100">
+              <p className="text-sm lg:text-base leading-tight text-blue-100">
                 Federação Cabo-verdiana de Basquetebol
               </p>
             </div>
             <img 
               src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
               alt="FCBB" 
-              className="h-16 w-auto"
+              className="h-16 lg:h-20 w-auto"
             />
           </Link>
 
@@ -276,25 +276,6 @@ const FCBBHeader = () => {
       </div>
     </header>
   );
-
-  function toggleDropdown(itemId: string) {
-    setActiveDropdown(activeDropdown === itemId ? null : itemId);
-  }
-
-  function closeAllDropdowns() {
-    setActiveDropdown(null);
-    setIsMobileMenuOpen(false);
-  }
-
-  // useEffect for handling clicks outside
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setActiveDropdown(null);
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
 };
 
 export default FCBBHeader;
