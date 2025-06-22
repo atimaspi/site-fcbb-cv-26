@@ -9,6 +9,9 @@ import PartnersSection from '@/components/PartnersSection';
 import InteractiveFloatingButtons from '@/components/InteractiveFloatingButtons';
 import StickyNavigation from '@/components/StickyNavigation';
 import Footer from '@/components/Footer';
+import GameResults from '@/components/GameResults';
+import GameCalendar from '@/components/GameCalendar';
+import EnhancedStatsSection from '@/components/EnhancedStatsSection';
 
 const Index = () => {
   return (
@@ -27,6 +30,15 @@ const Index = () => {
           <section id="hero">
             <ModernSlider />
           </section>
+
+          {/* Estatísticas Melhoradas */}
+          <EnhancedStatsSection />
+
+          {/* Resultados de Jogos */}
+          <GameResults />
+
+          {/* Calendário de Jogos */}
+          <GameCalendar />
 
           {/* Sobre Section */}
           <SobreSection />
