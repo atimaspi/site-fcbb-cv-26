@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Menu, X, Lock, Search, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -124,25 +125,8 @@ const FCBBHeader = () => {
       {/* Main Header */}
       <div className="cv-container">
         <div className="flex items-center justify-between h-20">
-          {/* Logo - Melhor alinhamento à esquerda */}
-          <Link to="/" className="flex items-center space-x-3">
-            <img 
-              src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
-              alt="FCBB" 
-              className="h-14 w-auto"
-            />
-            <div className="flex flex-col">
-              <h1 className="text-2xl font-bold leading-tight text-white">
-                FCBB
-              </h1>
-              <p className="text-sm leading-tight text-blue-100">
-                Federação Cabo-verdiana de Basquetebol
-              </p>
-            </div>
-          </Link>
-
           {/* Desktop Navigation - Centralized */}
-          <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-center ml-8">
+          <nav className="hidden lg:flex items-center space-x-1 flex-1">
             {navItems.map((item) => (
               <div key={item.id} className="relative group">
                 {item.href ? (
@@ -201,6 +185,23 @@ const FCBBHeader = () => {
               </div>
             ))}
           </nav>
+
+          {/* Logo - Alinhado à direita */}
+          <Link to="/" className="flex items-center space-x-3 ml-auto">
+            <div className="flex flex-col text-right">
+              <h1 className="text-2xl font-bold leading-tight text-white">
+                FCBB
+              </h1>
+              <p className="text-sm leading-tight text-blue-100">
+                Federação Cabo-verdiana de Basquetebol
+              </p>
+            </div>
+            <img 
+              src="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png" 
+              alt="FCBB" 
+              className="h-16 w-auto"
+            />
+          </Link>
 
           {/* Mobile Menu Button */}
           <button
@@ -275,6 +276,25 @@ const FCBBHeader = () => {
       </div>
     </header>
   );
+
+  function toggleDropdown(itemId: string) {
+    setActiveDropdown(activeDropdown === itemId ? null : itemId);
+  }
+
+  function closeAllDropdowns() {
+    setActiveDropdown(null);
+    setIsMobileMenuOpen(false);
+  }
+
+  // useEffect for handling clicks outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setActiveDropdown(null);
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 };
 
 export default FCBBHeader;

@@ -12,22 +12,42 @@ import EnhancedStatsSection from '@/components/EnhancedStatsSection';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 
 const Index = () => {
-  // Conectar com dados do Supabase
+  // Conectar com todos os dados do Supabase
   const { 
     newsData, 
     clubsData, 
     gamesData, 
     competitionsData, 
     statsData,
+    playersData,
+    refereesData,
+    eventsData,
+    federationsData,
+    regionalAssociationsData,
+    partnersData,
+    heroSlidesData,
+    galleryData,
+    galleryImagesData,
+    siteSettingsData,
     isLoading 
   } = useSupabaseData();
 
-  console.log('Index page - Supabase data:', {
+  console.log('Index page - Todos os dados do Supabase:', {
     news: newsData?.length || 0,
     clubs: clubsData?.length || 0,
     games: gamesData?.length || 0,
     competitions: competitionsData?.length || 0,
     stats: statsData?.length || 0,
+    players: playersData?.length || 0,
+    referees: refereesData?.length || 0,
+    events: eventsData?.length || 0,
+    federations: federationsData?.length || 0,
+    regionalAssociations: regionalAssociationsData?.length || 0,
+    partners: partnersData?.length || 0,
+    heroSlides: heroSlidesData?.length || 0,
+    gallery: galleryData?.length || 0,
+    galleryImages: galleryImagesData?.length || 0,
+    siteSettings: siteSettingsData?.length || 0,
     loading: isLoading
   });
 
