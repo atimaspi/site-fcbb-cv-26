@@ -1,204 +1,156 @@
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Trophy, Users, Calendar, Target, TrendingUp, Award, MapPin, Zap, Star, Activity } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Trophy, Users, Calendar, MapPin, TrendingUp, Star } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const PremiumStatsSection = () => {
-  const [activeCard, setActiveCard] = useState<number | null>(null);
-  const [counters, setCounters] = useState<number[]>([0, 0, 0, 0, 0, 0]);
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['basketball-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('basketball_stats')
+        .select('*')
+        .eq('active', true)
+        .order('order_index', { ascending: true });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
-  const stats = [
-    {
-      icon: Trophy,
-      title: "Competições Ativas",
-      value: 5,
-      displayValue: "5",
-      description: "Liga Nacional, Taça CV, Regionais",
-      trend: "+2 vs ano anterior",
-      color: "from-cv-blue to-blue-600",
-      bgColor: "bg-blue-500/20",
-      borderColor: "border-blue-300/50",
-      glowColor: "shadow-blue-500/30"
-    },
-    {
-      icon: Users,
-      title: "Jogadores Federados",
-      value: 240,
-      displayValue: "240+",
-      description: "Em todas as categorias",
-      trend: "+15% este ano",
-      color: "from-cv-red to-red-600",
-      bgColor: "bg-red-500/20",
-      borderColor: "border-red-300/50",
-      glowColor: "shadow-red-500/30"
-    },
-    {
-      icon: MapPin,
-      title: "Ilhas Representadas",
-      value: 9,
-      displayValue: "9",
-      description: "Cobertura nacional completa",
-      trend: "100% das ilhas",
-      color: "from-cv-yellow to-yellow-500",
-      bgColor: "bg-yellow-500/20",
-      borderColor: "border-yellow-300/50",
-      glowColor: "shadow-yellow-500/30"
-    },
-    {
-      icon: Calendar,
-      title: "Jogos esta Época",
-      value: 180,
-      displayValue: "180+",
-      description: "Todas as competições",
-      trend: "+20 jogos vs 2022/23",
-      color: "from-green-500 to-green-600",
-      bgColor: "bg-green-500/20",
-      borderColor: "border-green-300/50",
-      glowColor: "shadow-green-500/30"
-    },
-    {
-      icon: Award,
-      title: "Árbitros Certificados",
-      value: 45,
-      displayValue: "45",
-      description: "Níveis regional e nacional",
-      trend: "+8 novos este ano",
-      color: "from-purple-500 to-purple-600",
-      bgColor: "bg-purple-500/20",
-      borderColor: "border-purple-300/50",
-      glowColor: "shadow-purple-500/30"
-    },
-    {
-      icon: Zap,
-      title: "Média de Pontos",
-      value: 85.2,
-      displayValue: "85.2",
-      description: "Por jogo na Liga Nacional",
-      trend: "+3.5 vs época passada",
-      color: "from-orange-500 to-orange-600",
-      bgColor: "bg-orange-500/20",
-      borderColor: "border-orange-300/50",
-      glowColor: "shadow-orange-500/30"
-    }
-  ];
+  const getIconComponent = (iconName: string) => {
+    const icons: Record<string, any> = {
+      'trophy': Trophy,
+      'users': Users,
+      'calendar': Calendar,
+      'map-pin': MapPin,
+      'trending-up': TrendingUp,
+      'star': Star
+    };
+    return icons[iconName] || Trophy;
+  };
 
-  // Animated counter effect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCounters(prev => prev.map((count, index) => {
-        const target = stats[index].value;
-        if (count < target) {
-          return Math.min(count + Math.ceil(target / 50), target);
+  const AnimatedCounter = ({ value, duration = 2000 }: { value: string; duration?: number }) => {
+    const [displayValue, setDisplayValue] = useState('0');
+    
+    useEffect(() => {
+      // Extract numeric part for animation
+      const numericMatch = value.match(/(\d+)/);
+      if (!numericMatch) {
+        setDisplayValue(value);
+        return;
+      }
+      
+      const targetNum = parseInt(numericMatch[1]);
+      const increment = targetNum / (duration / 50);
+      let current = 0;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= targetNum) {
+          setDisplayValue(value);
+          clearInterval(timer);
+        } else {
+          const formattedValue = value.replace(/\d+/, Math.floor(current).toString());
+          setDisplayValue(formattedValue);
         }
-        return count;
-      }));
-    }, 50);
+      }, 50);
+      
+      return () => clearInterval(timer);
+    }, [value, duration]);
+    
+    return <span>{displayValue}</span>;
+  };
 
-    return () => clearInterval(interval);
-  }, []);
+  if (isLoading) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-cv-blue/5 to-cv-red/5">
+        <div className="cv-container">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-cv-blue mb-4">Basquetebol em Números</h2>
+            <div className="animate-pulse">
+              <div className="h-4 bg-gray-300 rounded w-96 mx-auto"></div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="p-6">
+                  <div className="h-12 bg-gray-300 rounded mb-4"></div>
+                  <div className="h-6 bg-gray-300 rounded"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cv-blue/5 to-cv-red/5"></div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cv-blue/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cv-red/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-      </div>
-
-      <div className="cv-container relative z-10">
-        <div className="text-center mb-16">
-          <Badge className="mb-6 bg-gradient-to-r from-cv-blue to-cv-red text-white border-none px-6 py-2 text-base">
-            <Star className="mr-2 h-4 w-4" />
-            Estatísticas Premium 2023/24
-          </Badge>
-          <h2 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent mb-6">
+    <section className="py-16 bg-gradient-to-br from-cv-blue/5 to-cv-red/5">
+      <div className="cv-container">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-cv-blue mb-4">
             Basquetebol em Números
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Acompanhe o crescimento extraordinário do basquetebol cabo-verdiano com dados em tempo real
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {stats.map((stat, index) => (
-            <Card
-              key={index}
-              className={`
-                group cursor-pointer transition-all duration-500 hover:scale-105 hover:-translate-y-2
-                bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20
-                ${activeCard === index ? `scale-105 -translate-y-2 ${stat.glowColor} shadow-2xl` : ''}
-                hover:${stat.glowColor} hover:shadow-2xl hover:border-white/40
-              `}
-              onMouseEnter={() => setActiveCard(index)}
-              onMouseLeave={() => setActiveCard(null)}
-            >
-              <CardContent className="p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div className={`p-4 rounded-2xl bg-gradient-to-br ${stat.color} shadow-lg group-hover:rotate-12 transition-transform duration-300`}>
-                    <stat.icon className="h-8 w-8 text-white" />
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <TrendingUp className="h-5 w-5 text-green-400" />
-                    <Activity className="h-4 w-4 text-green-400 animate-pulse" />
-                  </div>
-                </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+          {stats?.map((stat, index) => {
+            const IconComponent = getIconComponent(stat.icon_name || 'trophy');
+            
+            return (
+              <Card 
+                key={stat.id} 
+                className="group relative overflow-hidden bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+              >
+                {/* Animated background gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-cv-blue/10 to-cv-red/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                <div className="space-y-4">
-                  <h3 className="font-bold text-white text-lg group-hover:text-gray-100 transition-colors">
-                    {stat.title}
-                  </h3>
-                  
-                  <div className="flex items-baseline gap-2">
-                    <span className={`text-5xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
-                      {index < counters.length ? (
-                        typeof stat.value === 'number' && stat.value > 10 ? 
-                        counters[index] : stat.displayValue
-                      ) : stat.displayValue}
-                    </span>
-                  </div>
-                  
-                  <p className="text-gray-300 text-sm leading-relaxed">
-                    {stat.description}
-                  </p>
-                  
-                  <Badge 
-                    variant="outline" 
-                    className="text-xs border-green-400/50 text-green-400 bg-green-400/10"
-                  >
-                    {stat.trend}
-                  </Badge>
-                </div>
-
-                {activeCard === index && (
-                  <div className="mt-6 pt-6 border-t border-white/20 animate-fade-in">
-                    <div className="flex items-center justify-between text-xs text-gray-400">
-                      <span className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        Atualizado em tempo real
-                      </span>
-                      <span>●</span>
+                <CardContent className="p-6 text-center relative z-10">
+                  <div className="mb-4">
+                    <div className="w-16 h-16 mx-auto bg-gradient-to-br from-cv-blue to-cv-red rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <IconComponent className="w-8 h-8 text-white" />
                     </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                  
+                  <div className="text-3xl md:text-4xl font-bold text-cv-blue mb-2 group-hover:text-cv-red transition-colors duration-300">
+                    <AnimatedCounter value={stat.stat_value} duration={1500 + index * 200} />
+                  </div>
+                  
+                  <h3 className="font-semibold text-gray-800 mb-2">
+                    {stat.stat_name}
+                  </h3>
+                  
+                  {stat.description && (
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {stat.description}
+                    </p>
+                  )}
+                </CardContent>
+                
+                {/* Decorative corner element */}
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-cv-yellow/20 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </Card>
+            );
+          })}
         </div>
 
-        {/* Bottom CTA Enhanced */}
-        <div className="text-center mt-16">
-          <div className="inline-flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-cv-blue/20 to-cv-red/20 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl">
-            <Target className="h-6 w-6 text-cv-yellow" />
-            <span className="text-lg font-semibold text-white">
-              Dados atualizados a cada 5 minutos
+        {/* Call to action */}
+        <div className="text-center">
+          <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
+            <TrendingUp className="w-5 h-5 text-cv-blue" />
+            <span className="text-sm font-medium text-gray-700">
+              Dados atualizados em tempo real
             </span>
-            <div className="flex space-x-1">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
-            </div>
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           </div>
         </div>
       </div>

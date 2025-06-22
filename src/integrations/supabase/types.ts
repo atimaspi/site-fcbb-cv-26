@@ -51,6 +51,42 @@ export type Database = {
         }
         Relationships: []
       }
+      basketball_stats: {
+        Row: {
+          active: boolean | null
+          description: string | null
+          icon_name: string | null
+          id: string
+          order_index: number | null
+          stat_key: string
+          stat_name: string
+          stat_value: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          order_index?: number | null
+          stat_key: string
+          stat_name: string
+          stat_value: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          order_index?: number | null
+          stat_key?: string
+          stat_name?: string
+          stat_value?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       championships: {
         Row: {
           created_at: string | null
@@ -491,6 +527,48 @@ export type Database = {
           },
         ]
       }
+      hero_slides: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          cta_link: string | null
+          cta_text: string | null
+          description: string | null
+          id: string
+          image_url: string
+          order_index: number | null
+          subtitle: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          cta_link?: string | null
+          cta_text?: string | null
+          description?: string | null
+          id?: string
+          image_url: string
+          order_index?: number | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          cta_link?: string | null
+          cta_text?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string
+          order_index?: number | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       integrations: {
         Row: {
           config: Json
@@ -638,6 +716,42 @@ export type Database = {
           title?: string
           updated_at?: string | null
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      partners: {
+        Row: {
+          active: boolean | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          logo_url: string
+          name: string
+          order_index: number | null
+          website_url: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo_url: string
+          name: string
+          order_index?: number | null
+          website_url?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          logo_url?: string
+          name?: string
+          order_index?: number | null
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -851,6 +965,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_settings: {
+        Row: {
+          description: string | null
+          id: string
+          setting_key: string
+          setting_name: string
+          setting_type: string | null
+          setting_value: string
+          updated_at: string | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_name: string
+          setting_type?: string | null
+          setting_value: string
+          updated_at?: string | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_name?: string
+          setting_type?: string | null
+          setting_value?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       sync_logs: {
         Row: {
