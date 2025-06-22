@@ -69,6 +69,9 @@ export default {
         "cv-yellow": "#ffcc00",
         "cv-dark": "#1a1a1a",
         "cv-light": "#f8f9fa",
+        // FCBB FIBA-style colors
+        "fcbb-blue": "#002868",
+        "fcbb-yellow": "#FDB927",
       },
       screens: {
         'xs': '480px',

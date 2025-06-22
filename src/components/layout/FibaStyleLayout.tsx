@@ -3,7 +3,7 @@ import FibaStyleHeader from '@/components/header/FibaStyleHeader';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 
-interface FCBBLayoutProps {
+interface FibaStyleLayoutProps {
   title?: string;
   children: React.ReactNode;
   description?: string;
@@ -13,7 +13,7 @@ interface FCBBLayoutProps {
   showFooter?: boolean;
 }
 
-const FCBBLayout = ({ 
+const FibaStyleLayout = ({ 
   title, 
   children, 
   description, 
@@ -21,7 +21,7 @@ const FCBBLayout = ({
   image,
   showHeader = true,
   showFooter = true
-}: FCBBLayoutProps) => {
+}: FibaStyleLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-red-50">
       {title && (
@@ -45,4 +45,4 @@ const FCBBLayout = ({
   );
 };
 
-export default FCBBLayout;
+export default FibaStyleLayout;
