@@ -1,8 +1,6 @@
 
-import CompactHeader from '@/components/CompactHeader';
-import Footer from '@/components/Footer';
+import FCBBLayout from '@/components/layout/FCBBLayout';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import SEO from '@/components/SEO';
 import ResponsiveContainer from '@/components/ui/responsive-container';
 import SmoothTransition from '@/components/ui/smooth-transition';
 
@@ -16,47 +14,38 @@ interface PageLayoutProps {
 
 const PageLayout = ({ title, children, description, keywords, image }: PageLayoutProps) => {
   return (
-    <>
-      <SEO 
-        title={title}
-        description={description}
-        keywords={keywords}
-        image={image}
-        url={window.location.pathname}
-      />
-      <div className="min-h-screen flex flex-col">
-        <CompactHeader />
+    <FCBBLayout title={title} description={description} keywords={keywords} image={image}>
+      <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen">
         <Breadcrumbs />
         <main 
           id="main-content" 
-          className="flex-grow"
+          className="pb-16"
           role="main"
           aria-labelledby="page-title"
         >
-          <ResponsiveContainer maxWidth="xl" padding="md" className="py-2">
+          <ResponsiveContainer maxWidth="xl" padding="md" className="py-8">
             <SmoothTransition direction="up" duration={0.3}>
-              <header className="mb-3">
+              <header className="mb-8 text-center">
                 <h1 
                   id="page-title"
-                  className="text-xl md:text-2xl font-bold text-cv-blue mb-1"
+                  className="text-3xl md:text-4xl font-bold text-cv-blue mb-4"
                 >
                   {title}
                 </h1>
                 {description && (
-                  <p className="text-base text-gray-600 max-w-3xl">
+                  <p className="text-lg text-gray-600 max-w-3xl mx-auto">
                     {description}
                   </p>
                 )}
               </header>
-              <section className="space-y-4">
+              <section className="space-y-8">
                 {children}
               </section>
             </SmoothTransition>
           </ResponsiveContainer>
         </main>
-        <Footer />
       </div>
-    </>
+    </FCBBLayout>
   );
 };
 

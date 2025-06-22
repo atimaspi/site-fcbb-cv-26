@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -56,8 +57,12 @@ import SelecaoMasculinaPage from "./pages/teams/SelecaoMasculinaPage";
 import SelecaoFemininaPage from "./pages/teams/SelecaoFemininaPage";
 import SelecoesJovensPage from "./pages/teams/SelecoesJovensPage";
 
+// About pages  
+import HistoriaSobrePage from "./pages/sobre/HistoriaPage";
+import MissaoVisaoSobrePage from "./pages/sobre/MissaoVisaoPage";
+
 // Components
-import FloatingActionButtons from "./components/FloatingActionButtons";
+import InteractiveFloatingButtons from "./components/InteractiveFloatingButtons";
 
 const queryClient = new QueryClient();
 
@@ -118,13 +123,13 @@ const App = () => (
                 <Route path="/selecoes/feminina" element={<SelecaoFemininaPage />} />
                 <Route path="/selecoes/jovens" element={<SelecoesJovensPage />} />
                 
-                {/* New FCBB About routes */}
-                <Route path="/sobre/historia" element={<HistoriaPage />} />
-                <Route path="/sobre/missao-visao" element={<MissaoVisaoPage />} />
+                {/* About FCBB routes */}
+                <Route path="/sobre/historia" element={<HistoriaSobrePage />} />
+                <Route path="/sobre/missao-visao" element={<MissaoVisaoSobrePage />} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              <FloatingActionButtons />
+              <InteractiveFloatingButtons />
             </BrowserRouter>
           </TooltipProvider>
         </AuthProvider>

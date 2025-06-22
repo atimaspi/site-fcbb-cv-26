@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Calendar, Trophy, Users, MessageCircle, ChevronUp, Gamepad2, TrendingUp, Bell } from 'lucide-react';
+import { Calendar, Trophy, Users, MessageCircle, ChevronUp, Gamepad2, TrendingUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -27,42 +27,42 @@ const InteractiveFloatingButtons = () => {
     {
       icon: Calendar,
       label: "Próximos Jogos",
-      color: "bg-gradient-to-r from-cv-blue to-blue-600 hover:from-blue-600 hover:to-cv-blue",
+      color: "bg-gradient-to-r from-cv-blue to-blue-600",
       shadowColor: "hover:shadow-blue-500/50",
       link: "/resultados"
     },
     {
       icon: Trophy,
       label: "Classificações",
-      color: "bg-gradient-to-r from-cv-red to-red-600 hover:from-red-600 hover:to-cv-red",
+      color: "bg-gradient-to-r from-cv-red to-red-600",
       shadowColor: "hover:shadow-red-500/50",
       link: "/classificacoes"
     },
     {
       icon: Gamepad2,
       label: "Ao Vivo",
-      color: "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-500",
+      color: "bg-gradient-to-r from-green-500 to-green-600",
       shadowColor: "hover:shadow-green-500/50",
       link: "/resultados/ao-vivo"
     },
     {
       icon: TrendingUp,
       label: "Estatísticas",
-      color: "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-500",
+      color: "bg-gradient-to-r from-purple-500 to-purple-600",
       shadowColor: "hover:shadow-purple-500/50",
       link: "/estatisticas"
     },
     {
       icon: Users,
       label: "Equipas",
-      color: "bg-gradient-to-r from-cv-yellow to-yellow-500 hover:from-yellow-500 hover:to-cv-yellow text-black",
+      color: "bg-gradient-to-r from-cv-yellow to-yellow-500 text-cv-blue",
       shadowColor: "hover:shadow-yellow-500/50",
       link: "/clubes"
     },
     {
       icon: MessageCircle,
       label: "Contacto",
-      color: "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-500",
+      color: "bg-gradient-to-r from-orange-500 to-orange-600",
       shadowColor: "hover:shadow-orange-500/50",
       link: "/contacto"
     }
@@ -71,7 +71,7 @@ const InteractiveFloatingButtons = () => {
   return (
     <TooltipProvider>
       <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4">
-        {/* Action Buttons with Enhanced Effects */}
+        {/* Action Buttons */}
         <div className={`flex flex-col gap-4 transition-all duration-500 ease-out ${
           isExpanded ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-90 pointer-events-none'
         }`}>
@@ -108,7 +108,7 @@ const InteractiveFloatingButtons = () => {
           ))}
         </div>
 
-        {/* Enhanced Main Toggle Button */}
+        {/* Main Toggle Button */}
         <Button
           size="sm"
           className={`
@@ -129,12 +129,11 @@ const InteractiveFloatingButtons = () => {
             )}
           </div>
           
-          {/* Pulsing Ring Effect */}
           <div className="absolute inset-0 rounded-2xl border-2 border-white/50 animate-ping"></div>
           <div className="absolute inset-0 rounded-2xl bg-white/10"></div>
         </Button>
 
-        {/* Enhanced Scroll to Top Button */}
+        {/* Scroll to Top Button */}
         {showScrollTop && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -157,11 +156,6 @@ const InteractiveFloatingButtons = () => {
             </TooltipContent>
           </Tooltip>
         )}
-
-        {/* Notification Badge */}
-        <div className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-          <Bell className="h-3 w-3 text-white" />
-        </div>
       </div>
     </TooltipProvider>
   );
