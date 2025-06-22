@@ -30,7 +30,7 @@ const FCBBLayout = ({
           description={description}
           keywords={keywords}
           image={image}
-          url={window.location.pathname}
+          url={typeof window !== 'undefined' ? window.location.pathname : '/'}
         />
       )}
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-red-50">

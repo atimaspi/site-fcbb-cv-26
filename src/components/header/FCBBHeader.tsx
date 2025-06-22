@@ -62,7 +62,9 @@ const FCBBHeader = () => {
         { label: 'Seleção Masculina', link: '/selecoes/senior-masculina' },
         { label: 'Seleção Feminina', link: '/selecoes/senior-feminina' },
         { label: 'Sub-18 Masculina', link: '/selecoes/sub-18-masculina' },
-        { label: 'Sub-18 Feminina', link: '/selecoes/sub-18-feminina' }
+        { label: 'Sub-18 Feminina', link: '/selecoes/sub-18-feminina' },
+        { label: 'Sub-16 Masculina', link: '/selecoes/sub-16-masculina' },
+        { label: 'Sub-16 Feminina', link: '/selecoes/sub-16-feminina' }
       ],
       isActive: location.pathname.startsWith('/selecoes')
     },
@@ -73,11 +75,13 @@ const FCBBHeader = () => {
         { label: 'Diretório de Clubes', link: '/clubes' },
         { label: 'Lista Completa', link: '/clubes/completo' },
         { label: 'Transferências', link: '/transferencias' },
-        { label: 'Formação', link: '/formacao' }
+        { label: 'Formação', link: '/formacao' },
+        { label: 'Arbitragem', link: '/arbitragem' }
       ],
       isActive: location.pathname.startsWith('/clubes') || 
                 location.pathname.startsWith('/transferencias') || 
-                location.pathname.startsWith('/formacao')
+                location.pathname.startsWith('/formacao') ||
+                location.pathname.startsWith('/arbitragem')
     },
     { 
       id: 'multimedia', 
@@ -86,12 +90,14 @@ const FCBBHeader = () => {
         { label: 'Notícias', link: '/noticias' },
         { label: 'Galeria', link: '/galeria' },
         { label: 'Vídeos', link: '/videos' },
-        { label: 'Transmissões', link: '/transmissoes' }
+        { label: 'Transmissões', link: '/transmissoes' },
+        { label: 'Área de Imprensa', link: '/imprensa' }
       ],
       isActive: location.pathname.startsWith('/noticias') || 
                 location.pathname.startsWith('/galeria') || 
                 location.pathname.startsWith('/videos') || 
-                location.pathname.startsWith('/transmissoes')
+                location.pathname.startsWith('/transmissoes') ||
+                location.pathname.startsWith('/imprensa')
     }
   ];
 

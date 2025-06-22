@@ -38,9 +38,9 @@ import SobreFCBBPage from "./pages/SobreFCBBPage";
 // Federation pages
 import HistoriaPage from "./pages/federation/HistoriaPage";
 import MissaoVisaoPage from "./pages/federation/MissaoVisaoPage";
-import DirecaoPage from "./pages/federation/DirecaoPage";
-import OrgaosSociaisPage from "./pages/federation/OrgaosSociaisPage";
-import EstatutosPage from "./pages/federation/EstatutosPage";
+import DirecaoPage from "./pages/sobre/DirecaoPage";
+import OrgaosSociaisPage from "./pages/sobre/OrgaosSociaisPage";
+import EstatutosPage from "./pages/sobre/EstatutosPage";
 import ContactosPage from "./pages/federation/ContactosPage";
 
 // Competition pages
@@ -126,6 +126,10 @@ const App = () => (
                 {/* About FCBB routes */}
                 <Route path="/sobre/historia" element={<HistoriaSobrePage />} />
                 <Route path="/sobre/missao-visao" element={<MissaoVisaoSobrePage />} />
+                <Route path="/sobre/direcao" element={<DirecaoPage />} />
+                <Route path="/sobre/orgaos-sociais" element={<OrgaosSociaisPage />} />
+                <Route path="/sobre/estatutos" element={<EstatutosPage />} />
+                <Route path="/sobre/contactos" element={<ContactosPage />} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
