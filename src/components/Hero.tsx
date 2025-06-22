@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo, memo, useCallback } from 'react';
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import SlideItem from '@/components/ui/SlideItem';
 import SlideNavigation from '@/components/ui/SlideNavigation';
-import QuickStatsBar from '@/components/ui/QuickStatsBar';
 
 const Hero = memo(() => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -104,8 +103,6 @@ const Hero = memo(() => {
           onGoToSlide={goToSlide}
         />
       </div>
-
-      <QuickStatsBar />
     </section>
   );
 });
