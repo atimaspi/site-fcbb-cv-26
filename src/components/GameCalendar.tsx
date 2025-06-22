@@ -85,10 +85,10 @@ const GameCalendar = () => {
 
   if (isLoading) {
     return (
-      <div className="fcbb-container">
-        <div className="fcbb-grid fcbb-grid-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="fcbb-skeleton h-40"></div>
+            <div key={i} className="animate-pulse bg-gray-200 rounded-lg h-40"></div>
           ))}
         </div>
       </div>
@@ -98,10 +98,10 @@ const GameCalendar = () => {
   const filteredGames = getGamesByPeriod();
 
   return (
-    <div className="fcbb-section">
-      <div className="fcbb-container">
+    <section className="py-16 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="fcbb-title text-3xl flex items-center">
+          <h2 className="text-3xl font-bold text-blue-900 flex items-center">
             <Calendar className="w-8 h-8 mr-3 text-blue-600" />
             Calendário de Jogos
           </h2>
@@ -134,10 +134,10 @@ const GameCalendar = () => {
           </div>
         </div>
 
-        <div className="fcbb-grid fcbb-grid-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredGames.length > 0 ? (
             filteredGames.map((game) => (
-              <Card key={game.id} className="fcbb-card hover:shadow-lg transition-all">
+              <Card key={game.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-6">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
                     <Badge variant="outline" className="text-xs">
@@ -207,7 +207,7 @@ const GameCalendar = () => {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 
