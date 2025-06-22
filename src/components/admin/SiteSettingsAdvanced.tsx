@@ -20,7 +20,7 @@ const SiteSettingsAdvanced = () => {
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
-    if (settings.length > 0) {
+    if (Array.isArray(settings) && settings.length > 0) {
       const settingsObj = settings.reduce((acc: Record<string, string>, setting: any) => {
         acc[setting.setting_key] = setting.setting_value;
         return acc;
@@ -36,45 +36,63 @@ const SiteSettingsAdvanced = () => {
 
   const handleSave = async (settingKey: string) => {
     try {
-      const setting = settings.find((s: any) => s.setting_key === settingKey);
-      if (setting) {
-        await updateSetting.mutateAsync({
-          id: setting.id,
-          data: { setting_value: formData[settingKey] }
-        });
-        setHasChanges(false);
-        toast({
-          title: "Sucesso",
-          description: "Configuração atualizada com sucesso!",
-        });
+      if (Array.isArray(settings)) {
+        const setting = settings.find((s: any) => s.setting_key === settingKey);
+        if (setting && setting.id) {
+          await updateSetting.mutateAsync({
+            id: setting.id,
+            data: { setting_value: formData[settingKey] }
+          });
+          setHasChanges(false);
+          toast({
+            title: "Sucesso",
+            description: "Configuração atualizada com sucesso!",
+          });
+        }
       }
     } catch (error) {
       console.error('Erro ao salvar configuração:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar configuração",
+        variant: "destructive",
+      });
     }
   };
 
   const handleSaveAll = async () => {
     try {
-      const updates = settings.map((setting: any) => 
-        updateSetting.mutateAsync({
-          id: setting.id,
-          data: { setting_value: formData[setting.setting_key] || setting.setting_value }
-        })
-      );
-      
-      await Promise.all(updates);
-      setHasChanges(false);
-      toast({
-        title: "Sucesso",
-        description: "Todas as configurações foram atualizadas!",
-      });
+      if (Array.isArray(settings)) {
+        const updates = settings.map((setting: any) => 
+          updateSetting.mutateAsync({
+            id: setting.id,
+            data: { setting_value: formData[setting.setting_key] || setting.setting_value }
+          })
+        );
+        
+        await Promise.all(updates);
+        setHasChanges(false);
+        toast({
+          title: "Sucesso",
+          description: "Todas as configurações foram atualizadas!",
+        });
+      }
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar configurações",
+        variant: "destructive",
+      });
     }
   };
 
   if (isLoading) {
     return <div>Carregando configurações...</div>;
+  }
+
+  if (!Array.isArray(settings)) {
+    return <div>Erro ao carregar configurações</div>;
   }
 
   return (
