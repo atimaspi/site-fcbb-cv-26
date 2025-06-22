@@ -61,78 +61,51 @@ const Index = () => {
     >
       {/* Hero Section com slides dinâmicos */}
       <section className="relative">
-        <ModernSlider heroSlides={heroSlidesData} />
+        <ModernSlider />
       </section>
 
       {/* Estatísticas Melhoradas - dados dinâmicos do backend */}
       <section className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 py-16">
-        <EnhancedStatsSection 
-          statistics={statsData}
-          clubs={clubsData}
-          players={playersData}
-          competitions={competitionsData}
-        />
+        <EnhancedStatsSection />
       </section>
 
       {/* Resultados de Jogos - dados dinâmicos */}
       <section className="bg-gradient-to-br from-slate-50 to-blue-50/40 py-16">
         <div className="cv-container">
-          <GameResults 
-            games={gamesData}
-            teams={teamsData}
-            competitions={competitionsData}
-          />
+          <GameResults />
         </div>
       </section>
 
       {/* Calendário de Jogos - dados dinâmicos */}
       <section className="bg-gradient-to-br from-gray-100 to-red-50/40 py-16">
         <div className="cv-container">
-          <GameCalendar 
-            games={gamesData}
-            teams={teamsData}
-            competitions={competitionsData}
-          />
+          <GameCalendar />
         </div>
       </section>
 
       {/* Sobre Section - dados dinâmicos das configurações */}
       <section className="bg-gradient-to-br from-yellow-50 to-amber-50/60 py-16">
-        <SobreSection 
-          federations={federationsData}
-          settings={siteSettingsData}
-        />
+        <SobreSection />
       </section>
 
       {/* Notícias Section - dados dinâmicos */}
       <section className="bg-gradient-to-br from-blue-50 via-indigo-50/50 to-red-50/40 py-16">
-        <NoticiasSection 
-          news={newsData}
-          events={eventsData}
-        />
+        <NoticiasSection />
       </section>
 
       {/* Parceiros Section - dados dinâmicos */}
       <section className="bg-gradient-to-br from-gray-50 to-slate-100/60 py-16">
-        <PartnersSection 
-          partners={partnersData}
-        />
+        <PartnersSection />
       </section>
 
       {/* Galeria Section - dados dinâmicos */}
       <section className="bg-gradient-to-br from-orange-50/60 to-yellow-50/80 py-16">
-        <GaleriaSection 
-          gallery={galleryData}
-          galleryImages={galleryImagesData}
-        />
+        <GaleriaSection />
       </section>
 
       {/* Contacto Section - dados dinâmicos das configurações */}
       <section className="bg-gradient-to-r from-cv-blue to-cv-red py-16 text-white">
-        <ContactoSection 
-          settings={siteSettingsData}
-          federations={federationsData}
-        />
+        <ContactoSection />
       </section>
     </FCBBLayout>
   );
