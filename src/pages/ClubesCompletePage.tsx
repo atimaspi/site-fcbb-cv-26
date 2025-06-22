@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, FileText, CreditCard, Trophy, Download, Plus } from 'lucide-react';
+import { useFederationData } from '@/hooks/useFederationData';
 
 const ClubesCompletePage = () => {
+  const { federationData } = useFederationData();
+
   const registrationSteps = [
     {
       step: 1,
@@ -59,10 +62,8 @@ const ClubesCompletePage = () => {
       description="Diretório de clubes, processos de filiação e informações para associados"
     >
       <div className="space-y-8">
-        {/* Diretório de Clubes */}
         <ClubsDirectory />
         
-        {/* Processo de Filiação */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -122,7 +123,6 @@ const ClubesCompletePage = () => {
           </CardContent>
         </Card>
 
-        {/* Taxas e Emolumentos */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -163,7 +163,6 @@ const ClubesCompletePage = () => {
           </CardContent>
         </Card>
 
-        {/* Benefícios da Filiação */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -183,7 +182,6 @@ const ClubesCompletePage = () => {
           </CardContent>
         </Card>
 
-        {/* Formulários e Downloads */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -219,15 +217,18 @@ const ClubesCompletePage = () => {
           </CardContent>
         </Card>
 
-        {/* Contactos para Filiação */}
         <Card className="bg-cv-blue text-white">
           <CardContent className="p-6">
             <h3 className="font-semibold mb-4">Precisa de Ajuda com a Filiação?</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h4 className="font-medium mb-2">Departamento de Clubes</h4>
-                <p className="text-sm opacity-90">Telefone: +238 261 12 34</p>
-                <p className="text-sm opacity-90">Email: clubes@fcbb.cv</p>
+                <p className="text-sm opacity-90">
+                  Telefone: {federationData?.contact_phone || '+238 261 12 34'}
+                </p>
+                <p className="text-sm opacity-90">
+                  Email: {federationData?.contact_email || 'clubes@fcbb.cv'}
+                </p>
               </div>
               <div>
                 <h4 className="font-medium mb-2">Horário de Atendimento</h4>
