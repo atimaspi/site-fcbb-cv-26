@@ -1,6 +1,4 @@
 
-import CompactHeader from '@/components/CompactHeader';
-import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import ModernSlider from '@/components/ModernSlider';
 import SobreSection from '@/components/sections/SobreSection';
@@ -10,6 +8,7 @@ import ContactoSection from '@/components/sections/ContactoSection';
 import PartnersSection from '@/components/PartnersSection';
 import InteractiveFloatingButtons from '@/components/InteractiveFloatingButtons';
 import StickyNavigation from '@/components/StickyNavigation';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
@@ -21,7 +20,6 @@ const Index = () => {
         url="/"
       />
       <div className="min-h-screen flex flex-col">
-        <CompactHeader />
         <StickyNavigation />
         
         <main className="flex-grow">
