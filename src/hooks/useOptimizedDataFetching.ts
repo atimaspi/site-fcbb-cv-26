@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAdvancedCache } from './useAdvancedCache';
 import { usePerformanceMonitor } from './usePerformanceMonitor';
 import { supabase } from '@/integrations/supabase/client';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 interface QueryOptions {
   select?: string;
@@ -16,6 +16,7 @@ interface QueryOptions {
 export const useOptimizedDataFetching = () => {
   const { getFromCache, setToCache, predictivePreload } = useAdvancedCache();
   const { startRenderMeasure, endRenderMeasure } = usePerformanceMonitor();
+  const subscriptionRef = useRef<any>(null);
 
   // Optimized fetch function with intelligent caching
   const optimizedFetch = useCallback(async (
@@ -128,22 +129,36 @@ export const useOptimizedDataFetching = () => {
     predictivePreload(currentPath);
   }, [predictivePreload]);
 
-  // Real-time subscriptions for critical data
+  // Real-time subscriptions for critical data - com proteção contra múltiplas subscrições
   useEffect(() => {
-    const gamesSubscription = supabase
-      .channel('games-changes')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'games' },
-        () => {
-          // Invalidate games cache on changes
-          console.log('🔄 Games data updated via real-time');
-        }
-      )
-      .subscribe();
+    // Verificar se já existe uma subscrição ativa
+    if (subscriptionRef.current) {
+      return;
+    }
 
-    return () => {
-      gamesSubscription.unsubscribe();
-    };
+    try {
+      const gamesSubscription = supabase
+        .channel('games-changes-unique')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'games' },
+          () => {
+            // Invalidate games cache on changes
+            console.log('🔄 Games data updated via real-time');
+          }
+        )
+        .subscribe();
+
+      subscriptionRef.current = gamesSubscription;
+
+      return () => {
+        if (subscriptionRef.current) {
+          subscriptionRef.current.unsubscribe();
+          subscriptionRef.current = null;
+        }
+      };
+    } catch (error) {
+      console.error('❌ Error setting up real-time subscription:', error);
+    }
   }, []);
 
   return {
