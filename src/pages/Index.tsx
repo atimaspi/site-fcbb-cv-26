@@ -2,12 +2,12 @@
 import CompactHeader from '@/components/CompactHeader';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import EnhancedHeroSection from '@/components/EnhancedHeroSection';
+import FibaStyleHero from '@/components/FibaStyleHero';
+import FibaStyleNews from '@/components/FibaStyleNews';
+import FibaStyleLiveResults from '@/components/FibaStyleLiveResults';
 import PremiumStatsSection from '@/components/PremiumStatsSection';
-import NewsSection from '@/components/NewsSection';
 import CompetitionsSection from '@/components/CompetitionsSection';
 import TeamsSection from '@/components/TeamsSection';
-import UpcomingGames from '@/components/UpcomingGames';
 import PartnersSection from '@/components/PartnersSection';
 import InteractiveFloatingButtons from '@/components/InteractiveFloatingButtons';
 
@@ -23,10 +23,10 @@ const Index = () => {
       <div className="min-h-screen flex flex-col">
         <CompactHeader />
         <main className="flex-grow">
-          <EnhancedHeroSection />
+          <FibaStyleHero />
+          <FibaStyleLiveResults />
+          <FibaStyleNews />
           <PremiumStatsSection />
-          <NewsSection />
-          <UpcomingGames />
           <CompetitionsSection />
           <TeamsSection />
           <PartnersSection />
