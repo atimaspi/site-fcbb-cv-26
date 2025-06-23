@@ -5,11 +5,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Phone, Mail, Globe, Users, Search, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { useBackendData } from '@/hooks/useBackendData';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const ClubsDirectory = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { clubs, clubsLoading, clubsError } = useBackendData();
+
+  // Fetch clubs directly from Supabase
+  const { data: clubs, isLoading: clubsLoading, error: clubsError } = useQuery({
+    queryKey: ['clubs'],
+    queryFn: async () => {
+      console.log('Fetching clubs from Supabase...');
+      const { data, error } = await supabase
+        .from('clubs')
+        .select('*')
+        .order('name');
+      
+      if (error) {
+        console.error('Error fetching clubs:', error);
+        throw error;
+      }
+      
+      console.log('Clubs fetched successfully:', data);
+      return data || [];
+    }
+  });
 
   if (clubsLoading) {
     return (
@@ -33,6 +53,9 @@ const ClubsDirectory = () => {
           <p className="text-gray-500">
             Não foi possível carregar os dados dos clubes.
           </p>
+          <p className="text-sm text-red-500 mt-2">
+            {clubsError.message}
+          </p>
         </CardContent>
       </Card>
     );
@@ -45,6 +68,8 @@ const ClubsDirectory = () => {
   ) || [];
 
   const islands = [...new Set(clubs?.map(club => club.island).filter(Boolean) || [])];
+
+  console.log('Rendering clubs:', filteredClubs);
 
   return (
     <div className="space-y-6">
@@ -149,6 +174,11 @@ const ClubsDirectory = () => {
             <p className="text-gray-500">
               {searchTerm ? 'Tente ajustar os termos de pesquisa.' : 'Não há clubes registados na base de dados.'}
             </p>
+            {clubs && clubs.length > 0 && (
+              <p className="text-sm text-blue-600 mt-2">
+                Total de clubes na base de dados: {clubs.length}
+              </p>
+            )}
           </CardContent>
         </Card>
       )}
