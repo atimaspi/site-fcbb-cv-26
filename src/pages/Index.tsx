@@ -1,6 +1,6 @@
 
 import FCBBLayout from '@/components/layout/FCBBLayout';
-import ModernSlider from '@/components/ModernSlider';
+import EnhancedFCBBSlider from '@/components/EnhancedFCBBSlider';
 import SobreSection from '@/components/sections/SobreSection';
 import NoticiasSection from '@/components/sections/NoticiasSection';
 import GaleriaSection from '@/components/sections/GaleriaSection';
@@ -59,51 +59,51 @@ const Index = () => {
       description="Site oficial da Federação Cabo-verdiana de Basquetebol. Acompanhe as últimas notícias, resultados, classificações e competições do basquetebol cabo-verdiano."
       keywords="FCBB, basquetebol, Cabo Verde, federação, liga nacional, competições, resultados"
     >
-      {/* Hero Section com slides dinâmicos */}
+      {/* Enhanced Hero Section */}
       <section className="relative">
-        <ModernSlider />
+        <EnhancedFCBBSlider />
       </section>
 
-      {/* Estatísticas Melhoradas - dados dinâmicos do backend */}
+      {/* Estatísticas Melhoradas */}
       <section className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 py-16">
         <EnhancedStatsSection />
       </section>
 
-      {/* Resultados de Jogos - dados dinâmicos */}
+      {/* Resultados de Jogos */}
       <section className="bg-gradient-to-br from-slate-50 to-blue-50/40 py-16">
         <div className="cv-container">
           <GameResults />
         </div>
       </section>
 
-      {/* Calendário de Jogos - dados dinâmicos */}
+      {/* Calendário de Jogos */}
       <section className="bg-gradient-to-br from-gray-100 to-red-50/40 py-16">
         <div className="cv-container">
           <GameCalendar />
         </div>
       </section>
 
-      {/* Sobre Section - dados dinâmicos das configurações */}
+      {/* Sobre Section */}
       <section className="bg-gradient-to-br from-yellow-50 to-amber-50/60 py-16">
         <SobreSection />
       </section>
 
-      {/* Notícias Section - dados dinâmicos */}
+      {/* Notícias Section */}
       <section className="bg-gradient-to-br from-blue-50 via-indigo-50/50 to-red-50/40 py-16">
         <NoticiasSection />
       </section>
 
-      {/* Parceiros Section - dados dinâmicos */}
+      {/* Parceiros Section */}
       <section className="bg-gradient-to-br from-gray-50 to-slate-100/60 py-16">
         <PartnersSection />
       </section>
 
-      {/* Galeria Section - dados dinâmicos */}
+      {/* Galeria Section */}
       <section className="bg-gradient-to-br from-orange-50/60 to-yellow-50/80 py-16">
         <GaleriaSection />
       </section>
 
-      {/* Contacto Section - dados dinâmicos das configurações */}
+      {/* Contacto Section */}
       <section className="bg-gradient-to-r from-cv-blue to-cv-red py-16 text-white">
         <ContactoSection />
       </section>
