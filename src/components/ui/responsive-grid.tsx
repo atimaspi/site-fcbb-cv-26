@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -24,10 +23,9 @@ const ResponsiveGrid: React.FC<ResponsiveGridProps> = ({
   gap = 'md',
   adaptive = true
 }) => {
-  const { getCurrentBreakpoint, isMobile } = useResponsive();
+  const { breakpoint, isMobile } = useResponsive();
 
   const getColumns = () => {
-    const breakpoint = getCurrentBreakpoint();
     return cols[breakpoint] || cols.lg || 3;
   };
 
