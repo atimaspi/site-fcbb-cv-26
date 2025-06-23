@@ -13,8 +13,18 @@ interface PageLayoutProps {
 }
 
 const PageLayout = ({ title, children, description, keywords, image }: PageLayoutProps) => {
+  const breadcrumbs = [
+    { name: 'Início', url: '/' },
+    { name: title, url: window.location.pathname }
+  ];
+
   return (
-    <FCBBLayout title={title} description={description} keywords={keywords} image={image}>
+    <FCBBLayout 
+      title={title} 
+      description={description} 
+      keywords={keywords} 
+      image={image}
+    >
       <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen">
         <Breadcrumbs />
         <main 
@@ -38,7 +48,7 @@ const PageLayout = ({ title, children, description, keywords, image }: PageLayou
                   </p>
                 )}
               </header>
-              <section className="space-y-8">
+              <section className="space-y-8" aria-label={`Conteúdo da página ${title}`}>
                 {children}
               </section>
             </SmoothTransition>

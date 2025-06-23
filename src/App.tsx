@@ -7,6 +7,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { InternationalizationProvider } from '@/contexts/InternationalizationContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import ErrorMonitoring from '@/components/analytics/ErrorMonitoring';
 
 // Pages
 import Index from "./pages/Index";
@@ -72,6 +74,8 @@ const App = () => (
         <InternationalizationProvider>
           <AuthProvider>
             <TooltipProvider>
+              <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
+              <ErrorMonitoring enabled={true} />
               <Toaster />
               <Sonner />
               <BrowserRouter>

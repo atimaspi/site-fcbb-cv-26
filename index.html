@@ -7,30 +7,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FCBB - Federação Cabo-verdiana de Basquetebol</title>
     
-    <!-- Google Fonts -->
+    <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    
+    <!-- Google Fonts with optimized loading -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Meta tags for SEO -->
-    <meta name="description" content="Site oficial da Federação Cabo-verdiana de Basquetebol. Acompanhe as últimas notícias, resultados e competições do basquetebol cabo-verdiano.">
-    <meta name="keywords" content="FCBB, basquetebol, Cabo Verde, federação, liga nacional, competições">
-    <meta name="author" content="FCBB">
+    <!-- Enhanced Meta tags for SEO -->
+    <meta name="description" content="Site oficial da Federação Cabo-verdiana de Basquetebol. Acompanhe as últimas notícias, resultados, classificações e competições do basquetebol cabo-verdiano.">
+    <meta name="keywords" content="FCBB, basquetebol, Cabo Verde, federação, liga nacional, competições, resultados, seleção nacional, clubes">
+    <meta name="author" content="FCBB - Federação Cabo-verdiana de Basquetebol">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="pt-CV">
+    <meta name="geo.region" content="CV">
+    <meta name="geo.country" content="Cape Verde">
+    <meta name="geo.placename" content="Praia, Santiago">
     
     <!-- Open Graph tags -->
     <meta property="og:title" content="FCBB - Federação Cabo-verdiana de Basquetebol">
-    <meta property="og:description" content="Site oficial da Federação Cabo-verdiana de Basquetebol">
+    <meta property="og:description" content="Site oficial da Federação Cabo-verdiana de Basquetebol com notícias, competições e resultados atualizados.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fcbb.cv">
     <meta property="og:image" content="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="pt_CV">
+    <meta property="og:site_name" content="FCBB">
     
     <!-- Twitter Card tags -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@fcbb_oficial">
     <meta name="twitter:title" content="FCBB - Federação Cabo-verdiana de Basquetebol">
     <meta name="twitter:description" content="Site oficial da Federação Cabo-verdiana de Basquetebol">
     <meta name="twitter:image" content="/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="msapplication-TileColor" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="FCBB">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SportsOrganization",
+      "name": "Federação Cabo-verdiana de Basquetebol",
+      "alternateName": "FCBB",
+      "url": "https://fcbb.cv",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://fcbb.cv/lovable-uploads/8c0e50b0-b06a-42cf-b3fc-9a08063308b3.png"
+      },
+      "description": "Federação oficial de basquetebol de Cabo Verde, organizando competições nacionais e representando o país internacionalmente.",
+      "sport": "Basketball",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "CV",
+        "addressLocality": "Praia",
+        "addressRegion": "Santiago"
+      },
+      "sameAs": [
+        "https://www.facebook.com/fcbb.oficial",
+        "https://www.instagram.com/fcbb_oficial",
+        "https://twitter.com/fcbb_oficial"
+      ],
+      "foundingDate": "1986",
+      "memberOf": {
+        "@type": "Organization",
+        "name": "FIBA Africa"
+      }
+    }
+    </script>
+    
+    <!-- Skip to main content link for accessibility -->
+    <style>
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: #000;
+        color: #fff;
+        padding: 8px;
+        text-decoration: none;
+        z-index: 1000;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .skip-link:focus {
+        top: 6px;
+      }
+    </style>
   </head>
   <body>
+    <!-- Skip to main content for screen readers -->
+    <a href="#main-content" class="skip-link">Saltar para o conteúdo principal</a>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
