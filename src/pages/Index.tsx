@@ -9,6 +9,7 @@ import PartnersSection from '@/components/PartnersSection';
 import GameResults from '@/components/GameResults';
 import GameCalendar from '@/components/GameCalendar';
 import EnhancedStatsSection from '@/components/EnhancedStatsSection';
+import SocialFeed from '@/components/social/SocialFeed';
 import { useSupabaseData } from '@/hooks/useSupabaseData';
 
 const Index = () => {
@@ -91,6 +92,13 @@ const Index = () => {
       {/* Notícias Section */}
       <section className="bg-gradient-to-br from-blue-50 via-indigo-50/50 to-red-50/40 py-16">
         <NoticiasSection />
+      </section>
+
+      {/* Redes Sociais Section */}
+      <section className="bg-gradient-to-br from-purple-50 to-pink-50/60 py-16">
+        <div className="cv-container">
+          <SocialFeed maxPosts={3} />
+        </div>
       </section>
 
       {/* Parceiros Section */}

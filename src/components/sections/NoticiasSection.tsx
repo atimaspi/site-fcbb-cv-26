@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
+import SocialShare from '@/components/ui/social-share';
 
 const NoticiasSection = () => {
   const { newsData, isContentLoading } = useContentData();
@@ -167,8 +168,8 @@ const NoticiasSection = () => {
                     )}
                   </div>
                   
-                  {/* Read More */}
-                  <div className="mt-4">
+                  {/* Actions */}
+                  <div className="mt-4 flex items-center justify-between">
                     <motion.button 
                       className="flex items-center space-x-2 text-cv-blue hover:text-blue-700 font-semibold text-sm group/btn"
                       whileHover={{ x: 5 }}
@@ -181,6 +182,13 @@ const NoticiasSection = () => {
                         <ArrowRight className="w-4 h-4" />
                       </motion.div>
                     </motion.button>
+                    
+                    <SocialShare
+                      url={`${window.location.origin}/noticias/${item.id}`}
+                      title={item.title}
+                      description={item.excerpt}
+                      variant="compact"
+                    />
                   </div>
                 </CardContent>
 

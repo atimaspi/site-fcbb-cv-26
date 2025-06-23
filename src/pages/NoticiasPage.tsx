@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import SocialShare from '@/components/ui/social-share';
 import PageLayout from './PageLayout';
 
 const NoticiasPage = () => {
@@ -96,8 +97,16 @@ const NoticiasPage = () => {
                 <button className="text-cv-blue font-medium hover:text-blue-700 transition-colors text-sm">
                   Ler mais
                 </button>
-                <div className="flex items-center text-gray-400">
-                  <Eye className="w-3 h-3" />
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center text-gray-400">
+                    <Eye className="w-3 h-3" />
+                  </div>
+                  <SocialShare
+                    url={`${window.location.origin}/noticias/${noticia.id}`}
+                    title={noticia.title}
+                    description={noticia.excerpt}
+                    variant="compact"
+                  />
                 </div>
               </div>
             </CardContent>

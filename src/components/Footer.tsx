@@ -1,17 +1,11 @@
 
-import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin, ExternalLink, Trophy, Users, Calendar } from "lucide-react";
+import { Mail, Phone, MapPin, ExternalLink, Trophy, Users, Calendar } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import SocialLinks from '@/components/social/SocialLinks';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-
-  const socialLinks = [
-    { icon: Facebook, href: "https://facebook.com/fcbb.cv", label: "Facebook" },
-    { icon: Instagram, href: "https://instagram.com/fcbb.cv", label: "Instagram" },
-    { icon: Twitter, href: "https://twitter.com/fcbb_oficial", label: "Twitter" },
-    { icon: Youtube, href: "https://youtube.com/@fcbb.cv", label: "YouTube" }
-  ];
 
   const quickLinks = [
     { label: 'História da FCBB', path: '/sobre/historia' },
@@ -83,25 +77,7 @@ const Footer = () => {
               </p>
               
               {/* Social Links */}
-              <div className="flex space-x-4">
-                {socialLinks.map((social, index) => (
-                  <motion.a 
-                    key={social.label}
-                    href={social.href} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="w-12 h-12 bg-white/10 hover:bg-cv-blue rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 group backdrop-blur-sm border border-white/20"
-                    whileHover={{ y: -2 }}
-                    initial={{ opacity: 0, scale: 0 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    aria-label={social.label}
-                  >
-                    <social.icon className="w-5 h-5 text-white group-hover:text-cv-yellow transition-colors" />
-                  </motion.a>
-                ))}
-              </div>
+              <SocialLinks variant="footer" size="md" animated={true} />
             </motion.div>
             
             {/* Quick Links */}
